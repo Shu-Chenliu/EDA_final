@@ -128,7 +128,9 @@ pair<int,pair<set<string>,set<string>>> cost(set<string> c){
 	return {totalCost,{c,c}};
 }
 vector<set<string>> MBFFgeneration::generateMBFF(){
+	cout << "[DEBUG] Start MBFF Generation" << endl;
 	for (int strength = 1; strength <= maxDrivingStrength; ++strength) {
+		cout << "  -> Trying driving strength: " << strength << endl;
 		vector<Rect> regions;
 		// Build feasible regions
 		for (FF* ff : flipflops) {
@@ -137,14 +139,17 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 			region.name = ff->name;
 			regions.push_back(region);
 		}
+		cout << "    Collected " << regions.size() << " feasible regions." << endl;
 		//TODO: add total driving strength
 		vector<set<string>> cliques = findMaximalCliquesSweepLine(regions);
+		cout << "    Found " << cliques.size() << " maximal cliques." << endl;
 		// Store the cliques
 		for(set<string> clique:cliques){
 			mbff_candidates.push_back(clique);
 		}
 		
 	}
+	cout << "  => Total MBFF candidates: " << mbff_candidates.size() << endl;
 	priority_queue<pair<int,pair<set<string>,set<string>>>,vector<pair<int,pair<set<string>,set<string>>>>,greater<pair<int,pair<set<string>,set<string>>>>> pq;
 	vector<set<string>> non_conflictMBFF;
 	for(const auto& maxclique:mbff_candidates){
@@ -163,6 +168,7 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 		}
 		if(isValid){
 			non_conflictMBFF.push_back(m.second.first);
+			cout << "  [Selected MBFF] with " << m.second.first.size() << " FFs." << endl;
 			for(const auto& ff:m.second.first){
 				marked.insert(ff);
 			}
@@ -174,6 +180,7 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 			pq.push(cost(m.second.second));
 		}
 	}
+	cout << "[DEBUG] Final selected MBFF count: " << non_conflictMBFF.size() << endl;
 	return non_conflictMBFF;
 }
 int weightedMedian(vector<pair<int, int>>& coords_weights) {
@@ -226,6 +233,7 @@ vector<Bin> generateBins(Rect chip_area, int bin_width, int bin_height) {
 	return bins;
 }
 void assignMBFFLocation(MBFF& mbff, vector<Bin>& bins) {
+	cout << "  [Bin Assignment] For MBFF with " << mbff.members.size() << " members" << endl;
 	for (auto& bin : bins) {
 		if (bin.area.intersects(mbff.preferred_region)) {
 			bin.rank = 0;

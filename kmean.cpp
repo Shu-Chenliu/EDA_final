@@ -1,6 +1,3 @@
-// g++ kmean.cpp -o kmean
-// .kmean
-
 #include <iostream>
 #include <vector>
 #include <cmath>
