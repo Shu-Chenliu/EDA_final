@@ -36,17 +36,17 @@ class board{
     void setArea(double A);
 
     // Getter
-    double getW();
-    double getH();
-    double getBinW();
-    double getBinW();
+    double getW() const;
+    double getH() const;
+    double getBinW() const;
+    double getBinW() const;
 
-    double setAlpha(double A);
-    double setBeta(double B);
-    double setGamma(double C);
-    double setTNS(double tns);
-    double setTPO(double tpo);
-    double setArea(double A);
+    double setAlpha() const;
+    double setBeta() const;
+    double setGamma() const;
+    double setTNS() const;
+    double setTPO() const;
+    double setArea() const;
 };
 
 #endif
