@@ -4,24 +4,20 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <unordered_map>
 #include "Coor.h"
+#include "Pin.h"
 using namespace std;
 
 class Cell {
   private:
     string name;
-    string type;  // change?
     Coor coor;
     double w;
     double h;
     double power;
     double delay;
-    int bit;
 
-    int pinNum;
-    vector<string> pinNames;
-    unordered_map<string, Coor> pinCoorMap;
+    vector<Pin> pins;
 
   public:
     Cell();
@@ -29,7 +25,6 @@ class Cell {
 
     // Setter
     void setName(string Name);
-    void setType(string Type);
     void setX(double X);
     void setY(double Y);
     void setCoor(double X, double Y);
@@ -38,14 +33,12 @@ class Cell {
     void setH(double H);
     void setPower(double p);
     void setDelay(double d);
-    void setBit(int b);
 
-    void setPinNum(int n);
-    void addPins(const string &Name, const Coor &Coor);
+    void setPins(Pin &pins);
+    void addPins(Pin &pins);
 
     // Getter
     string getName() const;
-    string getType() const;
     double getX() const;
     double getY() const;
 
@@ -53,12 +46,9 @@ class Cell {
     double getH() const;
     double getPower() const;
     double getDelay() const;
-    int getBit() const;
 
     int getPinNum() const;
-    const string &getPinNames() const;
-    const Coor &getPinCoor(const string &pinName) const;
-    unordered_map<string, Coor> &getPinCoorMap() const;
+    const Pin &getPins() const;
 };
 
 #endif

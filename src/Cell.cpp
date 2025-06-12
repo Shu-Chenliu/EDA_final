@@ -6,19 +6,13 @@ Cell::Cell :
   w(0),
   h(0),
   delay(0),
-  power(0),
-  bit(0),
-  pinNum(0){}
+  power(0){}
 
 Cell::~Cell(){}
 
 // Setter
 void Cell::setName(string Name){
   name = Name;
-}
-
-void Cell::setType(string Type){
-  type = type;
 }
 
 void Cell::setX(double X){
@@ -49,28 +43,17 @@ void Cell::setDelay(double d){
   delay = d;
 }
 
-void Cell::setBit(int b){
-  bit = b;
+void Cell::setPins(Pin &Pins){
+  pins = Pins;
 }
 
-void Cell::setPinNum(int n){ 
-  pinNum = n;
-} // add one of this which is auto?(count & set)
-
-void addPins(const string &Name, const Coor &Coor){
-  pinNames.insert(end(pinNames), begin(Name), end(Name));
-  for (int i=0; i<Name.size; i++){
-    pinCoorMap.insert(pair<string, Coor>(Name[i], Coor[i]));
-  }
+void Cell::addPins(Pin &Pins){
+  pins.insert(end(pins), begin(Pins), end(Pins));
 }
 
 // Getter
 string Cell::getName() const{
   return name;
-}
-
-string Cell::getType() const{
-  return type;
 }
 
 double Cell::getX() const{
@@ -97,26 +80,10 @@ double Cell::getDelay() const{
   return delay;
 }
 
-int Cell::getBit() const{
-  return bit;
-}
-
 int Cell::getPinNum() const{
-  return pinNum;
+  return pins.size();
 }
 
-const string &Cell::getPinNames() const{
-  return pinNames;
-}
-
-const Coor &Cell::getPinCoor(const string &pinName) const{
-  auto pinCoor = pinCoorMap.find(pinName);
-  if (pinCoor == pinCoorMap.end()){
-    cout << pinName << " not found in " << name;
-  }
-  return pinCoor;
-}
-
-unordered_map<string, Coor> &Cell::getPinCoorMap() const{
-  return pinCoorMap;
+const Pin &Cell::getPins() const{
+  return pins;
 }
