@@ -9,8 +9,8 @@
 #include <algorithm>
 #include <cstdlib>
 #include <set>
-#include <MBFFgeneration.h>
-#include <classes.cpp>
+#include "MBFFgeneration.h"
+#include "classes.cpp"
 using namespace std;
 
 
