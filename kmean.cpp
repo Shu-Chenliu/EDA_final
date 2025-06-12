@@ -229,15 +229,54 @@ vector<Cluster> kmeansWeighted(vector<FF*>& flip_flops) {
 
 int main() {
     vector<FF*> flip_flops = {
-        new FF{10, 10}, new FF{12, 11}, new FF{11, 9}, new FF{9, 12},
-        new FF{20, 20}, new FF{22, 21}, new FF{23, 19},
-        new FF{100, 100}, new FF{101, 99}, new FF{99, 102}, new FF{102, 101},
-        new FF{250, 250}, new FF{251, 249},
-        new FF{60, 305}, new FF{62, 307}, new FF{61, 303}, new FF{59, 308},
-        new FF{80, 405}, new FF{82, 407}, new FF{81, 403}, new FF{79, 408},
-        new FF{300, 300}, new FF{302, 301}, new FF{301, 299}, new FF{299, 302},
-        new FF{400, 400}, new FF{402, 401}, new FF{401, 399}, new FF{399, 402}
+        new FF(1, 10, 10, "ff0",
+            { Pin{ Point(5, 5), 10.0, 2 } },            // fanins
+            { Pin{ Point(15, 15), 8.0, 3 } }            // fanouts
+        ),
+        new FF(1, 12, 11, "ff1",
+            { Pin{ Point(11, 10), 7.0, 1 } },
+            { Pin{ Point(16, 16), 9.0, 2 } }
+        ),
+        new FF(1, 11, 9,  "ff2"),
+        new FF(1, 9,  12, "ff3"),
+
+        new FF(1, 20, 20, "ff4"),
+        new FF(1, 22, 21, "ff5"),
+        new FF(1, 23, 19, "ff6"),
+
+        new FF(1, 100, 100, "ff7"),
+        new FF(1, 101, 99,  "ff8"),
+        new FF(1, 99,  102, "ff9"),
+        new FF(1, 102, 101, "ff10"),
+
+        new FF(1, 250, 250, "ff11"),
+        new FF(1, 251, 249, "ff12"),
+
+        new FF(1, 60, 305, "ff13"),
+        new FF(1, 62, 307, "ff14"),
+        new FF(1, 61, 303, "ff15"),
+        new FF(1, 59, 308, "ff16"),
+
+        new FF(1, 80, 405, "ff17"),
+        new FF(1, 82, 407, "ff18"),
+        new FF(1, 81, 403, "ff19"),
+        new FF(1, 79, 408, "ff20"),
+
+        new FF(1, 300, 300, "ff21"),
+        new FF(1, 302, 301, "ff22"),
+        new FF(1, 301, 299, "ff23"),
+        new FF(1, 299, 302, "ff24"),
+
+        new FF(1, 400, 400, "ff25"),
+        new FF(1, 402, 401, "ff26"),
+        new FF(1, 401, 399, "ff27"),
+        new FF(1, 399, 402, "ff28")
     };
+    for (int i = 0; i < flip_flops.size(); ++i) {
+        cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
+             << "), cluster=" << flip_flops[i]->cluster
+             << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
+    }
     SIZE_LIMIT = flip_flops.size() / 3 ; // Example size limit for clusters
     MAX_ITER = flip_flops.size() * 2; // Example maximum iterations
 

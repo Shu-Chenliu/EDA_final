@@ -75,6 +75,9 @@ struct FF {
 	Point position;
 	vector<Pin> fanins;
 	vector<Pin> fanouts;
+	FF(int drive, double x, double y, const string& n = "",const vector<Pin>& fi = {}, const vector<Pin>& fo = {})
+		: original_drive(drive), position(x, y), name(n),
+			fanins(fi), fanouts(fo) {}
 };
 
 struct Cluster {

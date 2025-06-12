@@ -261,8 +261,10 @@ void assignMBFFLocation(MBFF& mbff, vector<Bin>& bins) {
 
 	if (best_bin) {
 		best_bin->occupied = true;
-		// 記錄該 MBFF 的位置（可再加 slot size）
-		mbff.feasible_region = best_bin->area; // or assign a "slot" inside
+		mbff.feasible_region = best_bin->area;
+		cout << "    Assigned to bin (" << best_bin->x_idx << "," << best_bin->y_idx << ") rank = " << best_bin->rank << endl;
+	} else {
+		cout << "    [Warning] No available bin found!" << endl;
 	}
 }
 Rect MBFFgeneration::feasibleRegionForClique(MBFF mbff){
@@ -278,11 +280,15 @@ Rect MBFFgeneration::feasibleRegionForClique(MBFF mbff){
 	return Rect(new_x_min,new_x_max,new_y_min,new_y_max);
 }
 vector<MBFF> MBFFgeneration::locationAssignment(Rect chip_area) {
+	cout << "[DEBUG] Start MBFF Location Assignment" << endl;
 	int bin_width = 20, bin_height = 20;
 	vector<Bin> bins = generateBins(chip_area, bin_width, bin_height);
+	cout << "  -> Total bins generated: " << bins.size() << endl;
 	vector<set<string>> non_conflictMBFF=generateMBFF();
 	vector<MBFF> placed_mbffs;
+	int count = 0;
 	for (auto& clique : non_conflictMBFF) {
+		cout << "  [MBFF#" << (++count) << "] Placing..." << endl;
 		MBFF mbff;
 		mbff.members = clique;
 
@@ -298,6 +304,7 @@ vector<MBFF> MBFFgeneration::locationAssignment(Rect chip_area) {
 
 		placed_mbffs.push_back(mbff);
 	}
+	cout << "[DEBUG] All MBFFs placed: " << placed_mbffs.size() << endl;
 	return placed_mbffs;
 }
 void downsizeMBFFs(vector<MBFF>& mbffs, double avg_slack, double beta) {
@@ -339,5 +346,6 @@ double computeAvgSlack(const vector<MBFF>& mbffs) {
 }
 void MBFFgeneration::MBFFsizing(vector<MBFF>& mbffs){
 	double avg_slack = computeAvgSlack(mbffs);
+	cout << "[DEBUG] Average Slack: " << avg_slack << endl;
 	downsizeMBFFs(mbffs, avg_slack,beta);
 }
