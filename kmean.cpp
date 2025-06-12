@@ -10,7 +10,6 @@
 #include <cstdlib>
 #include <set>
 #include "MBFFgeneration.h"
-#include "classes.cpp"
 using namespace std;
 
 
@@ -144,8 +143,8 @@ void relocateFlops(vector<FF*>& flip_flops, vector<Cluster>& clusters) {
         int py = round(c.cy);
 
         // Sort flops by criticality (distance to center, descending)
-        sort(c.flip_flops.begin(), c.flip_flops.end(), [&](int a, int b) {
-            return manhattanDist(flip_flops[a], c) > manhattanDist(flip_flops[b], c);
+        sort(c.flip_flops.begin(), c.flip_flops.end(), [&](FF* a, FF* b) {
+            return manhattanDist(a, c) > manhattanDist(b, c);
         });
 
         set<pair<int, int>> used;
