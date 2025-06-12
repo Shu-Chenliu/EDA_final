@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace std;
 
-class Coor {
+class Coor{
   private:
     double x;
     double y;
@@ -23,7 +23,6 @@ class Coor {
 
     Coor Operator+(const Coor that) const;
     Coor Operator-(const Coor that) const;
-    
 };
 
 #endif

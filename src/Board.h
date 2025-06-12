@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace std;
 
-class board{
+class Board{
   private:
     double w;
     double h;

@@ -12,6 +12,8 @@ Board::Board() :
   TPO(0),
   area(1){}
 
+Board::~Board(){}
+
 // Setter
 void Board::setW(double W){
   w = W;

@@ -1,15 +1,15 @@
 #include "Coor.h"
 
-Coor::Coor(){
-  x = -1;
-  y = -1;
-}
+Coor::Coor() : 
+  x(-1), 
+  y(-1){}
+
 Coor::Coor(double X, double Y){
   x = X;
   y = Y;
 }
 
-Coor::~Coor(){ }
+Coor::~Coor(){}
 
 void Coor::setX(double X){
   x = X

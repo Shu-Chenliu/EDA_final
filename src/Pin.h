@@ -10,7 +10,7 @@ class Pin{
   private:
     string name;
     Coor coor;
-    int SR;
+    int SR;  // switching rate
     double slack;
 
   public:
