@@ -84,6 +84,6 @@ int Cell::getPinNum() const{
   return pins.size();
 }
 
-const Pin &Cell::getPins() const{
+const vector<Pin> &Cell::getPins() const{
   return pins;
 }

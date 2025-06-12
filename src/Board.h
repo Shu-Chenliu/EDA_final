@@ -2,6 +2,8 @@
 #define BOARD_H
 
 #include <iostream>
+#include <vector>
+#include "Pin.h"
 using namespace std;
 
 class Board{
@@ -17,6 +19,9 @@ class Board{
     double TNS;
     double TPO;
     double area;
+
+    vector<Pin> inPins;
+    vector<Pin> outPins;
   
   public:
     board();
@@ -35,18 +40,24 @@ class Board{
     void setTPO(double tpo);
     void setArea(double A);
 
+    void setInPins(vector<Pin> &pins);
+    void setOutPins(vector<Pin> &pins);
+
     // Getter
     double getW() const;
     double getH() const;
     double getBinW() const;
     double getBinW() const;
 
-    double setAlpha() const;
-    double setBeta() const;
-    double setGamma() const;
-    double setTNS() const;
-    double setTPO() const;
-    double setArea() const;
+    double getAlpha() const;
+    double getBeta() const;
+    double getGamma() const;
+    double getTNS() const;
+    double getTPO() const;
+    double getArea() const;
+
+    const vector<Pin> &getInPins() const;
+    const vector<Pin> &getOutPins() const;
 };
 
 #endif

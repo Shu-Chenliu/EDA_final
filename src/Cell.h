@@ -48,7 +48,7 @@ class Cell {
     double getDelay() const;
 
     int getPinNum() const;
-    const Pin &getPins() const;
+    const vector<Pin> &getPins() const;
 };
 
 #endif
