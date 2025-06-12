@@ -55,6 +55,14 @@ void Board::setArea(double A){
   area = A;
 }
 
+void Board::setInPins(vector<Pin> &pins){
+  inPins = pins;
+}
+
+void Board::setOutPins(vector<Pin> &pins){
+  outPins = pins;
+}
+
 // Getter
 double Board::getW() const{
   return w;
@@ -72,26 +80,34 @@ double Board::getBinW() const{
   return binH;
 }
 
-double Board::setAlpha() const{
+double Board::getAlpha() const{
   return alpha;
 }
 
-double Board::setBeta() const{
+double Board::getBeta() const{
   return beta;
 }
 
-double Board::setGamma() const{
+double Board::getGamma() const{
   return gamma;
 }
 
-double Board::setTNS() const{
+double Board::getTNS() const{
   return TNS;
 }
 
-double Board::setTPO() const{
+double Board::getTPO() const{
   return TPO;
 }
 
-double Board::setArea() const{
+double Board::getArea() const{
   return area;
+}
+
+const vector<Pin> &Board::getInPins(){
+  return inPins;
+}
+
+const vector<Pin> &Board::getOutPins(){
+  return outPins;
 }
