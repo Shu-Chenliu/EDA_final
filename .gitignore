@@ -1,0 +1,18 @@
+# Object files
+*.o
+
+# Executable
+*.out
+*.exe
+
+# Backup files
+*~
+
+# Swap files
+*.swp
+
+# VSCode
+.vscode/
+
+# Binary directory
+bin/
