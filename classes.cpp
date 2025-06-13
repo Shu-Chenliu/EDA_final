@@ -75,9 +75,9 @@ struct FF {
 	Point position;
 	vector<Pin> fanins;
 	vector<Pin> fanouts;
-	FF(int drive, double x, double y, const string& n = "",const vector<Pin>& fi = {}, const vector<Pin>& fo = {})
-		: original_drive(drive), position(x, y), name(n),
-			fanins(fi), fanouts(fo) {}
+	FF(int drive, double x, double y, const string& n = "", const vector<Pin>& fi = {}, const vector<Pin>& fo = {})
+  : name(n), original_drive(drive), position(x, y), fanins(fi), fanouts(fo) {}
+
 };
 
 struct Cluster {
@@ -106,5 +106,7 @@ struct Bin {
 	int x_idx, y_idx;
 	Rect area;
 	int rank = -1;
-	bool occupied = false;
+	bool occupied;
+	Bin(int x, int y, const Rect& r)
+		: x_idx(x), y_idx(y), area(r), rank(-1), occupied(false) {}
 };
