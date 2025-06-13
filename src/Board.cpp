@@ -1,4 +1,5 @@
 #include "Board.h"
+#include <bits/stdc++.h>
 
 Board::Board() : 
   w(1),
@@ -27,7 +28,7 @@ void Board::setBinW(double W){
   binW = W;
 }
 
-void Board::setBinW(double H){
+void Board::setBinH(double H){
   binH = H;
 }
 
@@ -76,7 +77,7 @@ double Board::getBinW() const{
   return binW;
 }
 
-double Board::getBinW() const{
+double Board::getBinH() const{
   return binH;
 }
 
@@ -104,10 +105,15 @@ double Board::getArea() const{
   return area;
 }
 
-const vector<Pin> &Board::getInPins(){
+const vector<Pin> &Board::getInPins() const{
   return inPins;
 }
 
-const vector<Pin> &Board::getOutPins(){
+const vector<Pin> &Board::getOutPins() const{
   return outPins;
+}
+
+// read .def
+void Board::readDef(string file){
+
 }

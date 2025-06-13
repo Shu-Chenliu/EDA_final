@@ -12,7 +12,7 @@ Coor::Coor(double X, double Y){
 Coor::~Coor(){}
 
 void Coor::setX(double X){
-  x = X
+  x = X;
 }
 
 void Coor::setY(double Y){

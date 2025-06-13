@@ -2,6 +2,7 @@
 #define BOARD_H
 
 #include <iostream>
+#include <string>
 #include <vector>
 #include "Pin.h"
 using namespace std;
@@ -24,14 +25,14 @@ class Board{
     vector<Pin> outPins;
   
   public:
-    board();
-    ~board();
+    Board();
+    ~Board();
 
     // Setter
     void setW(double W);
     void setH(double H);
     void setBinW(double W);
-    void setBinW(double H);
+    void setBinH(double H);
 
     void setAlpha(double A);
     void setBeta(double B);
@@ -47,7 +48,7 @@ class Board{
     double getW() const;
     double getH() const;
     double getBinW() const;
-    double getBinW() const;
+    double getBinH() const;
 
     double getAlpha() const;
     double getBeta() const;
@@ -58,6 +59,9 @@ class Board{
 
     const vector<Pin> &getInPins() const;
     const vector<Pin> &getOutPins() const;
+
+    // read .def
+    void readDef(string file);
 };
 
 #endif

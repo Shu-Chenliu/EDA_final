@@ -34,8 +34,8 @@ class Cell {
     void setPower(double p);
     void setDelay(double d);
 
-    void setPins(Pin &pins);
-    void addPins(Pin &pins);
+    void setPins(vector<Pin> Pins);
+    void addPins(vector<Pin> Pins);
 
     // Getter
     string getName() const;

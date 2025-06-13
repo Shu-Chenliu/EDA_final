@@ -11,18 +11,18 @@ class Coor{
   
   public:
     Coor();
-    Coor(double x, double y);
+    Coor(double X, double Y);
     ~Coor();
 
-    void setX(double x);
-    void setY(double y);
-    void setCoor(double x, double y);
+    void setX(double X);
+    void setY(double Y);
+    void setCoor(double X, double Y);
 
     double getX() const;
     double getY() const;
 
-    Coor Operator+(const Coor that) const;
-    Coor Operator-(const Coor that) const;
+    Coor operator+(const Coor& that) const;
+    Coor operator-(const Coor& that) const;
 };
 
 #endif

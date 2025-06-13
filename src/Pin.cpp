@@ -26,7 +26,7 @@ void Pin::setSlack(double S){
 
 // Getter
 string Pin::getName() const{
-  return Name;
+  return name;
 }
 
 double Pin::getX() const{
