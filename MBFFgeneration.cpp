@@ -134,13 +134,37 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 	return vector<set<string>>(filtered.begin(), filtered.end());
 }
 
-int cost(set<string> c){
-	int totalCost=0;
-	//TODO: 可以generate binary code去random產生要取的ff有哪些 做個c.size次之類的
-	
-	return totalCost;
+int MBFFgeneration::cost(set<string> c){
+	double totalCost=0;
+	double totalArea=0;
+	double total_slack = 0;
+  int total_switching = 0;
+	int count=0;
+	double areaAfter=0;
+	for(const auto&name:c){
+		FF* ff=map[name];
+		totalArea+=ff->area;
+		for(const auto&pin:ff->fanins){
+			total_slack+=pin.slack;
+			total_switching+=pin.switching_rate;
+			count++;
+		}
+		for(const auto&pin:ff->fanouts){
+			total_slack+=pin.slack;
+			total_switching+=pin.switching_rate;
+			count++;
+		}
+	}
+	//TODO: delta 算法要改
+	double delta_area=c.size()/3;
+	double delta_power=total_switching*0.15;
+	double delta_tns=total_slack*0.15;
+	totalCost+=delta_area;
+	totalCost+=delta_power;
+	totalCost+=delta_tns;
+	return (int)totalCost;
 }
-pair<int,pair<set<string>,set<string>>> MBFFcost(set<string> c){
+pair<int,pair<set<string>,set<string>>> MBFFgeneration::MBFFcost(set<string> c){
 	int size=c.size();
 	int currCost=INT_MAX;
 	set<string> currClique;

@@ -75,8 +75,9 @@ struct FF {
 	Point position;
 	vector<Pin> fanins;
 	vector<Pin> fanouts;
-	FF(int drive, double x, double y, const string& n = "", const vector<Pin>& fi = {}, const vector<Pin>& fo = {})
-  : name(n), original_drive(drive), position(x, y), fanins(fi), fanouts(fo) {}
+	double area;
+	FF(int drive, double x, double y, const string& n = "", const vector<Pin>& fi = {}, const vector<Pin>& fo = {},double a)
+  : name(n), original_drive(drive), position(x, y), fanins(fi), fanouts(fo),area(a) {}
 
 };
 
@@ -105,7 +106,7 @@ struct MBFF {
 struct Bin {
 	int x_idx, y_idx;
 	Rect area;
-	int rank = -1;
+	int rank;
 	bool occupied;
 	Bin(int x, int y, const Rect& r)
 		: x_idx(x), y_idx(y), area(r), rank(-1), occupied(false) {}
