@@ -12,7 +12,7 @@ using namespace std;
 
 
 int SIZE_LIMIT;
-const double DISP_LIMIT = 160.0;
+double DISP_LIMIT;
 int MAX_ITER;
 
 double manhattanDist(const FF* p, const Cluster& c) {
@@ -123,6 +123,49 @@ void resolveOverDisplacement(vector<FF*>& flip_flops, vector<Cluster>& clusters)
             newC.flip_flops.push_back(flip_flops[i]);
             flip_flops[i]->cluster = clusters.size();
             clusters.push_back(newC);
+            
+            // Remove flop from old cluster
+            auto& oldCluster = clusters[cid];
+            auto it = find(oldCluster.flip_flops.begin(), oldCluster.flip_flops.end(), flip_flops[i]);
+            if (it != oldCluster.flip_flops.end()) {
+                oldCluster.flip_flops.erase(it);
+            }
+            // Update cluster center
+            oldCluster.cx = 0;
+            oldCluster.cy = 0;
+            for (FF* ff : oldCluster.flip_flops) {
+                oldCluster.cx += ff->position.x;
+                oldCluster.cy += ff->position.y;
+            }
+            if (!oldCluster.flip_flops.empty()) {
+                oldCluster.cx /= oldCluster.flip_flops.size();
+                oldCluster.cy /= oldCluster.flip_flops.size();
+            } else {
+                // If the cluster is empty, reset center to origin
+                oldCluster.cx = 0;
+                oldCluster.cy = 0;
+            }
+            // Update new cluster center
+            newC.cx = flip_flops[i]->position.x;
+            newC.cy = flip_flops[i]->position.y;
+            for (FF* ff : newC.flip_flops) {
+                newC.cx += ff->position.x;
+                newC.cy += ff->position.y;
+            }
+            if (!newC.flip_flops.empty()) {
+                newC.cx /= newC.flip_flops.size();
+                newC.cy /= newC.flip_flops.size();
+            } else {
+                // If the new cluster is empty, reset center to origin
+                newC.cx = 0;
+                newC.cy = 0;
+            }
+            // Update the cluster in the vector
+            clusters[cid] = oldCluster;
+            clusters.push_back(newC); // Add the new cluster to the list
+            cout << "Flop " << flip_flops[i]->name << " moved to new cluster " << clusters.size() - 1
+                 << " due to over displacement from cluster " << cid << "\n";
+
         }
     }
 }
@@ -209,8 +252,13 @@ vector<Cluster> kmeansWeighted(vector<FF*>& flip_flops) {
     // relocateFlops(flip_flops, clusters);
 
     cout << "\nClusters after relocation:\n";
-    for (size_t i = 0; i < clusters.size(); ++i)
+    for (size_t i = 0; i < clusters.size(); ++i){
         cout << "Cluster " << i << ": " << clusters[i].flip_flops.size() << " flops\n";
+        for (FF* ff : clusters[i].flip_flops) {
+            cout << "  " << ff->name << " at (" << ff->relocatedX << ", " << ff->relocatedY << ")\n";
+        }
+    }
+
     
     int totalMove = 0;   
     int totalDistToCluster = 0;
@@ -255,15 +303,7 @@ int main() {
             { Pin{ Point(22, 22), 8.0, 3 } }
         ),
 
-        new FF(1, 20, 20, "ff4", 
-            { Pin{ Point(15, 15), 14.0, 2 } },
-            { Pin{ Point(25, 25), 13.0, 3 } }
-        ),
-        new FF(1, 21, 18, "ff5",
-            { Pin{ Point(16, 17), 12.0, 1 }, 
-              Pin{ Point(19, 20), 11.0, 2 } },
-            { Pin{ Point(23, 24), 10.0, 3 } }
-        ),
+        
         new FF(1, 18, 19, "ff6",
             { Pin{ Point(13, 14), 8.0, 1 }, 
               Pin{ Point(17, 18), 9.0, 2 },
@@ -378,10 +418,19 @@ int main() {
              << "), cluster=" << flip_flops[i]->cluster
              << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
     }
+    int left = 0, right = 0, top = 0, bottom = 0;
+    for (auto ff : flip_flops) {
+        if (ff->position.x < left) left = ff->position.x;
+        if (ff->position.x > right) right = ff->position.x;
+        if (ff->position.y < top) top = ff->position.y;
+        if (ff->position.y > bottom) bottom = ff->position.y;
+    }
     SIZE_LIMIT = flip_flops.size() / 3 ; // Example size limit for clusters
     MAX_ITER = flip_flops.size() * 2; // Example maximum iterations
-
+    DISP_LIMIT = (right - left + bottom - top) / 3;
+    
     vector<Cluster> clusters=kmeansWeighted(flip_flops);
+
     for(size_t i=0;i<clusters.size();i++){
         vector<FF*> flipflop=clusters[i].flip_flops;
         int maxDrivingStrength = 4;
