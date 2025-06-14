@@ -209,16 +209,21 @@ vector<Cluster> kmeansWeighted(vector<FF*>& flip_flops) {
     // relocateFlops(flip_flops, clusters);
 
     cout << "\nClusters after relocation:\n";
-    for (int i = 0; i < clusters.size(); ++i)
+    for (int i = 0; i < clusters.size(); ++i){
         cout << "Cluster " << i << ": " << clusters[i].flip_flops.size() << " flops\n";
+        for(const auto&ff:clusters[i].flip_flops){
+            cout<<ff->name<<endl;
+        }
+    }
+        
     
     int totalMove = 0;   
     int totalDistToCluster = 0;
 
     for (int i = 0; i < flip_flops.size(); ++i) {
-        cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
-             << "), cluster=" << flip_flops[i]->cluster
-             << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
+        // cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
+        //      << "), cluster=" << flip_flops[i]->cluster
+        //      << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
         totalMove += abs(flip_flops[i]->relocatedX - flip_flops[i]->position.x) + abs(flip_flops[i]->relocatedY - flip_flops[i]->position.y);
         totalDistToCluster += manhattanDist(flip_flops[i], clusters[flip_flops[i]->cluster]);
     }
@@ -373,21 +378,21 @@ int main() {
         )
         
     };
-    for (int i = 0; i < flip_flops.size(); ++i) {
-        cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
-             << "), cluster=" << flip_flops[i]->cluster
-             << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
-    }
+    // for (int i = 0; i < flip_flops.size(); ++i) {
+    //     cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
+    //          << "), cluster=" << flip_flops[i]->cluster
+    //          << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
+    // }
     SIZE_LIMIT = flip_flops.size() / 3 ; // Example size limit for clusters
     MAX_ITER = flip_flops.size() * 2; // Example maximum iterations
 
     vector<Cluster> clusters=kmeansWeighted(flip_flops);
-    for(int i=0;i<clusters.size();i++){
+    for(int i=0;i<1;i++){
         vector<FF*> flipflop=clusters[i].flip_flops;
         int maxDrivingStrength = 4;
         double beta = 0.95;
         MBFFgeneration generator(flipflop, maxDrivingStrength, beta);
-        vector<set<string>> mbff_result = generator.generateMBFF();
+        // vector<set<string>> mbff_result = generator.generateMBFF();
         vector<MBFF> placed_mbffs=generator.locationAssignment(Rect(-30,441,-31,448));
         generator.MBFFsizing(placed_mbffs);
     }
