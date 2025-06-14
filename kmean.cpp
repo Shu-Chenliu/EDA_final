@@ -220,10 +220,25 @@ vector<Cluster> kmeansWeighted(vector<FF*>& flip_flops) {
     // }
     int update = 1;
     int iter = 0;
-    vector<FF*> oldPoints = flip_flops; // Store original flip_flops for relocation
-    while (update && iter < MAX_ITER)  // Continue until no updates or max iterations
+    double currentCost = numeric_limits<double>::max();
+    double totalCost = 0;
+    // vector<FF*> oldPoints = flip_flops; // Store original flip_flops for relocation
+    while (update &&  iter < MAX_ITER)  // Continue until no updates or max iterations
     {
         /* code */
+        iter++;
+        // record each ff's original cluster
+        vector<FF*> oldPoints = flip_flops; // Store original flip_flops for relocation
+        
+        // print current flip_flops' clusters
+        
+        // for (size_t i = 0; i < flip_flops.size(); ++i) {
+        //     cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
+        //          << "), cluster=" << flip_flops[i]->cluster
+        //          << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
+        // }
+        
+
         assignPoints(flip_flops, clusters, true); // weighted after first iteration
         resolveOverflow(flip_flops, clusters);
         updateCenters(flip_flops, clusters);
@@ -231,21 +246,39 @@ vector<Cluster> kmeansWeighted(vector<FF*>& flip_flops) {
         for (size_t i = 0; i < flip_flops.size(); ++i) {
             if (flip_flops[i]->cluster != oldPoints[i]->cluster) {
                 update = 1; // If any point's cluster changed, we need another iteration
-                iter++;
+                
                 i = flip_flops.size();
                 // break;
             } 
         }
-        if (update) {
-            cout << "Iteration " << iter << ": updated clusters\n";
-        } else {
-            cout << "No updates in iteration " << iter << "\n";
-        }
+        // if (update) {
+        //     cout << "Iteration " << iter << ": updated clusters\n";
+        // } else {
+        //     cout << "No updates in iteration " << iter << "\n";
+        // }
         
         resolveOverDisplacement(flip_flops, clusters);
         relocateFlops(flip_flops, clusters);
+        updateCenters(flip_flops, clusters);
+
+        // print cost
+        
+        totalCost = 0;
+        for (size_t i = 0; i < flip_flops.size(); ++i) {
+            totalCost += weightedCost(flip_flops[i], clusters[flip_flops[i]->cluster]);
+        }
+        if (totalCost < currentCost) {
+            update = 1; // If cost improved, we need another iteration
+            cout << "Iteration " << iter << ": cost improved from " << currentCost << " to " << totalCost << "\n";
+        } else {
+            cout << "Iteration " << iter << ": cost did not improve (" << currentCost << ")\n";
+        }
+        currentCost = totalCost; // Update current cost for next iteration
+        // cout << "Total cost after iteration " << iter << ": " << totalCost << "\n";
             
     }
+    
+
     
 
     // resolveOverDisplacement(flip_flops, clusters);
@@ -413,11 +446,11 @@ int main() {
         )
         
     };
-    for (size_t i = 0; i < flip_flops.size(); ++i) {
-        cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
-             << "), cluster=" << flip_flops[i]->cluster
-             << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
-    }
+    // for (size_t i = 0; i < flip_flops.size(); ++i) {
+    //     cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
+    //          << "), cluster=" << flip_flops[i]->cluster
+    //          << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
+    // }
     int left = 0, right = 0, top = 0, bottom = 0;
     for (auto ff : flip_flops) {
         if (ff->position.x < left) left = ff->position.x;
