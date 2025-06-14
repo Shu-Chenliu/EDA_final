@@ -464,13 +464,13 @@ int main() {
     
     vector<Cluster> clusters=kmeansWeighted(flip_flops);
 
-    for(size_t i=0;i<clusters.size();i++){
+    for(size_t i=0;i<1;i++){
         vector<FF*> flipflop=clusters[i].flip_flops;
         int maxDrivingStrength = 4;
         double beta = 0.95;
         MBFFgeneration generator(flipflop, maxDrivingStrength, beta);
         // vector<set<string>> mbff_result = generator.generateMBFF();
-        vector<MBFF> placed_mbffs=generator.locationAssignment(Rect(-30,441,-31,448));
+        vector<MBFF> placed_mbffs=generator.locationAssignment(Rect(0,441,0,448));
         generator.MBFFsizing(placed_mbffs);
     }
     for (auto ff : flip_flops) {

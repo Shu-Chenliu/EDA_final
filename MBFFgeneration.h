@@ -2,6 +2,8 @@
 #define MBFFGENERATION_H
 
 #include "classes.cpp"
+#include <cstdlib> // Needed for rand() and srand()
+#include <ctime>
 using namespace std;
 
 

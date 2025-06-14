@@ -134,10 +134,32 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 	return vector<set<string>>(filtered.begin(), filtered.end());
 }
 
-pair<int,pair<set<string>,set<string>>> cost(set<string> c){
+int cost(set<string> c){
 	int totalCost=0;
 	//TODO: 可以generate binary code去random產生要取的ff有哪些 做個c.size次之類的
-	return {totalCost,{c,c}};
+	
+	return totalCost;
+}
+pair<int,pair<set<string>,set<string>>> MBFFcost(set<string> c){
+	int size=c.size();
+	int currCost=INT_MAX;
+	set<string> currClique;
+	for(int i=0;i<size*size;i++){
+		set<string> ff;
+		for(const auto&ffs:c){
+			srand(time(0));
+			int randomNum = rand() % 2;
+			if(randomNum==1){
+				ff.insert(ffs);
+			}
+		}
+		int randomCost=cost(ff);
+		if(currCost>randomCost){
+			randomCost=currCost;
+			currClique=ff;
+		}
+	}
+	return {currCost,{c,currClique}};
 }
 vector<set<string>> MBFFgeneration::generateMBFF(){
 	cout << "[DEBUG] Start MBFF Generation" << endl;
@@ -170,7 +192,7 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 	priority_queue<pair<int,pair<set<string>,set<string>>>,vector<pair<int,pair<set<string>,set<string>>>>,greater<pair<int,pair<set<string>,set<string>>>>> pq;
 	vector<set<string>> non_conflictMBFF;
 	for(const auto& maxclique:mbff_candidates){
-		pq.push(cost(maxclique));
+		pq.push(MBFFcost(maxclique));
 	}
 	unordered_set<string> marked;
 	while(!pq.empty()){
@@ -194,7 +216,7 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 			for(const auto&ff:m.second.first){
 				m.second.second.erase(ff);
 			}
-			pq.push(cost(m.second.second));
+			pq.push(MBFFcost(m.second.second));
 		}
 	}
 	cout << "[DEBUG] Final selected MBFF count: " << non_conflictMBFF.size() << endl;
