@@ -6,46 +6,47 @@
 #include <vector>
 #include "Coor.h"
 #include "Pin.h"
+#include "Rect.h"
 using namespace std;
 
 class Cell {
   private:
     string name;
+    string model;
     Coor coor;
-    double w;
-    double h;
-    double power;
-    double delay;
+    Rect size;
+    float power;
+    float delay;
 
     vector<Pin> pins;
 
   public:
     Cell();
+    Cell(string Name, string Model, float X, float Y);
     ~Cell();
 
     // Setter
     void setName(string Name);
-    void setX(double X);
-    void setY(double Y);
-    void setCoor(double X, double Y);
-
-    void setW(double W);
-    void setH(double H);
-    void setPower(double p);
-    void setDelay(double d);
+    void setModel(string Model);
+    void setX(float X);
+    void setY(float Y);
+    void setCoor(float X, float Y);
+    void setSize(float W, float H);
+    void setPower(float p);
+    void setDelay(float d);
 
     void setPins(vector<Pin> Pins);
     void addPins(vector<Pin> Pins);
 
     // Getter
     string getName() const;
-    double getX() const;
-    double getY() const;
-
-    double getW() const;
-    double getH() const;
-    double getPower() const;
-    double getDelay() const;
+    string getModel() const;
+    float getX() const;
+    float getY() const;
+    float getW() const;
+    float getH() const;
+    float getPower() const;
+    float getDelay() const;
 
     int getPinNum() const;
     const vector<Pin> &getPins() const;

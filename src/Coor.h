@@ -6,20 +6,20 @@ using namespace std;
 
 class Coor{
   private:
-    double x;
-    double y;
+    float x;
+    float y;
   
   public:
     Coor();
-    Coor(double X, double Y);
+    Coor(float X, float Y);
     ~Coor();
 
-    void setX(double X);
-    void setY(double Y);
-    void setCoor(double X, double Y);
+    void setX(float X);
+    void setY(float Y);
+    void setCoor(float X, float Y);
 
-    double getX() const;
-    double getY() const;
+    float getX() const;
+    float getY() const;
 
     Coor operator+(const Coor& that) const;
     Coor operator-(const Coor& that) const;

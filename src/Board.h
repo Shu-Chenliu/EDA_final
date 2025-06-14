@@ -4,64 +4,85 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "Pin.h"
+#include <unordered_map>
+#include "IOPin.h"
+#include "Cell.h"
+#include "Rect.h"
+#include "Netlist.h"
 using namespace std;
 
 class Board{
   private:
-    double w;
-    double h;
-    double binW;
-    double binH;
+    Rect size;
+    Rect binSize;
+    Coor binShift;
+    int binNumX;
+    int binNumY;
+    int* dir;  //
 
-    double alpha;
-    double beta;
-    double gamma;
-    double TNS;
-    double TPO;
-    double area;
+    float Alpha;
+    float Beta;
+    float Gamma;
+    float TNS;
+    float TPO;
+    float Area;
 
-    vector<Pin> inPins;
-    vector<Pin> outPins;
+    int unit;
+    int cellNum;  //
+    int pinNum;  //
+
+    vector<Cell> Cells;
+    vector<IOPin> inPins;
+    vector<IOPin> outPins;  // merge IOPins ?
+    unordered_map<string, Cell*> CellList;
+    Netlist NetList;
+
+    vector<string> split(const string& s); 
+    float norm(const string& s);
   
   public:
     Board();
     ~Board();
 
     // Setter
-    void setW(double W);
-    void setH(double H);
-    void setBinW(double W);
-    void setBinH(double H);
+    void setSize(float W, float H);
+    void setBinW(float W);
+    void setBinH(float H);
+    void setBinShift(float X, float Y);
 
-    void setAlpha(double A);
-    void setBeta(double B);
-    void setGamma(double C);
-    void setTNS(double tns);
-    void setTPO(double tpo);
-    void setArea(double A);
+    void setAlpha(float A);
+    void setBeta(float B);
+    void setGamma(float C);
+    void setTNS(float s);
+    void setTPO(float p);
+    void setArea(float a);
 
-    void setInPins(vector<Pin> &pins);
-    void setOutPins(vector<Pin> &pins);
+    void setInPins(vector<IOPin> &pins);
+    void setOutPins(vector<IOPin> &pins);
 
     // Getter
-    double getW() const;
-    double getH() const;
-    double getBinW() const;
-    double getBinH() const;
+    float getW() const;
+    float getH() const;
+    float getBinW() const;
+    float getBinH() const;
+    float getBinShiftX() const;
+    float getBinShiftY() const;
 
-    double getAlpha() const;
-    double getBeta() const;
-    double getGamma() const;
-    double getTNS() const;
-    double getTPO() const;
-    double getArea() const;
+    float getAlpha() const;
+    float getBeta() const;
+    float getGamma() const;
+    float getTNS() const;
+    float getTPO() const;
+    float getArea() const;
 
-    const vector<Pin> &getInPins() const;
-    const vector<Pin> &getOutPins() const;
+    const vector<IOPin> &getInPins() const;
+    const vector<IOPin> &getOutPins() const;
 
-    // read .def
+    // Read files
+    void readWeight(string file);
     void readDef(string file);
+    void readSdc(string file);
+    void readV(string file);
 };
 
 #endif

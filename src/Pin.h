@@ -9,9 +9,10 @@ using namespace std;
 class Pin{
   private:
     string name;
+    string layer;
     Coor coor;
     int SR;  // switching rate
-    double slack;
+    float slack;
 
   public:
     Pin();
@@ -19,16 +20,18 @@ class Pin{
 
     // Setter
     void setName(string Name);
-    void setCoor(double X, double Y);
+    void setLayer(string Layer);
+    void setCoor(float X, float Y);
     void setSR(int sr);
-    void setSlack(double S);
+    void setSlack(float S);
 
     // Getter
     string getName() const;
-    double getX() const;
-    double getY() const;
+    string getLayer() const;
+    float getX() const;
+    float getY() const;
     int getSR() const;
-    double getSlack() const;
+    float getSlack() const;
 };
 
 #endif

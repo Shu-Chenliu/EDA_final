@@ -2,10 +2,15 @@
 
 Cell::Cell() : 
   name(""),
-  w(0),
-  h(0),
+  model(""),
   delay(0),
   power(0){}
+
+Cell::Cell(string Name, string Model, float X, float Y) : 
+  name(Name),
+  model(Model){
+    coor.setCoor(X, Y);
+  }
 
 Cell::~Cell(){}
 
@@ -14,31 +19,31 @@ void Cell::setName(string Name){
   name = Name;
 }
 
-void Cell::setX(double X){
+void Cell::setModel(string Model){
+  model = Model;
+}
+
+void Cell::setX(float X){
   coor.setX(X);
 }
 
-void Cell::setY(double Y){
+void Cell::setY(float Y){
   coor.setY(Y);
 }
 
-void Cell::setCoor(double X, double Y){
+void Cell::setCoor(float X, float Y){
   coor.setCoor(X, Y);
 }
 
-void Cell::setW(double W){
-  w = W;
+void Cell::setSize(float W, float H){
+  size.setSize(W, H);
 }
 
-void Cell::setH(double H){
-  h = H;
-}
-
-void Cell::setPower(double p){
+void Cell::setPower(float p){
   power = p;
 }
 
-void Cell::setDelay(double d){
+void Cell::setDelay(float d){
   delay = d;
 }
 
@@ -55,27 +60,31 @@ string Cell::getName() const{
   return name;
 }
 
-double Cell::getX() const{
+string Cell::getModel() const{
+  return model;
+}
+
+float Cell::getX() const{
   return coor.getX();
 }
 
-double Cell::getY() const{
+float Cell::getY() const{
   return coor.getY();
 }
 
-double Cell::getW() const{
-  return w;
+float Cell::getW() const{
+  return size.getW();
 }
 
-double Cell::getH() const{
-  return h;
+float Cell::getH() const{
+  return size.getH();
 }
 
-double Cell::getPower() const{
+float Cell::getPower() const{
   return power;
 }
 
-double Cell::getDelay() const{
+float Cell::getDelay() const{
   return delay;
 }
 
