@@ -36,6 +36,7 @@ class Pin{
 
     // Print
     void print();
+    void printCoor();
 };
 
 #endif

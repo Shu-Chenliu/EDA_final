@@ -15,5 +15,17 @@ vector<string> Netlist::getNets() const{
 }
 
 vector<pair<string, string>> Netlist::members(string net) const{
-  return pinMap.at(net);
+  auto it = pinMap.find(net);
+  if (it != pinMap.end()) return it->second;
+  return {};
+}
+
+// Print
+void Netlist::print(){
+  for (auto& net : pinMap){
+    cout << net.first << endl;
+    for (int i=0; i<(int)net.second.size(); i++){
+      cout << "  " << (net.second)[i].first << " " << (net.second)[i].second << endl;
+    }
+  }
 }

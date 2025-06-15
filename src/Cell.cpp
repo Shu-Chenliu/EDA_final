@@ -8,7 +8,9 @@ Cell::Cell() :
 
 Cell::Cell(string Name, string Model, float X, float Y) : 
   name(Name),
-  model(Model){
+  model(Model),
+  delay(0),
+  power(0){
     coor.setCoor(X, Y);
   }
 
@@ -101,7 +103,7 @@ void Cell::print(){
   cout << name << " ";
   cout << model << " ";
   cout << power << " ";
-  cout /*<< delay*/ << endl;
+  cout << delay << endl;
   cout << "   ";
   coor.print();
   // cout << "   ";

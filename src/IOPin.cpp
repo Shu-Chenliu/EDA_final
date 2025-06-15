@@ -25,3 +25,11 @@ float IOPin::getW() const{
 float IOPin::getH() const{
   return size.getH();
 }
+
+// Print 
+void IOPin::print(){
+  cout << getName() << " " << getNet() << " " << layer << " ";
+  size.print();
+  cout << "   ";
+  printCoor();
+}

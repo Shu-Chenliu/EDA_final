@@ -24,6 +24,9 @@ class Netlist{
     // Getter
     vector<string> getNets() const;
     vector<pair<string, string>> members(string net) const;
+
+    // Pring
+    void print();
 };
 
 #endif

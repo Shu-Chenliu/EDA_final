@@ -42,5 +42,5 @@ Coor Coor::operator-(const Coor& that) const {
 
 // Print
 void Coor::print(){
-  
+  cout << "( " << x << ", " << y << " )" << endl;
 }

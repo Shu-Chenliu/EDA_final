@@ -27,14 +27,8 @@ float Board::norm(const string& s){
   return stof(s)/unit;
 }
 
-void erase(string& s, char c){
+void Board::erase(string& s, char c){
   s.erase(remove(s.begin(), s.end(), c), s.end());
-}
-
-string Erase(const string& s, char c){
-  string ss = s;
-  ss.erase(remove(ss.begin(), ss.end(), c), ss.end());
-  return ss;
 }
 
 // Setter
@@ -143,11 +137,16 @@ const vector<IOPin> &Board::getOutPins() const{
   return outPins;
 }
 
+Cell* Board::getCell(const string& name) {
+    auto it = CellList.find(name);
+    return it != CellList.end() ? it->second : nullptr;
+}
+
 // Read files
 void Board::readWeight(string file){
   ifstream f(file + "_weight");
   if (!f.is_open()) {
-    cerr << "Fail to open weight";
+    cerr << "Fail to open weight" << endl;
     return;
   }
 
@@ -171,7 +170,7 @@ void Board::readWeight(string file){
 void Board::readDef(string file){
   ifstream f(file + ".def");
   if (!f.is_open()) {
-    cerr << "Fail to open def";
+    cerr << "Fail to open def" << endl;
     return;
   }
 
@@ -182,10 +181,10 @@ void Board::readDef(string file){
 
     if (str.size() <= 1){ continue; }
     else if (str[0] == "UNITS"){
-      unit = stoi(str.back());
+      unit = stoi(*(str.end()-2));
     }
     else if (str[0] == "DIEAREA"){
-      if (str.size() == 5){
+      if (str.size() == 10){
         // DIEAREA ( <LLX> <LLY> ) ( <RUX> <RUY> )
         size.setW(norm(str[6])-norm(str[2]));
         size.setH(norm(str[7])-norm(str[3]));
@@ -226,13 +225,14 @@ void Board::readDef(string file){
     }
     else if (str[0] == "COMPONENTS"){
       cellNum = stoi(str[1]);
+      Cells.reserve(cellNum+10);
       for (int i=0; i<cellNum; i++){
         getline(f, s);
         str = split(s);
         // - <comp_name> <model_name> ... + PLACED ( <X> <Y> ) <orientation>
         auto it = find(str.begin(), str.end(), "PLACED");
         Cells.push_back(Cell(str[1], str[2], norm(*(it+2)), norm(*(it+3))));
-        CellList.emplace(str[1], Cells.end()-1);
+        CellList.emplace(str[1], &Cells.back());
       }
       getline(f, s);  // END COMPONENTS
     }
@@ -254,14 +254,18 @@ void Board::readDef(string file){
           if (it != str.end()){
             if (*(it+1) == "INPUT")  io = 1;
           }
+          it = find(str.begin(), str.end(), "NET");
+          if (it != str.end()){
+            p.setNet(*(it+1));
+          }
           it = find(str.begin(), str.end(), "LAYER");
           if (it != str.end()){
             p.setLayer(*(it+1));
-            p.setSize(norm(*(it+4))-norm(*(it+2)), norm(*(it+5))-norm(*(it+3)));
+            p.setSize(norm(*(it+7))-norm(*(it+3)), norm(*(it+8))-norm(*(it+4)));
           }
           it = find(str.begin(), str.end(), "PLACED");
           if (it != str.end()){
-            p.setCoor(norm(*(it+1)), norm(*(it+2)));
+            p.setCoor(norm(*(it+2)), norm(*(it+3)));
           }
         } while (find(str.begin(), str.end(), ";") == str.end());
         if (io)  inPins.push_back(p);
@@ -280,6 +284,8 @@ void Board::readDef(string file){
         string netName;
         vector<pair<string, string>> pins;
         do{
+          getline(f, s);
+          str = split(s);
           if (str[0] == "-"){
             netName = str[1];
             erase(netName, '\\');
@@ -302,7 +308,7 @@ void Board::readSdc(string file){
   // I think this could be skipped though?
   ifstream f(file + ".sdc");
   if (!f.is_open()) {
-    cerr << "Fail to open sdc";
+    cerr << "Fail to open sdc" << endl;
     return;
   }
 
@@ -312,7 +318,7 @@ void Board::readSdc(string file){
 void Board::readV(string file){
   ifstream f(file + ".v");
   if (!f.is_open()) {
-    cerr << "Fail to open v";
+    cerr << "Fail to open v" << endl;
     return;
   }
 
@@ -321,15 +327,30 @@ void Board::readV(string file){
   while (getline(f, s)){
     str = split(s);
     if (str.size() < 9 ){ continue; }
-    else if (str[0] != "module"){
-      Cell *c = getCell(str[1]);
+    else if (str[0] == "module"){
       do{
-        for (int i=0; i<str.size(); i++){
+        getline(f, s);
+        str = split(s);
+      } while (find(str.begin(), str.end(), ";") == str.end());
+    }
+    else{
+      bool isNew = true;
+      Cell *c = getCell(str[1]);
+      if(!c)  cout << "empty ptr" << endl;
+      do{
+        if (isNew)  isNew = false;
+        else{
+          getline(f, s);
+          str = split(s);
+        }
+        for (int i=0; i<(int)str.size(); i++){
           if (str[i][0] == '.'){
-            c->addPin(Pin(str[i], Erase(str[i+2], '\\')));
+            erase(str[i+2], '\\');
+            c->addPin(Pin(str[i].substr(1), str[i+2]));
           }
         }
-      } while (find(str.begin(), str.end(), ";") == str.end());
+      } while (find(str.begin(), str.end(), ";") == str.end() );
+      cout << c->getName() << endl;
     }
   }
   
@@ -337,43 +358,62 @@ void Board::readV(string file){
 }
 
 // Print
-void Board::print(){
-  cout << "size: ";
-  size.print();
-  cout << "binSize: ";
-  binSize.print();
-  cout << "binShift: ";
-  binShift.print();
-  cout << "binNum: " << binNumX << " x " << binNumY << endl;
+void Board::print(bool basic, bool cells, bool pins, bool nets){
+  if (basic){
+    cout << "size: ";
+    size.print();
+    cout << "binSize: ";
+    binSize.print();
+    cout << "binShift: ";
+    binShift.print();
+    cout << "binNum: " << binNumX << " x " << binNumY << endl;
 
-  cout << "\n==================================\n";
+    cout << "\n==================================\n\n";
 
-  cout << "ALpha: " << Alpha << endl;
-  cout << "Beta: " << Beta << endl;
-  cout << "Gamma: " << Gamma << endl;
-  cout << "TNS: " << TNS << endl;
-  cout << "TPO: " << TPO << endl;
-  cout << "Area: " << Area << endl;
-  cout << "unit: " << unit << endl;
+    cout << "ALpha: " << Alpha << endl;
+    cout << "Beta: " << Beta << endl;
+    cout << "Gamma: " << Gamma << endl;
+    cout << "TNS: " << TNS << endl;
+    cout << "TPO: " << TPO << endl;
+    cout << "Area: " << Area << endl;
+    cout << "unit: " << unit << endl;
 
-  cout << "\n==================================\n";
-
-  cout << "cellNum: " << cellNum << endl;
-  for (Cell c : Cells){
-    c.print();
+    cout << "\n==================================\n\n";
   }
 
-  cout << "\n==================================\n";
+  if (cells){
+    cout << "cellNum: " << cellNum << endl;
+    for (Cell c : Cells){
+      c.print();
 
-  cout << "pinNum: " << pinNum << endl;
-  for (IOPin p : inPins){
-    cout << " - ";
-    p.print();
-  }
-  for (IOPin p : outPins){
-    cout << " + ";
-    p.print();
+      // cout << c.getName() << " ";
+      
+      // if (c.getName() == "foo1__1"){
+      //   c.print();
+      //   cout << "YES~" << endl;
+      //   getCell(c.getName())->print();
+      // }
+    }
+
+    cout << "\n==================================\n\n";
   }
 
-  // Netlist NetList;
+  if (pins){
+    cout << "pinNum: " << pinNum << endl;
+    for (IOPin p : inPins){
+      cout << " - ";
+      p.print();
+    }
+    for (IOPin p : outPins){
+      cout << " + ";
+      p.print();
+    }
+
+    cout << "\n==================================\n\n";
+  }
+  
+  if (nets){
+    NetList.print();
+    cout << "\n==================================\n\n";
+  }
 }

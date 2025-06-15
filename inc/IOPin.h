@@ -20,6 +20,9 @@ class IOPin : public Pin{
     string getLayer() const;
     float getW() const;
     float getH() const;
+
+    // Print
+    void print();
 };
 
 #endif

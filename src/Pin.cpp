@@ -64,3 +64,7 @@ float Pin::getSlack() const{
 void Pin::print(){
   cout << name << " " << net << endl;
 }
+
+void Pin::printCoor(){
+  coor.print();
+}
