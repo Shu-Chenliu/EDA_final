@@ -19,11 +19,11 @@ class Netlist{
     ~Netlist();
 
     // Setter
-    void addNet(string name, vector<pair<string, string>>);
+    void addNet(string name, vector<pair<string, string>> pins);
 
     // Getter
-    string getNet(string cell, string pin) const;
-    vector<pair<string, string>> adjacent(string cell, string pin) const;
+    vector<string> getNets() const;
+    vector<pair<string, string>> members(string net) const;
 };
 
 #endif

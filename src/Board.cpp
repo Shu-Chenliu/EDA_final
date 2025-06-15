@@ -299,6 +299,7 @@ void Board::readDef(string file){
 }
 
 void Board::readSdc(string file){
+  // I think this could be skipped though?
   ifstream f(file + ".sdc");
   if (!f.is_open()) {
     cerr << "Fail to open sdc";
