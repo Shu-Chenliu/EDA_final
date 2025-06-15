@@ -32,10 +32,10 @@ float Coor::getY() const{
   return y;
 }
 
-Coor Coor::operator+(const Coor& that) const{
+Coor Coor::operator+(const Coor& that) const {
     return Coor(x + that.x, y + that.y);
 }
 
-Coor Coor::operator-(const Coor& that) const{
+Coor Coor::operator-(const Coor& that) const {
     return Coor(x - that.x, y - that.y);
 }

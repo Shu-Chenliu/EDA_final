@@ -1,6 +1,7 @@
 #include "Cell.h"
 
 Cell::Cell() : 
+Cell::Cell() : 
   name(""),
   model(""),
   delay(0),

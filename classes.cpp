@@ -1,3 +1,6 @@
+#ifndef CLASS_H
+#define CLASS_H
+
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -72,11 +75,13 @@ struct FF {
   double relocatedX = -1, relocatedY = -1;
   string name;
 	int original_drive;
+	double area;
 	Point position;
 	vector<Pin> fanins;
 	vector<Pin> fanouts;
-	FF(int drive, double x, double y, const string& n = "", const vector<Pin>& fi = {}, const vector<Pin>& fo = {})
-  : name(n), original_drive(drive), position(x, y), fanins(fi), fanouts(fo) {}
+	
+	FF(int drive, double a, double x, double y, const string& n = "", const vector<Pin>& fi = {}, const vector<Pin>& fo = {})
+  : name(n), original_drive(drive),area(a), position(x, y), fanins(fi), fanouts(fo) {}
 
 };
 
@@ -91,7 +96,7 @@ struct MBFFBit {
 	string name;
 	double slack;
 	bool is_empty = false;
-	DriveStrength strength = HIGH;
+	DriveStrength strength;
 };
 struct MBFF {
 	set<string> members;
@@ -105,8 +110,10 @@ struct MBFF {
 struct Bin {
 	int x_idx, y_idx;
 	Rect area;
-	int rank = -1;
+	int rank;
 	bool occupied;
 	Bin(int x, int y, const Rect& r)
 		: x_idx(x), y_idx(y), area(r), rank(-1), occupied(false) {}
 };
+
+#endif

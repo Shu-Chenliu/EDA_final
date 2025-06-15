@@ -134,32 +134,64 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 	return vector<set<string>>(filtered.begin(), filtered.end());
 }
 
-int cost(set<string> c){
-	int totalCost=0;
-	//TODO: 可以generate binary code去random產生要取的ff有哪些 做個c.size次之類的
-	
-	return totalCost;
+int MBFFgeneration::cost(set<string> c){
+	double totalCost=0;
+	double totalArea=0;
+	double total_slack = 0;
+  int total_switching = 0;
+	int count=0;
+	double areaAfter=0;
+	for(const auto&name:c){
+		FF* ff=map[name];
+		totalArea+=ff->area;
+		for(const auto&pin:ff->fanins){
+			total_slack+=pin.slack;
+			total_switching+=pin.switching_rate;
+			count++;
+		}
+		for(const auto&pin:ff->fanouts){
+			total_slack+=pin.slack;
+			total_switching+=pin.switching_rate;
+			count++;
+		}
+	}
+	//TODO: delta 算法要改
+	double delta_area=c.size()/3;
+	double delta_power=total_switching*0.15;
+	double delta_tns=total_slack*0.15;
+	totalCost-=delta_area;
+	totalCost-=delta_power;
+	totalCost-=delta_tns;
+	return (int)totalCost;
 }
-pair<int,pair<set<string>,set<string>>> MBFFcost(set<string> c){
-	int size=c.size();
-	int currCost=INT_MAX;
+pair<int, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c) {
+	int size = c.size();
+	int currCost = INT_MAX;
 	set<string> currClique;
-	for(int i=0;i<size*size;i++){
+
+	vector<string> elements(c.begin(), c.end()); // for random selection
+
+	for (int i = 0; i < size * size; i++) {
 		set<string> ff;
-		for(const auto&ffs:c){
-			srand(time(0));
+		for (const auto& ffs : elements) {
 			int randomNum = rand() % 2;
-			if(randomNum==1){
+			if (randomNum == 1) {
 				ff.insert(ffs);
 			}
 		}
-		int randomCost=cost(ff);
-		if(currCost>randomCost){
-			randomCost=currCost;
-			currClique=ff;
+
+		if (ff.empty()) {
+			int randomIndex = rand() % size;
+			ff.insert(elements[randomIndex]);
+		}
+
+		int randomCost = cost(ff);
+		if (currCost > randomCost) {
+			currCost = randomCost;
+			currClique = ff;
 		}
 	}
-	return {currCost,{c,currClique}};
+	return {currCost, {currClique,c}};
 }
 vector<set<string>> MBFFgeneration::generateMBFF(){
 	cout << "[DEBUG] Start MBFF Generation" << endl;
@@ -332,6 +364,7 @@ vector<MBFF> MBFFgeneration::locationAssignment(Rect chip_area) {
 		mbff.members = clique;
 
 		for (auto& name : clique) {
+			cout<<name<<endl;
 			FF* ff = map[name];
 			mbff.fanins.insert(mbff.fanins.end(), ff->fanins.begin(), ff->fanins.end());
 			mbff.fanouts.insert(mbff.fanouts.end(), ff->fanouts.begin(), ff->fanouts.end());
