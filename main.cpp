@@ -159,7 +159,7 @@ int main() {
   int DISP_LIMIT = (right - left + bottom - top) / 3;
   kmean kmean(SIZE_LIMIT,MAX_ITER,DISP_LIMIT);
   vector<Cluster> clusters=kmean.kmeansWeighted(flip_flops);
-
+  srand(time(0));
   for(size_t i=0;i<1;i++){
     vector<FF*> flipflop=clusters[i].flip_flops;
     int maxDrivingStrength = 4;

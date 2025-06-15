@@ -159,31 +159,39 @@ int MBFFgeneration::cost(set<string> c){
 	double delta_area=c.size()/3;
 	double delta_power=total_switching*0.15;
 	double delta_tns=total_slack*0.15;
-	totalCost+=delta_area;
-	totalCost+=delta_power;
-	totalCost+=delta_tns;
+	totalCost-=delta_area;
+	totalCost-=delta_power;
+	totalCost-=delta_tns;
 	return (int)totalCost;
 }
-pair<int,pair<set<string>,set<string>>> MBFFgeneration::MBFFcost(set<string> c){
-	int size=c.size();
-	int currCost=INT_MAX;
+pair<int, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c) {
+	int size = c.size();
+	int currCost = INT_MAX;
 	set<string> currClique;
-	for(int i=0;i<size*size;i++){
+
+	vector<string> elements(c.begin(), c.end()); // for random selection
+
+	for (int i = 0; i < size * size; i++) {
 		set<string> ff;
-		for(const auto&ffs:c){
-			srand(time(0));
+		for (const auto& ffs : elements) {
 			int randomNum = rand() % 2;
-			if(randomNum==1){
+			if (randomNum == 1) {
 				ff.insert(ffs);
 			}
 		}
-		int randomCost=cost(ff);
-		if(currCost>randomCost){
-			randomCost=currCost;
-			currClique=ff;
+
+		if (ff.empty()) {
+			int randomIndex = rand() % size;
+			ff.insert(elements[randomIndex]);
+		}
+
+		int randomCost = cost(ff);
+		if (currCost > randomCost) {
+			currCost = randomCost;
+			currClique = ff;
 		}
 	}
-	return {currCost,{c,currClique}};
+	return {currCost, {currClique,c}};
 }
 vector<set<string>> MBFFgeneration::generateMBFF(){
 	cout << "[DEBUG] Start MBFF Generation" << endl;
@@ -356,6 +364,7 @@ vector<MBFF> MBFFgeneration::locationAssignment(Rect chip_area) {
 		mbff.members = clique;
 
 		for (auto& name : clique) {
+			cout<<name<<endl;
 			FF* ff = map[name];
 			mbff.fanins.insert(mbff.fanins.end(), ff->fanins.begin(), ff->fanins.end());
 			mbff.fanouts.insert(mbff.fanouts.end(), ff->fanouts.begin(), ff->fanouts.end());
