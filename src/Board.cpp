@@ -27,6 +27,16 @@ float Board::norm(const string& s){
   return stof(s)/unit;
 }
 
+void erase(string& s, char c){
+  s.erase(remove(s.begin(), s.end(), c), s.end());
+}
+
+string Erase(const string& s, char c){
+  string ss = s;
+  ss.erase(remove(ss.begin(), ss.end(), c), ss.end());
+  return ss;
+}
+
 // Setter
 void Board::setSize(float W, float H){
   size.setSize(W, H);
@@ -170,7 +180,8 @@ void Board::readDef(string file){
   while (getline(f, s)){
     str = split(s);
 
-    if (str[0] == "UNITS"){
+    if (str.size() <= 1){ continue; }
+    else if (str[0] == "UNITS"){
       unit = stoi(str.back());
     }
     else if (str[0] == "DIEAREA"){
@@ -271,7 +282,7 @@ void Board::readDef(string file){
         do{
           if (str[0] == "-"){
             netName = str[1];
-            netName.erase(remove(netName.begin(), netName.end(), '\\'), netName.end());
+            erase(netName, '\\');
           }
           auto ptr = find(str.begin(), str.end(), "(");
           while (ptr != str.end()){
@@ -304,5 +315,22 @@ void Board::readV(string file){
     return;
   }
 
+  string s, ss;
+  vector<string> str;
+  while (getline(f, s)){
+    str = split(s);
+    if (str.size() < 9 ){ continue; }
+    else if (str[0] != "module"){
+      Cell *c = getCell(str[1]);
+      do{
+        for (int i=0; i<str.size(); i++){
+          if (str[i][0] == '.'){
+            c->addPin(Pin(str[i], Erase(str[i+2], '\\')));
+          }
+        }
+      } while (find(str.begin(), str.end(), ";") == str.end());
+    }
+  }
+  
   f.close();
 }

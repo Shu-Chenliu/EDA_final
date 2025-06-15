@@ -47,8 +47,8 @@ void Cell::setDelay(float d){
   delay = d;
 }
 
-void Cell::setPins(vector<Pin> Pins){
-  pins = Pins;
+void Cell::addPin(Pin pin){
+  pins.push_back(pin);
 }
 
 void Cell::addPins(vector<Pin> Pins){

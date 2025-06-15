@@ -39,6 +39,8 @@ class Board{
 
     vector<string> split(const string& s); 
     float norm(const string& s);
+    void erase(string& s, char c);
+    string Erase(const string& s, char c);
   
   public:
     Board();
@@ -74,6 +76,8 @@ class Board{
     float getTNS() const;
     float getTPO() const;
     float getArea() const;
+
+    Cell* getCell(string name);
 
     const vector<IOPin> &getInPins() const;
     const vector<IOPin> &getOutPins() const;

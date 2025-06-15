@@ -35,7 +35,7 @@ class Cell {
     void setPower(float p);
     void setDelay(float d);
 
-    void setPins(vector<Pin> Pins);
+    void addPin(Pin pin);
     void addPins(vector<Pin> Pins);
 
     // Getter

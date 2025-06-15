@@ -2,7 +2,13 @@
 
 Pin::Pin() : 
   name(""),
-  layer(""),
+  net(""),
+  SR(0),
+  slack(0){}
+
+Pin::Pin(string Name, string Net) : 
+  name(Name),
+  net(Net),
   SR(0),
   slack(0){}
 
@@ -13,8 +19,8 @@ void Pin::setName(string Name){
   name = Name;
 }
 
-void Pin::setLayer(string Layer){
-  layer = Layer;
+void Pin::setNet(string Net){
+  net = Net;
 }
 
 void Pin::setCoor(float X, float Y){
@@ -34,8 +40,8 @@ string Pin::getName() const{
   return name;
 }
 
-string Pin::getLayer() const{
-  return layer;
+string Pin::getNet() const{
+  return net;
 }
 
 float Pin::getX() const{
