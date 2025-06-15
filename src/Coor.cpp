@@ -39,3 +39,8 @@ Coor Coor::operator+(const Coor& that) const {
 Coor Coor::operator-(const Coor& that) const {
     return Coor(x - that.x, y - that.y);
 }
+
+// Print
+void Coor::print(){
+  
+}

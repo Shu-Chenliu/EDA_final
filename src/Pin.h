@@ -33,6 +33,9 @@ class Pin{
     float getY() const;
     int getSR() const;
     float getSlack() const;
+
+    // Print
+    void print();
 };
 
 #endif

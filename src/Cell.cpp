@@ -1,7 +1,6 @@
 #include "Cell.h"
 
 Cell::Cell() : 
-Cell::Cell() : 
   name(""),
   model(""),
   delay(0),
@@ -95,4 +94,20 @@ int Cell::getPinNum() const{
 
 const vector<Pin> &Cell::getPins() const{
   return pins;
+}
+
+// Print
+void Cell::print(){
+  cout << name << " ";
+  cout << model << " ";
+  cout << power << " ";
+  cout /*<< delay*/ << endl;
+  cout << "   ";
+  coor.print();
+  // cout << "   ";
+  // size.print();
+  for (Pin p : pins){
+    cout << "    = ";
+    p.print();
+  }
 }

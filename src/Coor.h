@@ -23,6 +23,9 @@ class Coor{
 
     Coor operator+(const Coor& that) const;
     Coor operator-(const Coor& that) const;
+
+    // Print
+    void print();
 };
 
 #endif

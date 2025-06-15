@@ -22,6 +22,9 @@ class Rect{
     // Getter
     float getW() const;
     float getH() const;
+
+    // Print
+    void print();
 };
 
 #endif

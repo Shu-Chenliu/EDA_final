@@ -59,3 +59,8 @@ int Pin::getSR() const{
 float Pin::getSlack() const{
   return slack;
 }
+
+// Print 
+void Pin::print(){
+  cout << name << " " << net << endl;
+}

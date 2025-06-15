@@ -335,3 +335,45 @@ void Board::readV(string file){
   
   f.close();
 }
+
+// Print
+void Board::print(){
+  cout << "size: ";
+  size.print();
+  cout << "binSize: ";
+  binSize.print();
+  cout << "binShift: ";
+  binShift.print();
+  cout << "binNum: " << binNumX << " x " << binNumY << endl;
+
+  cout << "\n==================================\n";
+
+  cout << "ALpha: " << Alpha << endl;
+  cout << "Beta: " << Beta << endl;
+  cout << "Gamma: " << Gamma << endl;
+  cout << "TNS: " << TNS << endl;
+  cout << "TPO: " << TPO << endl;
+  cout << "Area: " << Area << endl;
+  cout << "unit: " << unit << endl;
+
+  cout << "\n==================================\n";
+
+  cout << "cellNum: " << cellNum << endl;
+  for (Cell c : Cells){
+    c.print();
+  }
+
+  cout << "\n==================================\n";
+
+  cout << "pinNum: " << pinNum << endl;
+  for (IOPin p : inPins){
+    cout << " - ";
+    p.print();
+  }
+  for (IOPin p : outPins){
+    cout << " + ";
+    p.print();
+  }
+
+  // Netlist NetList;
+}

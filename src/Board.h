@@ -87,6 +87,9 @@ class Board{
     void readDef(string file);
     void readSdc(string file);
     void readV(string file);
+
+    // Print
+    void print();
 };
 
 #endif

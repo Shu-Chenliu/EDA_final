@@ -32,3 +32,8 @@ float Rect::getW() const{
 float Rect::getH() const{
   return h;
 }
+
+// Print
+void Rect::print(){
+  cout << w << " x " << h << endl;
+}

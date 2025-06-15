@@ -50,6 +50,9 @@ class Cell {
 
     int getPinNum() const;
     const vector<Pin> &getPins() const;
+
+    // Print
+    void print();
 };
 
 #endif
