@@ -24,8 +24,8 @@ class Board{
     vector<Pin> outPins;
   
   public:
-    board();
-    ~board();
+    Board();
+    ~Board();
 
     // Setter
     void setW(double W);

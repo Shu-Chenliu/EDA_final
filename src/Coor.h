@@ -21,8 +21,8 @@ class Coor{
     double getX() const;
     double getY() const;
 
-    Coor Operator+(const Coor that) const;
-    Coor Operator-(const Coor that) const;
+    Coor operator+(const Coor& that) const;
+    Coor operator-(const Coor& that) const;
 };
 
 #endif

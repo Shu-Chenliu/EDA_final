@@ -1,8 +1,8 @@
 #include "Cell.h"
 
-Cell::Cell : 
+Cell::Cell() : 
   name(""),
-  type(""),
+  // type(""),
   w(0),
   h(0),
   delay(0),
@@ -43,11 +43,11 @@ void Cell::setDelay(double d){
   delay = d;
 }
 
-void Cell::setPins(Pin &Pins){
+void Cell::setPins(vector<Pin> &Pins){
   pins = Pins;
 }
 
-void Cell::addPins(Pin &Pins){
+void Cell::addPins(vector<Pin> &Pins){
   pins.insert(end(pins), begin(Pins), end(Pins));
 }
 

@@ -104,10 +104,10 @@ double Board::getArea() const{
   return area;
 }
 
-const vector<Pin> &Board::getInPins(){
+const vector<Pin> &Board::getInPins()const{
   return inPins;
 }
 
-const vector<Pin> &Board::getOutPins(){
+const vector<Pin> &Board::getOutPins()const{
   return outPins;
 }

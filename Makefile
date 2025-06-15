@@ -3,10 +3,10 @@ CXX = g++
 CXXFLAGS = -std=c++11 -O2 -Wall
 
 # Target executable
-TARGET = kmean.out
+TARGET = main.out
 
 # Source and object files
-SRCS = kmean.cpp MBFFgeneration.cpp classes.cpp
+SRCS = kmean.cpp MBFFgeneration.cpp classes.cpp main.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 # Default target
