@@ -3,7 +3,7 @@
 MBFFgeneration::MBFFgeneration(vector<FF*> flipflops, int maxDrivingStrength,double beta)
 	: flipflops(flipflops), maxDrivingStrength(maxDrivingStrength), beta(beta) {
 		for(size_t i=0;i<flipflops.size();i++){
-			map[flipflops[i]->name]=flipflops[i];
+			map[flipflops[i]->getName()]=flipflops[i];
 		}
 }
 
@@ -13,34 +13,30 @@ MBFFgeneration::~MBFFgeneration()
 int slackToWireLength(int slack){
 	return slack;
 }
-Rect manhattanCircle(const Point& center, int radius) {
-	return Rect(center.x - radius, center.x + radius, center.y - radius, center.y + radius);
+Rect manhattanCircle(const Coor& center, int radius) {
+	return Rect(center.getX() - radius, center.getX() + radius, center.getY() - radius, center.getY() + radius);
 }
 Rect intersectRects(const vector<Rect>& rects) {
 	Rect result = rects[0];
 	for (const auto& r : rects) {
-		result.x_min = max(result.x_min, r.x_min);
-		result.x_max = min(result.x_max, r.x_max);
-		result.y_min = max(result.y_min, r.y_min);
-		result.y_max = min(result.y_max, r.y_max);
+		result.setX(max(result.getX(), r.getX()));
+		result.setW(min(result.getX()+result.getW() ,r.getX()+r.getW())-result.getX());
+		result.setY(max(result.getY(), r.getY()));
+		result.setH(min(result.getY()+result.getH() ,r.getY()+r.getH())-result.getY());
 	}
-	if(result.x_max<result.x_min||result.y_max<result.y_min){
+	if(result.getW()<0||result.getH()<0){
 		return Rect();
 	}
 	return result;
 }
 Rect feasibleRegion(int driving_strength,FF* flipflop){
-	if (driving_strength < flipflop->original_drive) {
+	if (driving_strength < flipflop->getBit()) {
 		return Rect();
 	}
 	vector<Rect> manhattanRegions;
-	for (const auto& pin : flipflop->fanins) {
-		int radius = slackToWireLength(pin.slack);
-		manhattanRegions.push_back(manhattanCircle(pin.relative_position+flipflop->relocatedPosition, radius));
-	}
-	for (const auto& pin : flipflop->fanouts) {
-		int radius = slackToWireLength(pin.slack);
-		manhattanRegions.push_back(manhattanCircle(pin.relative_position+flipflop->relocatedPosition, radius));
+	for (const auto& pin : flipflop->getPins()) {
+		int radius = slackToWireLength(pin.getSlack());
+		manhattanRegions.push_back(manhattanCircle(pin.getCoor()+flipflop->getRelocateCoor(), radius));
 	}
 	if (manhattanRegions.empty()){
 		return Rect();
@@ -67,11 +63,11 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 	vector<int> x_boundaries;
 
 	for (const auto& r : rects) {
-		if(r.x_max==0){
+		if(r.getX()+r.getW()==0){
 			continue;
 		}
-		x_boundaries.push_back(r.x_min);
-		x_boundaries.push_back(r.x_max);
+		x_boundaries.push_back(r.getX());
+		x_boundaries.push_back(r.getX()+r.getW());
 	}
 
 	sort(x_boundaries.begin(), x_boundaries.end());
@@ -85,10 +81,10 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 		map<string, Rect> active_rects;
 
 		for (const auto& r : rects) {
-			if (r.x_min <= x_start && r.x_max >= x_end) {
-				events.emplace_back(r.y_min, "+" + r.name);
-				events.emplace_back(r.y_max, "-" + r.name);
-				active_rects[r.name] = r;
+			if (r.getX() <= x_start && r.getX()+r.getW() >= x_end) {
+				events.emplace_back(r.getY(), "+" + r.getName());
+				events.emplace_back(r.getY()+r.getH(), "-" + r.getName());
+				active_rects[r.getName()] = r;
 			}
 		}
 		sort(events.begin(), events.end());
@@ -143,15 +139,10 @@ int MBFFgeneration::cost(set<string> c){
 	// double areaAfter=0;
 	for(const auto&name:c){
 		FF* ff=map[name];
-		totalArea+=ff->area;
-		for(const auto&pin:ff->fanins){
-			total_slack+=pin.slack;
-			total_switching+=pin.switching_rate;
-			count++;
-		}
-		for(const auto&pin:ff->fanouts){
-			total_slack+=pin.slack;
-			total_switching+=pin.switching_rate;
+		totalArea+=ff->getW()*ff->getH();
+		for(const auto&pin:ff->getPins()){
+			total_slack+=pin.getSlack();
+			total_switching+=pin.getSR();
 			count++;
 		}
 	}
@@ -200,10 +191,10 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 		vector<Rect> regions;
 		// Build feasible regions
 		for (FF* ff : flipflops) {
-			if (strength < ff->original_drive) continue;
+			if (strength < ff->getBit()) continue;
 			Rect region = feasibleRegion(strength, ff);
-			cout<<ff->name<<":"<<region.x_min<<" "<<region.x_max<<" "<<region.y_min<<" "<<region.y_max<<endl;
-			region.name = ff->name;
+			cout<<ff->getName()<<":"<<region.getX()<<" "<<region.getX()+region.getW()<<" "<<region.getY()<<" "<<region.getY()+region.getH()<<endl;
+			region.setName(ff->getName());
 			regions.push_back(region);
 		}
 		cout << "    Collected " << regions.size() << " feasible regions." << endl;
@@ -253,11 +244,11 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 		}
 	}
 	for(FF* ff:flipflops){
-		if(marked.count(ff->name)){
+		if(marked.count(ff->getName())){
 			continue;
 		}
 		set<string> set;
-		set.insert(ff->name);
+		set.insert(ff->getName());
 		non_conflictMBFF.push_back(set);
 	}
 	cout << "[DEBUG] Final selected MBFF count: " << non_conflictMBFF.size() << endl;
@@ -280,12 +271,8 @@ int weightedMedian(vector<pair<int, int>>& coords_weights) {
 Rect computePreferredRegion(const MBFF& mbff) {
 	vector<pair<int, int>> x_weights, y_weights;
 	for (auto& pin : mbff.fanins) {
-		x_weights.emplace_back(pin.relative_position.x+mbff.position.x, pin.switching_rate);
-		y_weights.emplace_back(pin.relative_position.y+mbff.position.y, pin.switching_rate);
-	}
-	for (auto& pin : mbff.fanouts) {
-		x_weights.emplace_back(pin.relative_position.x+mbff.position.x, pin.switching_rate);
-		y_weights.emplace_back(pin.relative_position.y+mbff.position.y, pin.switching_rate);
+		x_weights.emplace_back(pin.getX()+mbff.position.getX(), pin.getSR());
+		y_weights.emplace_back(pin.getY()+mbff.position.getY(), pin.getSR());
 	}
 
 	int x_center = weightedMedian(x_weights);
@@ -294,6 +281,7 @@ Rect computePreferredRegion(const MBFF& mbff) {
 
 	return Rect(x_center - margin, x_center + margin, y_center - margin, y_center + margin);
 }
+//TODO:  change chip area to board
 vector<Bin> generateBins(Rect chip_area, int bin_width, int bin_height) {
 	vector<Bin> bins;
 	int x_bins = (chip_area.x_max - chip_area.x_min) / bin_width;
@@ -315,14 +303,14 @@ vector<Bin> generateBins(Rect chip_area, int bin_width, int bin_height) {
 void assignMBFFLocation(MBFF& mbff, vector<Bin>& bins) {
 	cout << "  [Bin Assignment] For MBFF with " << mbff.members.size() << " members" << endl;
 	for (auto& bin : bins) {
-		if (bin.area.intersects(mbff.preferred_region)) {
+		if (bin.area.intersect(mbff.preferred_region)) {
 			bin.rank = 0;
-		} else if (bin.area.intersects(mbff.feasible_region)) {
+		} else if (bin.area.intersect(mbff.feasible_region)) {
 			// Calculate Manhattan distance to preferred region center
-			int cx = (mbff.preferred_region.x_min + mbff.preferred_region.x_max) / 2;
-			int cy = (mbff.preferred_region.y_min + mbff.preferred_region.y_max) / 2;
-			int bx = (bin.area.x_min + bin.area.x_max) / 2;
-			int by = (bin.area.y_min + bin.area.y_max) / 2;
+			int cx = (mbff.preferred_region.getX() + mbff.preferred_region.getX()+mbff.preferred_region.getW()) / 2;
+			int cy = (mbff.preferred_region.getY() + mbff.preferred_region.getY()+mbff.preferred_region.getH()) / 2;
+			int bx = (bin.area.getX() + bin.area.getX()+bin.area.getW()) / 2;
+			int by = (bin.area.getY() + bin.area.getY()+bin.area.getH()) / 2;
 			bin.rank = abs(cx - bx) + abs(cy - by);
 		} else {
 			bin.rank = -1; // invalid
@@ -352,10 +340,10 @@ Rect MBFFgeneration::feasibleRegionForClique(MBFF mbff){
   int new_y_min = INT_MAX, new_y_max = INT_MIN;
 	for(const auto&ff:mbff.members){
 		Rect region= feasibleRegion(mbff.driving_strength,map[ff]);
-		new_x_min=max(new_x_min,region.x_min);
-		new_x_max=min(new_x_max,region.x_max);
-		new_y_min=max(new_y_min,region.y_min);
-		new_y_max=min(new_y_max,region.y_max);
+		new_x_min=max(new_x_min,(int)region.getX());
+		new_x_max=min(new_x_max,(int)region.getX()+(int)region.getW());
+		new_y_min=max(new_y_min,(int)region.getY());
+		new_y_max=min(new_y_max,(int)region.getY()+(int)region.getW());
 	}
 	return Rect(new_x_min,new_x_max,new_y_min,new_y_max);
 }
@@ -377,12 +365,12 @@ vector<MBFF> MBFFgeneration::locationAssignment(Rect chip_area) {
 		for (auto& name : clique) {
 			cout<<name<<endl;
 			FF* ff = map[name];
-			x+=ff->relocatedPosition.x;
-			y+=ff->relocatedPosition.y;
+			x+=ff->getRelocateCoor().getX();
+			y+=ff->getRelocateCoor().getY();
 			mbff.fanins.insert(mbff.fanins.end(), ff->fanins.begin(), ff->fanins.end());
 			mbff.fanouts.insert(mbff.fanouts.end(), ff->fanouts.begin(), ff->fanouts.end());
 		}
-		mbff.position=Point(x/clique.size(),y/clique.size());
+		mbff.position=Coor(x/clique.size(),y/clique.size());
 		mbff.feasible_region = feasibleRegionForClique(mbff); // intersect all FF feasible regions
 		mbff.preferred_region = computePreferredRegion(mbff);
 		assignMBFFLocation(mbff, bins);

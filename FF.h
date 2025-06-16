@@ -8,6 +8,8 @@ class FF : public Cell{
     int bit;
     int clk;
     int scan;
+    Coor relcateCoor;
+    int cluster;
 
   public:
     FF();
@@ -17,11 +19,14 @@ class FF : public Cell{
     void setBit(int n);
     void setClk(int n);
     void setScan(int n);
-
+    void setRelocateCoor(Coor coor);
+    void setCluster(int cluster);
     // Getter
     int getBit() const;
     int getClk() const;
     int getScan() const;
+    Coor getRelocateCoor() const;
+    int getCluster() const;
 };
 
 #endif

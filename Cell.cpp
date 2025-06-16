@@ -56,7 +56,7 @@ void Cell::addPin(Pin pin){
   pins.push_back(pin);
 }
 
-void Cell::addPins(vector<Pin> Pins){
+void Cell::addPins(vector<Pin>& Pins){
   pins.insert(end(pins), begin(Pins), end(Pins));
 }
 

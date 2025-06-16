@@ -2,6 +2,11 @@
 #define MBFFGENERATION_H
 
 #include "classes.cpp"
+#include "Coor.h"
+#include "Rect.h"
+#include "Pin.h"
+#include "FF.h"
+#include <set>
 #include <cstdlib> // Needed for rand() and srand()
 #include <ctime>
 using namespace std;

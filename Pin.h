@@ -4,8 +4,9 @@
 #include <iostream>
 #include <string>
 #include "Coor.h"
-using namespace std;
 
+using namespace std;
+class FF;
 class Pin{
   private:
     string name;
@@ -13,10 +14,11 @@ class Pin{
     Coor coor;
     int SR;  // switching rate
     float slack;
+    FF* ff;
 
   public:
     Pin();
-    Pin(string Name, string Net);
+    Pin(string Name, string Net,FF* ff);
     ~Pin();
 
     // Setter
@@ -25,6 +27,7 @@ class Pin{
     void setCoor(float X, float Y);
     void setSR(int sr);
     void setSlack(float S);
+    void setFF(FF* ff);
 
     // Getter
     string getName() const;
@@ -33,7 +36,8 @@ class Pin{
     float getY() const;
     int getSR() const;
     float getSlack() const;
-
+    FF* getFF() const;
+    Coor getCoor() const;
     // Print
     void print();
     void printCoor();

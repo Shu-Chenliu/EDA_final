@@ -15,7 +15,7 @@ using namespace std;
 kmean::kmean(int SIZE_LIMIT,int MAX_ITER,int DISP_LIMIT):SIZE_LIMIT(SIZE_LIMIT),MAX_ITER(MAX_ITER),DISP_LIMIT(DISP_LIMIT){}
 kmean::~kmean(){}
 double manhattanDist(const FF* p, const Cluster& c) {
-    return abs(p->position.x - c.cx) + abs(p->position.y - c.cy);
+    return abs(p->getX() - c.cx) + abs(p->getY() - c.cy);
 }
 
 double kmean::weightedCost(const FF* p, const Cluster& c) {
@@ -30,8 +30,8 @@ void updateCenters(vector<FF*>& flip_flops, vector<Cluster>& clusters) {
         if (c.flip_flops.empty()) continue;
         double sumX = 0, sumY = 0;
         for (FF* ff : c.flip_flops) {
-            sumX += ff->position.x;
-            sumY += ff->position.y;
+            sumX += ff->getX();
+            sumY += ff->getY();
         }
         c.cx = sumX / c.flip_flops.size();
         c.cy = sumY / c.flip_flops.size();
@@ -52,7 +52,7 @@ void kmean::assignPoints(vector<FF*>& flip_flops, vector<Cluster>& clusters, boo
                 best = k;
             }
         }
-        flip_flops[i]->cluster = best;
+        flip_flops[i]->setCluster(best);
         clusters[best].flip_flops.push_back(flip_flops[i]);
     }
 }
@@ -61,8 +61,8 @@ void initCentersRecursive(const vector<FF*>& flip_flops, vector<Cluster>& cluste
     if (K == 1) {
         double avgX = 0, avgY = 0;
         for (int i : indices) {
-            avgX += flip_flops[i]->position.x;
-            avgY += flip_flops[i]->position.y;
+            avgX += flip_flops[i]->getX();
+            avgY += flip_flops[i]->getY();
         }
         avgX /= indices.size();
         avgY /= indices.size();
@@ -71,7 +71,7 @@ void initCentersRecursive(const vector<FF*>& flip_flops, vector<Cluster>& cluste
     }
 
     sort(indices.begin(), indices.end(), [&](int a, int b) {
-        return splitX ? (flip_flops[a]->position.x < flip_flops[b]->position.x) : (flip_flops[a]->position.y < flip_flops[b]->position.y);
+        return splitX ? (flip_flops[a]->getX() < flip_flops[b]->getX()) : (flip_flops[a]->getY() < flip_flops[b]->getY());
     });
 
     int mid = indices.size() / 2;
@@ -102,7 +102,7 @@ void kmean::resolveOverflow(vector<FF*>& flip_flops, vector<Cluster>& clusters) 
         while ((int)clusters[i].flip_flops.size() > SIZE_LIMIT) {
             FF* ff = clusters[i].flip_flops.back();
             clusters[i].flip_flops.pop_back();
-            ff->cluster = clusters.size();
+            ff->setCluster(clusters.size());
             newCluster.flip_flops.push_back(ff);
         }
 
@@ -113,14 +113,14 @@ void kmean::resolveOverflow(vector<FF*>& flip_flops, vector<Cluster>& clusters) 
 // Resolve over displacement
 void kmean::resolveOverDisplacement(vector<FF*>& flip_flops, vector<Cluster>& clusters) {
     for (size_t i = 0; i < flip_flops.size(); ++i) {
-        int cid = flip_flops[i]->cluster;
+        int cid = flip_flops[i]->getCluster();
         // Check if the flop is too far from its cluster center
 
         if (manhattanDist(flip_flops[i], clusters[cid]) > DISP_LIMIT) {
             // New cluster centered at violating flop
-            Cluster newC = {flip_flops[i]->position.x, flip_flops[i]->position.y};
+            Cluster newC = {flip_flops[i]->getX(), flip_flops[i]->getY()};
             newC.flip_flops.push_back(flip_flops[i]);
-            flip_flops[i]->cluster = clusters.size();
+            flip_flops[i]->setCluster(clusters.size());
             clusters.push_back(newC);
             
             // Remove flop from old cluster
@@ -133,8 +133,8 @@ void kmean::resolveOverDisplacement(vector<FF*>& flip_flops, vector<Cluster>& cl
             oldCluster.cx = 0;
             oldCluster.cy = 0;
             for (FF* ff : oldCluster.flip_flops) {
-                oldCluster.cx += ff->position.x;
-                oldCluster.cy += ff->position.y;
+                oldCluster.cx += ff->getX();
+                oldCluster.cy += ff->getY();
             }
             if (!oldCluster.flip_flops.empty()) {
                 oldCluster.cx /= oldCluster.flip_flops.size();
@@ -145,11 +145,11 @@ void kmean::resolveOverDisplacement(vector<FF*>& flip_flops, vector<Cluster>& cl
                 oldCluster.cy = 0;
             }
             // Update new cluster center
-            newC.cx = flip_flops[i]->position.x;
-            newC.cy = flip_flops[i]->position.y;
+            newC.cx = flip_flops[i]->getX();
+            newC.cy = flip_flops[i]->getY();
             for (FF* ff : newC.flip_flops) {
-                newC.cx += ff->position.x;
-                newC.cy += ff->position.y;
+                newC.cx += ff->getX();
+                newC.cy += ff->getY();
             }
             if (!newC.flip_flops.empty()) {
                 newC.cx /= newC.flip_flops.size();
@@ -162,7 +162,7 @@ void kmean::resolveOverDisplacement(vector<FF*>& flip_flops, vector<Cluster>& cl
             // Update the cluster in the vector
             clusters[cid] = oldCluster;
             clusters.push_back(newC); // Add the new cluster to the list
-            cout << "Flop " << flip_flops[i]->name << " moved to new cluster " << clusters.size() - 1
+            cout << "Flop " << flip_flops[i]->getName() << " moved to new cluster " << clusters.size() - 1
                  << " due to over displacement from cluster " << cid << "\n";
 
         }
@@ -197,8 +197,7 @@ void relocateFlops(vector<FF*>& flip_flops, vector<Cluster>& clusters) {
                 int ry = py + dy + row;
 
                 while (used.count({rx, ry})) rx++;  // ensure unique placement
-                c.flip_flops[i]->relocatedPosition.x=rx;
-                c.flip_flops[i]->relocatedPosition.y=ry;
+                c.flip_flops[i]->setRelocateCoor(Coor(rx,ry));
                 // c.flip_flops[i]->relocatedX = rx;
                 // c.flip_flops[i]->relocatedY = ry;
                 used.insert({rx, ry});
@@ -244,7 +243,7 @@ vector<Cluster> kmean::kmeansWeighted(vector<FF*>& flip_flops) {
         updateCenters(flip_flops, clusters);
         update = 0;
         for (size_t i = 0; i < flip_flops.size(); ++i) {
-            if (flip_flops[i]->cluster != oldPoints[i]->cluster) {
+            if (flip_flops[i]->getCluster() != oldPoints[i]->getCluster()) {
                 update = 1; // If any point's cluster changed, we need another iteration
                 
                 i = flip_flops.size();
@@ -265,7 +264,7 @@ vector<Cluster> kmean::kmeansWeighted(vector<FF*>& flip_flops) {
         
         totalCost = 0;
         for (size_t i = 0; i < flip_flops.size(); ++i) {
-            totalCost += weightedCost(flip_flops[i], clusters[flip_flops[i]->cluster]);
+            totalCost += weightedCost(flip_flops[i], clusters[flip_flops[i]->getCluster()]);
         }
         if (totalCost < currentCost) {
             update = 1; // If cost improved, we need another iteration
@@ -288,7 +287,7 @@ vector<Cluster> kmean::kmeansWeighted(vector<FF*>& flip_flops) {
     for (size_t i = 0; i < clusters.size(); ++i){
         cout << "Cluster " << i << ": " << clusters[i].flip_flops.size() << " flops\n";
         for (FF* ff : clusters[i].flip_flops) {
-            cout << "  " << ff->name << " at (" << ff->relocatedPosition.x << ", " << ff->relocatedPosition.y << ")\n";
+            cout << "  " << ff->getName() << " at (" << ff->getRelocateCoor().getX() << ", " << ff->getRelocateCoor().getY() << ")\n";
         }
     }
 
@@ -297,11 +296,11 @@ vector<Cluster> kmean::kmeansWeighted(vector<FF*>& flip_flops) {
     int totalDistToCluster = 0;
 
     for (size_t i = 0; i < flip_flops.size(); ++i) {
-        cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
-             << "), cluster=" << flip_flops[i]->cluster
-             << ", relocated=(" << flip_flops[i]->relocatedPosition.x << "," << flip_flops[i]->relocatedPosition.y << ")\n";
-        totalMove += abs(flip_flops[i]->relocatedPosition.x - flip_flops[i]->position.x) + abs(flip_flops[i]->relocatedPosition.y - flip_flops[i]->position.y);
-        totalDistToCluster += manhattanDist(flip_flops[i], clusters[flip_flops[i]->cluster]);
+        cout << "Flop " << i << ": original=(" << flip_flops[i]->getX() << "," << flip_flops[i]->getY()
+             << "), cluster=" << flip_flops[i]->getCluster()
+             << ", relocated=(" << flip_flops[i]->getRelocateCoor().getX() << "," << flip_flops[i]->getRelocateCoor().getY() << ")\n";
+        totalMove += abs(flip_flops[i]->getRelocateCoor().getX() - flip_flops[i]->getX()) + abs(flip_flops[i]->getRelocateCoor().getY() - flip_flops[i]->getY());
+        totalDistToCluster += manhattanDist(flip_flops[i], clusters[flip_flops[i]->getCluster()]);
     }
     cout << "Total distance relocated to cluster centers: " << totalMove << endl;
     cout << "Total distance to cluster centers: " << totalDistToCluster << endl;
