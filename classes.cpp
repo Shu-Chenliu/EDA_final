@@ -16,7 +16,7 @@
 #include <string>
 #include <limits.h>
 using namespace std;
-
+struct FF;
 struct Point {
   double x, y;
 	Point() : x(0), y(0) {}
@@ -27,6 +27,9 @@ struct Point {
 		double ry = (x + y) * sqrt2_inv;
 		return Point(rx, ry);
 	}
+	Point operator+(const Point& other) const {
+    return Point(x + other.x, y + other.y);
+  }
 };
 struct Rect {
 	int x_min, x_max, y_min, y_max;
@@ -73,7 +76,8 @@ struct Pin {
 };
 struct FF {
   int cluster = -1;
-  double relocatedX = -1, relocatedY = -1;
+  // double relocatedX = -1, relocatedY = -1;
+	Point relocatedPosition=Point(-1,-1);
   string name;
 	int original_drive;
 	double area;
@@ -107,6 +111,7 @@ struct MBFF {
 	Rect preferred_region;
 	int driving_strength;
 	vector<MBFFBit> bits;
+	Point position;
 	// ... slot assignment fields
 };
 struct Bin {

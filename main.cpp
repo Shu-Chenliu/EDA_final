@@ -336,8 +336,8 @@ int main() {
         edges.push_back(Edge(
           i,
           flip_flops[i]->next[j],
-          (int)abs(flip_flops[i]->relocatedX - flip_flops[flip_flops[i]->next[j]]->relocatedX) +
-          abs(flip_flops[i]->relocatedY - flip_flops[flip_flops[i]->next[j]]->relocatedY)
+          (int)abs(flip_flops[i]->relocatedPosition.x - flip_flops[flip_flops[i]->next[j]]->relocatedPosition.x) +
+          abs(flip_flops[i]->relocatedPosition.y - flip_flops[flip_flops[i]->next[j]]->relocatedPosition.y)
         )); // Manhattan distance
       }
     }
@@ -359,8 +359,7 @@ int main() {
   
 
   for (auto ff : flip_flops) {
-    ff->relocatedX = ff->position.x;
-    ff->relocatedY = ff->position.y;
+    ff->relocatedPosition = Point(ff->position.x,ff->position.y);
   }
 
   for (auto ff : flip_flops) {

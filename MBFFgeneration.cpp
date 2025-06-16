@@ -36,11 +36,11 @@ Rect feasibleRegion(int driving_strength,FF* flipflop){
 	vector<Rect> manhattanRegions;
 	for (const auto& pin : flipflop->fanins) {
 		int radius = slackToWireLength(pin.slack);
-		manhattanRegions.push_back(manhattanCircle(pin.position, radius));
+		manhattanRegions.push_back(manhattanCircle(pin.relative_position+flipflop->relocatedPosition, radius));
 	}
 	for (const auto& pin : flipflop->fanouts) {
 		int radius = slackToWireLength(pin.slack);
-		manhattanRegions.push_back(manhattanCircle(pin.position, radius));
+		manhattanRegions.push_back(manhattanCircle(pin.relative_position+flipflop->relocatedPosition, radius));
 	}
 	if (manhattanRegions.empty()){
 		return Rect();
@@ -271,12 +271,12 @@ int weightedMedian(vector<pair<int, int>>& coords_weights) {
 Rect computePreferredRegion(const MBFF& mbff) {
 	vector<pair<int, int>> x_weights, y_weights;
 	for (auto& pin : mbff.fanins) {
-		x_weights.emplace_back(pin.position.x, pin.switching_rate);
-		y_weights.emplace_back(pin.position.y, pin.switching_rate);
+		x_weights.emplace_back(pin.relative_position.x+mbff.position.x, pin.switching_rate);
+		y_weights.emplace_back(pin.relative_position.y+mbff.position.y, pin.switching_rate);
 	}
 	for (auto& pin : mbff.fanouts) {
-		x_weights.emplace_back(pin.position.x, pin.switching_rate);
-		y_weights.emplace_back(pin.position.y, pin.switching_rate);
+		x_weights.emplace_back(pin.relative_position.x+mbff.position.x, pin.switching_rate);
+		y_weights.emplace_back(pin.relative_position.y+mbff.position.y, pin.switching_rate);
 	}
 
 	int x_center = weightedMedian(x_weights);
@@ -362,7 +362,7 @@ vector<MBFF> MBFFgeneration::locationAssignment(Rect chip_area) {
 		cout << "  [MBFF#" << (++count) << "] Placing..." << endl;
 		MBFF mbff;
 		mbff.members = clique;
-
+		//TODO: assign MBFF position to average x and y
 		for (auto& name : clique) {
 			cout<<name<<endl;
 			FF* ff = map[name];

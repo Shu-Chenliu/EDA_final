@@ -197,9 +197,10 @@ void relocateFlops(vector<FF*>& flip_flops, vector<Cluster>& clusters) {
                 int ry = py + dy + row;
 
                 while (used.count({rx, ry})) rx++;  // ensure unique placement
-
-                c.flip_flops[i]->relocatedX = rx;
-                c.flip_flops[i]->relocatedY = ry;
+                c.flip_flops[i]->relocatedPosition.x=rx;
+                c.flip_flops[i]->relocatedPosition.y=ry;
+                // c.flip_flops[i]->relocatedX = rx;
+                // c.flip_flops[i]->relocatedY = ry;
                 used.insert({rx, ry});
                 ++i;
             }
@@ -287,7 +288,7 @@ vector<Cluster> kmean::kmeansWeighted(vector<FF*>& flip_flops) {
     for (size_t i = 0; i < clusters.size(); ++i){
         cout << "Cluster " << i << ": " << clusters[i].flip_flops.size() << " flops\n";
         for (FF* ff : clusters[i].flip_flops) {
-            cout << "  " << ff->name << " at (" << ff->relocatedX << ", " << ff->relocatedY << ")\n";
+            cout << "  " << ff->name << " at (" << ff->relocatedPosition.x << ", " << ff->relocatedPosition.y << ")\n";
         }
     }
 
@@ -298,8 +299,8 @@ vector<Cluster> kmean::kmeansWeighted(vector<FF*>& flip_flops) {
     for (size_t i = 0; i < flip_flops.size(); ++i) {
         cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
              << "), cluster=" << flip_flops[i]->cluster
-             << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
-        totalMove += abs(flip_flops[i]->relocatedX - flip_flops[i]->position.x) + abs(flip_flops[i]->relocatedY - flip_flops[i]->position.y);
+             << ", relocated=(" << flip_flops[i]->relocatedPosition.x << "," << flip_flops[i]->relocatedPosition.y << ")\n";
+        totalMove += abs(flip_flops[i]->relocatedPosition.x - flip_flops[i]->position.x) + abs(flip_flops[i]->relocatedPosition.y - flip_flops[i]->position.y);
         totalDistToCluster += manhattanDist(flip_flops[i], clusters[flip_flops[i]->cluster]);
     }
     cout << "Total distance relocated to cluster centers: " << totalMove << endl;
