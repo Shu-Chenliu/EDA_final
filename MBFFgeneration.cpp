@@ -363,13 +363,17 @@ vector<MBFF> MBFFgeneration::locationAssignment(Rect chip_area) {
 		MBFF mbff;
 		mbff.members = clique;
 		//TODO: assign MBFF position to average x and y
+		double x=0;
+		double y=0;
 		for (auto& name : clique) {
 			cout<<name<<endl;
 			FF* ff = map[name];
+			x+=ff->relocatedPosition.x;
+			y+=ff->relocatedPosition.y;
 			mbff.fanins.insert(mbff.fanins.end(), ff->fanins.begin(), ff->fanins.end());
 			mbff.fanouts.insert(mbff.fanouts.end(), ff->fanouts.begin(), ff->fanouts.end());
 		}
-
+		mbff.position=Point(x/clique.size(),y/clique.size());
 		mbff.feasible_region = feasibleRegionForClique(mbff); // intersect all FF feasible regions
 		mbff.preferred_region = computePreferredRegion(mbff);
 		assignMBFFLocation(mbff, bins);
