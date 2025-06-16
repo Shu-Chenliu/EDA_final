@@ -63,12 +63,10 @@ int main(){
   Board B;
   string file = "testcase1/testcase1";
   B.readWeight(file);
-  // B.print();
-
   B.readDef(file);
   B.readV(file);
 
-  B.print(1, 1, 0, 0);
+  B.print(1, 0, 0, 0);
 
-  // readFile("testcase1/123.txt");
+  B.forMatplotlib(file);
 }

@@ -89,6 +89,9 @@ class Board{
 
     // Print
     void print(bool basic = true, bool cells = true, bool pins = true, bool nets = true);
+
+    // Output
+    void forMatplotlib(const string& file);
 };
 
 #endif
