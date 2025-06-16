@@ -75,8 +75,9 @@ struct FF {
 	Point position;
 	vector<Pin> fanins;
 	vector<Pin> fanouts;
+	FF* nextFF;
 	FF(int drive, double x, double y, const string& n = "", const vector<Pin>& fi = {}, const vector<Pin>& fo = {})
-  : name(n), original_drive(drive), position(x, y), fanins(fi), fanouts(fo) {}
+  : name(n), original_drive(drive), position(x, y), fanins(fi), fanouts(fo), nextFF(nullptr) {}
 
 };
 

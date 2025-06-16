@@ -464,6 +464,8 @@ int main() {
     
     vector<Cluster> clusters=kmeansWeighted(flip_flops);
 
+    
+
     for(size_t i=0;i<clusters.size();i++){
         vector<FF*> flipflop=clusters[i].flip_flops;
         int maxDrivingStrength = 4;
