@@ -12,6 +12,8 @@
 
 using namespace std;
 int main() {
+  random_device rd;
+  mt19937 gen(rd());
   vector<FF*> flip_flops = {
     new FF(1, 1, 10, 10, "ff0",
       { Pin{ Point(5, 5), 10.0, 2 } },
@@ -144,8 +146,7 @@ int main() {
     )
   };
   for(size_t i=0;i<flip_flops.size();i++){
-    random_device rd;
-    mt19937 gen(rd());
+    
     uniform_int_distribution<> num_next_dis(0, 3);
     int x = num_next_dis(gen);
     vector<int> indices;
@@ -177,24 +178,30 @@ int main() {
     if (ff->position.y < top) top = ff->position.y;
     if (ff->position.y > bottom) bottom = ff->position.y;
   }
-  int SIZE_LIMIT = flip_flops.size() / 3 ; // Example size limit for clusters
-  int MAX_ITER = flip_flops.size() * 2; // Example maximum iterations
-  int DISP_LIMIT = (right - left + bottom - top) / 3;
-  kmean kmean(SIZE_LIMIT,MAX_ITER,DISP_LIMIT);
-  // update flip flops position
-  
+  int size=flip_flops.size();
+  for(int i=0;i<flip_flops.size();i++){
+    uniform_int_distribution<> num_size((int)flip_flops.size() / 3, (int)flip_flops.size()*2 / 3);
+    int SIZE_LIMIT = num_size(gen) ; // Example size limit for clusters
+    int MAX_ITER = flip_flops.size() * 2; // Example maximum iterations
+    uniform_int_distribution<> num_disp((int)(right - left + bottom - top) / 3, (int)(right - left + bottom - top) *2/ 3);
+    int DISP_LIMIT = num_disp(gen);
+    kmean kmean(SIZE_LIMIT,MAX_ITER,DISP_LIMIT);
+    // update flip flops position
+    
 
-  vector<Cluster> clusters=kmean.kmeansWeighted(flip_flops);
-  srand(time(0));
-  for(size_t i=0;i<1;i++){
-    vector<FF*> flipflop=clusters[i].flip_flops;
-    int maxDrivingStrength = 4;
-    double beta = 0.95;
-    MBFFgeneration generator(flipflop, maxDrivingStrength, beta);
-    // vector<set<string>> mbff_result = generator.generateMBFF();
-    vector<MBFF> placed_mbffs=generator.locationAssignment(Rect(0,441,0,448));
-    generator.MBFFsizing(placed_mbffs);
+    vector<Cluster> clusters=kmean.kmeansWeighted(flip_flops);
+    srand(time(0));
+    for(size_t i=0;i<1;i++){
+      vector<FF*> flipflop=clusters[i].flip_flops;
+      int maxDrivingStrength = 4;
+      double beta = 0.95;
+      MBFFgeneration generator(flipflop, maxDrivingStrength, beta);
+      // vector<set<string>> mbff_result = generator.generateMBFF();
+      vector<MBFF> placed_mbffs=generator.locationAssignment(Rect(0,441,0,448));
+      generator.MBFFsizing(placed_mbffs);
+    }
   }
+  
 
   for (auto ff : flip_flops) {
     ff->relocatedX = ff->position.x;
