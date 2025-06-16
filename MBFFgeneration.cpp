@@ -226,6 +226,7 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 	for(const auto& maxclique:mbff_candidates){
 		pq.push(MBFFcost(maxclique));
 	}
+	//TODO: 處理剩下烙單的ff
 	unordered_set<string> marked;
 	while(!pq.empty()){
 		pair<int,pair<set<string>,set<string>>> m=pq.top();
@@ -250,6 +251,14 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 			}
 			pq.push(MBFFcost(m.second.second));
 		}
+	}
+	for(FF* ff:flipflops){
+		if(marked.count(ff->name)){
+			continue;
+		}
+		set<string> set;
+		set.insert(ff->name);
+		non_conflictMBFF.push_back(set);
 	}
 	cout << "[DEBUG] Final selected MBFF count: " << non_conflictMBFF.size() << endl;
 	return non_conflictMBFF;

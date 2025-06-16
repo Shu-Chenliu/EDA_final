@@ -319,7 +319,7 @@ int main() {
     if (ff->position.y > bottom) bottom = ff->position.y;
   }
   size_t size=flip_flops.size();
-  for(size_t j=0;j<size*size;j++){
+  for(size_t j=0;j<1;j++){
     uniform_int_distribution<> num_size((int)flip_flops.size() / 3, (int)flip_flops.size()*2 / 3);
     int SIZE_LIMIT = num_size(gen) ; // Example size limit for clusters
     int MAX_ITER = flip_flops.size() * 2; // Example maximum iterations
