@@ -2,7 +2,7 @@
 
 MBFFgeneration::MBFFgeneration(vector<FF*> flipflops, int maxDrivingStrength,double beta)
 	: flipflops(flipflops), maxDrivingStrength(maxDrivingStrength), beta(beta) {
-		for(int i=0;i<flipflops.size();i++){
+		for(size_t i=0;i<flipflops.size();i++){
 			map[flipflops[i]->name]=flipflops[i];
 		}
 }
@@ -113,7 +113,7 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 			// }
 			FFinRegion.push_back(active);
 		}
-		for(int i=1;i<FFinRegion.size()-1;i++){
+		for(size_t i=1;i<FFinRegion.size()-1;i++){
 			if(FFinRegion[i].size()>FFinRegion[i-1].size()&&FFinRegion[i].size()>FFinRegion[i+1].size()){
 				maximal_cliques.push_back(FFinRegion[i]);
 			}
@@ -140,7 +140,7 @@ int MBFFgeneration::cost(set<string> c){
 	double total_slack = 0;
   int total_switching = 0;
 	int count=0;
-	double areaAfter=0;
+	// double areaAfter=0;
 	for(const auto&name:c){
 		FF* ff=map[name];
 		totalArea+=ff->area;
@@ -397,8 +397,8 @@ void downsizeMBFFs(vector<MBFF>& mbffs, double avg_slack, double beta) {
 			}
 		}
 
-		int k = mbff.bits.size();
-		int h = k - l;
+		// int k = mbff.bits.size();
+		// int h = k - l;
 		// Step 10: 已原地更新 MBFF，可加上 power report 或 output log
 	}
 }

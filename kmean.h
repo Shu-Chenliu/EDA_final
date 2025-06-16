@@ -20,8 +20,8 @@ class kmean
 	protected:
 	private:
 		int SIZE_LIMIT;
-    double DISP_LIMIT;
     int MAX_ITER;
+		double DISP_LIMIT;
 
 };
 
