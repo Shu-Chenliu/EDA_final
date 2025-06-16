@@ -201,8 +201,8 @@ int main() {
     if (ff->position.y < top) top = ff->position.y;
     if (ff->position.y > bottom) bottom = ff->position.y;
   }
-  int size=flip_flops.size();
-  for(int i=0;i<flip_flops.size();i++){
+  size_t size=flip_flops.size();
+  for(size_t j=0;j<1;j++){
     uniform_int_distribution<> num_size((int)flip_flops.size() / 3, (int)flip_flops.size()*2 / 3);
     int SIZE_LIMIT = num_size(gen) ; // Example size limit for clusters
     int MAX_ITER = flip_flops.size() * 2; // Example maximum iterations
@@ -213,6 +213,21 @@ int main() {
     
 
     vector<Cluster> clusters=kmean.kmeansWeighted(flip_flops);
+    edges.clear();
+    for (size_t i = 0; i < flip_flops.size(); ++i) {
+      for (size_t j = 0; j < flip_flops[i]->next.size(); ++j) {
+        edges.push_back(Edge(
+          i,
+          flip_flops[i]->next[j],
+          (int)abs(flip_flops[i]->relocatedX - flip_flops[flip_flops[i]->next[j]]->relocatedX) +
+          abs(flip_flops[i]->relocatedY - flip_flops[flip_flops[i]->next[j]]->relocatedY)
+        )); // Manhattan distance
+      }
+    }
+    // do MST
+    MST mst_after(edges, (int)flip_flops.size());
+    total_wire_length = mst_after.MinimumSpanningTreeCost();
+    cout << "MST wire length after k-means: " << total_wire_length << endl;
     srand(time(0));
     for(size_t i=0;i<1;i++){
       vector<FF*> flipflop=clusters[i].flip_flops;

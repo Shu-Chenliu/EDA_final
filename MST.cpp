@@ -40,11 +40,11 @@ int MST::MinimumSpanningTreeCost() {
     vector<Edge> mst;
     int weight = kruskal(n, edges, mst);
 
-    cout << "Total weight of MST: " << weight << endl;
-    cout << "Edges in MST:\n";
-    for(const Edge& e : mst) {
-        cout << e.start << " - " << e.end << " : " << e.weight << endl;
-    }
+    // cout << "Total weight of MST: " << weight << endl;
+    // cout << "Edges in MST:\n";
+    // for(const Edge& e : mst) {
+    //     cout << e.start << " - " << e.end << " : " << e.weight << endl;
+    // }
 
     return weight;
 }
