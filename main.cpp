@@ -28,26 +28,26 @@ int main() {
   flip_flops.push_back(new FF(1, 1, 18, 19, "ff6"));
   flip_flops.push_back(new FF(1, 1, 20, 20, "ff7"));
   flip_flops.push_back(new FF(1, 1, 22, 21, "ff8"));
-  flip_flops.push_back(new FF(1, 1, 24, 23, "ff9"));
-  flip_flops.push_back(new FF(1, 1, 25, 25, "ff10"));
-  flip_flops.push_back(new FF(1, 1, 30, 30, "ff11"));
-  flip_flops.push_back(new FF(1, 1, 28, 28, "ff12"));
-  flip_flops.push_back(new FF(1, 1, 26, 26, "ff13"));
-  flip_flops.push_back(new FF(1, 1, 27, 27, "ff14"));
-  flip_flops.push_back(new FF(1, 1, 29, 29, "ff15"));
-  flip_flops.push_back(new FF(1, 1, 31, 31, "ff16"));
-  flip_flops.push_back(new FF(1, 1, 32, 32, "ff17"));
-  flip_flops.push_back(new FF(1, 1, 33, 33, "ff18"));
-  flip_flops.push_back(new FF(1, 1, 34, 34, "ff19"));
-  flip_flops.push_back(new FF(1, 1, 35, 35, "ff20"));
-  flip_flops.push_back(new FF(1, 1, 36, 36, "ff21"));
-  flip_flops.push_back(new FF(1, 1, 37, 37, "ff22"));
-  flip_flops.push_back(new FF(1, 1, 38, 38, "ff23"));
-  flip_flops.push_back(new FF(1, 1, 39, 39, "ff24"));
-  flip_flops.push_back(new FF(1, 1, 40, 40, "ff25"));
-  flip_flops.push_back(new FF(1, 1, 41, 41, "ff26"));
-  flip_flops.push_back(new FF(1, 1, 42, 42, "ff27"));
-  flip_flops.push_back(new FF(1, 1, 43, 43, "ff28"));
+  flip_flops.push_back(new FF(1, 1, 240, 193, "ff9"));
+  flip_flops.push_back(new FF(1, 1, 200, 150, "ff10"));
+  flip_flops.push_back(new FF(1, 1, 180, 170, "ff11"));
+  flip_flops.push_back(new FF(1, 1, 160, 180, "ff12"));
+  flip_flops.push_back(new FF(1, 1, 140, 190, "ff13"));
+  flip_flops.push_back(new FF(1, 1, 120, 200, "ff14"));
+  flip_flops.push_back(new FF(1, 1, 480, 210, "ff15"));
+  flip_flops.push_back(new FF(1, 1, 500, 220, "ff16"));
+  flip_flops.push_back(new FF(1, 1, 490, 2, "ff17"));
+  flip_flops.push_back(new FF(1, 1, 480, 3, "ff18"));
+  flip_flops.push_back(new FF(1, 1, 270, 45, "ff19"));
+  flip_flops.push_back(new FF(1, 1, 300, 50, "ff20"));
+  flip_flops.push_back(new FF(1, 1, 350, 60, "ff21"));
+  flip_flops.push_back(new FF(1, 1, 400, 70, "ff22"));
+  flip_flops.push_back(new FF(1, 1, 450, 80, "ff23"));
+  flip_flops.push_back(new FF(1, 1, 500, 90, "ff24"));
+  flip_flops.push_back(new FF(1, 1, 550, 100, "ff25"));
+  flip_flops.push_back(new FF(1, 1, 290, 114, "ff26"));
+  flip_flops.push_back(new FF(1, 1, 310, 129, "ff27"));
+  flip_flops.push_back(new FF(1, 1, 330, 140, "ff28"));
 
   // Step 2: 為每個 FF 補上 fanins 與 fanouts 的 Pin，並填入 ff 指標
   flip_flops[0]->fanins = {
