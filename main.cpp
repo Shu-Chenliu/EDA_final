@@ -9,7 +9,7 @@
 #include <random>  // For random device and engine
 #include "MBFFgeneration.h"
 #include "kmean.h"
-#include "MST.cpp"
+#include "MST.h"
 
 
 using namespace std;
@@ -173,7 +173,7 @@ int main() {
   //          << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
   // }
   // initial wire cost for TNS
-  double total_wire_length = 0;
+  int total_wire_length = 0;
   vector<Edge> edges;
   // turn wire to edge
   for (size_t i = 0; i < flip_flops.size(); ++i) {
@@ -181,12 +181,16 @@ int main() {
       edges.push_back(Edge(
         i,
         flip_flops[i]->next[j],
-        abs(flip_flops[i]->position.x - flip_flops[i]->next[j]->position.x) +
-        abs(flip_flops[i]->position.y - flip_flops[i]->next[j]->position.y)
-      ));
+        (int)abs(flip_flops[i]->position.x - flip_flops[flip_flops[i]->next[j]]->position.x) +
+        abs(flip_flops[i]->position.y - flip_flops[flip_flops[i]->next[j]]->position.y)
+      )); // Manhattan distance
       
     }
   }
+  // do MST
+  MST mst_before(edges, (int)flip_flops.size());
+  total_wire_length = mst_before.MinimumSpanningTreeCost();
+  cout << "Initial total wire length: " << total_wire_length << endl;
 
 
   int left = 0, right = 0, top = 0, bottom = 0;
@@ -199,11 +203,27 @@ int main() {
   int SIZE_LIMIT = flip_flops.size() / 3 ; // Example size limit for clusters
   int MAX_ITER = flip_flops.size() * 2; // Example maximum iterations
   int DISP_LIMIT = (right - left + bottom - top) / 3;
-  kmean kmean(SIZE_LIMIT,MAX_ITER,DISP_LIMIT);
-  
+  kmean kmean(SIZE_LIMIT,MAX_ITER,DISP_LIMIT);  
+  vector<Cluster> clusters=kmean.kmeansWeighted(flip_flops);
+
+  edges.clear();
+  for (size_t i = 0; i < flip_flops.size(); ++i) {
+    for (size_t j = 0; j < flip_flops[i]->next.size(); ++j) {
+      edges.push_back(Edge(
+        i,
+        flip_flops[i]->next[j],
+        (int)abs(flip_flops[i]->relocatedX - flip_flops[flip_flops[i]->next[j]]->relocatedX) +
+        abs(flip_flops[i]->relocatedY - flip_flops[flip_flops[i]->next[j]]->relocatedY)
+      )); // Manhattan distance
+    }
+  }
+  // do MST
+  MST mst_after(edges, (int)flip_flops.size());
+  total_wire_length = mst_after.MinimumSpanningTreeCost();
+  cout << "Total wire length after k-means: " << total_wire_length << endl;
   
 
-  vector<Cluster> clusters=kmean.kmeansWeighted(flip_flops);
+
   srand(time(0));
   for(size_t i=0;i<1;i++){
     vector<FF*> flipflop=clusters[i].flip_flops;

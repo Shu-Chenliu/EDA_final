@@ -6,7 +6,7 @@ CXXFLAGS = -std=c++11 -O2 -Wall
 TARGET = main.out
 
 # Source and object files
-SRCS = kmean.cpp MBFFgeneration.cpp classes.cpp main.cpp
+SRCS = kmean.cpp MBFFgeneration.cpp classes.cpp main.cpp MST.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 # Default target
