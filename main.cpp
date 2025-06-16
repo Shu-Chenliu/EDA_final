@@ -143,14 +143,14 @@ int main() {
       { Pin{ Point(404, 408), 382.0, 2 } }
     )
   };
-  for(int i=0;i<flip_flops.size();i++){
+  for(size_t i=0;i<flip_flops.size();i++){
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> num_next_dis(0, 3);
     int x = num_next_dis(gen);
     vector<int> indices;
     cout<<i<<":";
-    for (int j = 0; j < flip_flops.size(); ++j) {
+    for (size_t j = 0; j < flip_flops.size(); ++j) {
       if (j != i)
         indices.push_back(j);
     }
@@ -159,7 +159,7 @@ int main() {
     shuffle(indices.begin(), indices.end(), gen);
 
     // 取前 x 個當作 next
-    for (int j = 0; j < x && j < indices.size(); ++j) {
+    for (int j = 0; j < x && j < (int)indices.size(); ++j) {
       flip_flops[i]->next.push_back(flip_flops[indices[j]]);
       cout<<indices[j]<<" ";
     }
@@ -182,10 +182,7 @@ int main() {
   int DISP_LIMIT = (right - left + bottom - top) / 3;
   kmean kmean(SIZE_LIMIT,MAX_ITER,DISP_LIMIT);
   // update flip flops position
-  for (auto ff : flip_flops) {
-    ff->relocatedX = ff->position.x;
-    ff->relocatedY = ff->position.y;
-  }
+  
 
   vector<Cluster> clusters=kmean.kmeansWeighted(flip_flops);
   srand(time(0));
@@ -198,6 +195,12 @@ int main() {
     vector<MBFF> placed_mbffs=generator.locationAssignment(Rect(0,441,0,448));
     generator.MBFFsizing(placed_mbffs);
   }
+
+  for (auto ff : flip_flops) {
+    ff->relocatedX = ff->position.x;
+    ff->relocatedY = ff->position.y;
+  }
+
   for (auto ff : flip_flops) {
     delete ff;
   }
