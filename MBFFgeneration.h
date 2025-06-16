@@ -2,6 +2,8 @@
 #define MBFFGENERATION_H
 
 #include "classes.cpp"
+#include <cstdlib> // Needed for rand() and srand()
+#include <ctime>
 using namespace std;
 
 
@@ -17,6 +19,8 @@ class MBFFgeneration
 		Rect feasibleRegionForClique(MBFF mbff);
 		vector<MBFF> locationAssignment(Rect chip_area);
 		void MBFFsizing(vector<MBFF>& mbffs);
+		int cost(set<string> c);
+		pair<int,pair<set<string>,set<string>>> MBFFcost(set<string> c);
 		
 	protected:
 	private:

@@ -2,14 +2,16 @@
 
 MBFFgeneration::MBFFgeneration(vector<FF*> flipflops, int maxDrivingStrength,double beta)
 	: flipflops(flipflops), maxDrivingStrength(maxDrivingStrength), beta(beta) {
-
+		for(int i=0;i<flipflops.size();i++){
+			map[flipflops[i]->name]=flipflops[i];
+		}
 }
 
 MBFFgeneration::~MBFFgeneration()
 {
 }
 int slackToWireLength(int slack){
-	return slack*0.1;
+	return slack;
 }
 Rect manhattanCircle(const Point& center, int radius) {
 	return Rect(center.x - radius, center.x + radius, center.y - radius, center.y + radius);
@@ -21,6 +23,9 @@ Rect intersectRects(const vector<Rect>& rects) {
 		result.x_max = min(result.x_max, r.x_max);
 		result.y_min = max(result.y_min, r.y_min);
 		result.y_max = min(result.y_max, r.y_max);
+	}
+	if(result.x_max<result.x_min||result.y_max<result.y_min){
+		return Rect();
 	}
 	return result;
 }
@@ -35,7 +40,7 @@ Rect feasibleRegion(int driving_strength,FF* flipflop){
 	}
 	for (const auto& pin : flipflop->fanouts) {
 		int radius = slackToWireLength(pin.slack);
-		manhattanRegions.push_back(manhattanCircle(pin.position, radius).rotate45());
+		manhattanRegions.push_back(manhattanCircle(pin.position, radius));
 	}
 	if (manhattanRegions.empty()){
 		return Rect();
@@ -62,6 +67,9 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 	vector<int> x_boundaries;
 
 	for (const auto& r : rects) {
+		if(r.x_max==0){
+			continue;
+		}
 		x_boundaries.push_back(r.x_min);
 		x_boundaries.push_back(r.x_max);
 	}
@@ -83,11 +91,11 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 				active_rects[r.name] = r;
 			}
 		}
-
 		sort(events.begin(), events.end());
 
 		set<string> active;
 		set<string> prev_clique;
+		vector<set<string>> FFinRegion;
 
 		for (const auto& event : events) {
 			bool is_entering = event.second[0] == '+';
@@ -99,15 +107,20 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 				active.erase(name);
 			}
 
-			if (active.size() >= 2 && active != prev_clique) {
-				maximal_cliques.push_back(active);
-				prev_clique = active;
+			// if (active.size() >= 2 && active != prev_clique) {
+			// 	maximal_cliques.push_back(active);
+			// 	prev_clique = active;
+			// }
+			FFinRegion.push_back(active);
+		}
+		for(int i=1;i<FFinRegion.size()-1;i++){
+			if(FFinRegion[i].size()>FFinRegion[i-1].size()&&FFinRegion[i].size()>FFinRegion[i+1].size()){
+				maximal_cliques.push_back(FFinRegion[i]);
 			}
 		}
 	}
-
 	// Filter subset cliques
-	vector<set<string>> filtered;
+	set<set<string>> filtered;
 	for (const auto& clique : maximal_cliques) {
 		bool is_subset = false;
 		for (const auto& other : maximal_cliques) {
@@ -116,26 +129,80 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 				break;
 			}
 		}
-		if (!is_subset) filtered.push_back(clique);
+		if (!is_subset) filtered.insert(clique);
 	}
-
-	return filtered;
+	return vector<set<string>>(filtered.begin(), filtered.end());
 }
 
-pair<int,pair<set<string>,set<string>>> cost(set<string> c){
-	int totalCost=0;
-	//TODO: 可以generate binary code去random產生要取的ff有哪些 做個c.size次之類的
-	return {totalCost,{c,c}};
+int MBFFgeneration::cost(set<string> c){
+	double totalCost=0;
+	double totalArea=0;
+	double total_slack = 0;
+  int total_switching = 0;
+	int count=0;
+	double areaAfter=0;
+	for(const auto&name:c){
+		FF* ff=map[name];
+		totalArea+=ff->area;
+		for(const auto&pin:ff->fanins){
+			total_slack+=pin.slack;
+			total_switching+=pin.switching_rate;
+			count++;
+		}
+		for(const auto&pin:ff->fanouts){
+			total_slack+=pin.slack;
+			total_switching+=pin.switching_rate;
+			count++;
+		}
+	}
+	//TODO: delta 算法要改
+	double delta_area=c.size()/3;
+	double delta_power=total_switching*0.15;
+	double delta_tns=total_slack*0.15;
+	totalCost-=delta_area;
+	totalCost-=delta_power;
+	totalCost-=delta_tns;
+	return (int)totalCost;
+}
+pair<int, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c) {
+	int size = c.size();
+	int currCost = INT_MAX;
+	set<string> currClique;
+
+	vector<string> elements(c.begin(), c.end()); // for random selection
+
+	for (int i = 0; i < size * size; i++) {
+		set<string> ff;
+		for (const auto& ffs : elements) {
+			int randomNum = rand() % 2;
+			if (randomNum == 1) {
+				ff.insert(ffs);
+			}
+		}
+
+		if (ff.empty()) {
+			int randomIndex = rand() % size;
+			ff.insert(elements[randomIndex]);
+		}
+
+		int randomCost = cost(ff);
+		if (currCost > randomCost) {
+			currCost = randomCost;
+			currClique = ff;
+		}
+	}
+	return {currCost, {currClique,c}};
 }
 vector<set<string>> MBFFgeneration::generateMBFF(){
 	cout << "[DEBUG] Start MBFF Generation" << endl;
-	for (int strength = 1; strength <= maxDrivingStrength; ++strength) {
+	for (int strength = 1; strength <= 1; ++strength) {
 		cout << "  -> Trying driving strength: " << strength << endl;
 		vector<Rect> regions;
 		// Build feasible regions
 		for (FF* ff : flipflops) {
 			if (strength < ff->original_drive) continue;
 			Rect region = feasibleRegion(strength, ff);
+			cout<<ff->name<<":"<<region.x_min<<" "<<region.x_max<<" "<<region.y_min<<" "<<region.y_max<<endl;
 			region.name = ff->name;
 			regions.push_back(region);
 		}
@@ -145,7 +212,11 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 		cout << "    Found " << cliques.size() << " maximal cliques." << endl;
 		// Store the cliques
 		for(set<string> clique:cliques){
+			cout<<"clique"<<endl;
 			mbff_candidates.push_back(clique);
+			for(const auto& c:clique){
+				cout<<c<<endl;
+			}
 		}
 		
 	}
@@ -153,7 +224,7 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 	priority_queue<pair<int,pair<set<string>,set<string>>>,vector<pair<int,pair<set<string>,set<string>>>>,greater<pair<int,pair<set<string>,set<string>>>>> pq;
 	vector<set<string>> non_conflictMBFF;
 	for(const auto& maxclique:mbff_candidates){
-		pq.push(cost(maxclique));
+		pq.push(MBFFcost(maxclique));
 	}
 	unordered_set<string> marked;
 	while(!pq.empty()){
@@ -177,7 +248,7 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 			for(const auto&ff:m.second.first){
 				m.second.second.erase(ff);
 			}
-			pq.push(cost(m.second.second));
+			pq.push(MBFFcost(m.second.second));
 		}
 	}
 	cout << "[DEBUG] Final selected MBFF count: " << non_conflictMBFF.size() << endl;
@@ -281,7 +352,7 @@ Rect MBFFgeneration::feasibleRegionForClique(MBFF mbff){
 }
 vector<MBFF> MBFFgeneration::locationAssignment(Rect chip_area) {
 	cout << "[DEBUG] Start MBFF Location Assignment" << endl;
-	int bin_width = 20, bin_height = 20;
+	int bin_width = 1, bin_height = 1;
 	vector<Bin> bins = generateBins(chip_area, bin_width, bin_height);
 	cout << "  -> Total bins generated: " << bins.size() << endl;
 	vector<set<string>> non_conflictMBFF=generateMBFF();
@@ -293,6 +364,7 @@ vector<MBFF> MBFFgeneration::locationAssignment(Rect chip_area) {
 		mbff.members = clique;
 
 		for (auto& name : clique) {
+			cout<<name<<endl;
 			FF* ff = map[name];
 			mbff.fanins.insert(mbff.fanins.end(), ff->fanins.begin(), ff->fanins.end());
 			mbff.fanouts.insert(mbff.fanouts.end(), ff->fanouts.begin(), ff->fanouts.end());

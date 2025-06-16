@@ -4,38 +4,43 @@ Coor::Coor() :
   x(-1), 
   y(-1){}
 
-Coor::Coor(double X, double Y){
+Coor::Coor(float X, float Y){
   x = X;
   y = Y;
 }
 
 Coor::~Coor(){}
 
-void Coor::setX(double X){
-  x = X
+void Coor::setX(float X){
+  x = X;
 }
 
-void Coor::setY(double Y){
+void Coor::setY(float Y){
   y = Y;
 }
 
-void Coor::setCoor(double X, double Y){
+void Coor::setCoor(float X, float Y){
   x = X;
   y = Y;
 }
 
-double Coor::getX() const{
+float Coor::getX() const{
   return x;
 }
 
-double Coor::getY() const{
+float Coor::getY() const{
   return y;
 }
 
-Coor Coor::operator+(const Coor& that) const{
+Coor Coor::operator+(const Coor& that) const {
     return Coor(x + that.x, y + that.y);
 }
 
-Coor Coor::operator-(const Coor& that) const{
+Coor Coor::operator-(const Coor& that) const {
     return Coor(x - that.x, y - that.y);
+}
+
+// Print
+void Coor::print(){
+  cout << "( " << x << ", " << y << " )" << endl;
 }

@@ -2,6 +2,13 @@
 
 Pin::Pin() : 
   name(""),
+  net(""),
+  SR(0),
+  slack(0){}
+
+Pin::Pin(string Name, string Net) : 
+  name(Name),
+  net(Net),
   SR(0),
   slack(0){}
 
@@ -12,7 +19,11 @@ void Pin::setName(string Name){
   name = Name;
 }
 
-void Pin::setCoor(double X, double Y){
+void Pin::setNet(string Net){
+  net = Net;
+}
+
+void Pin::setCoor(float X, float Y){
   coor.setCoor(X, Y);
 }
 
@@ -20,20 +31,24 @@ void Pin::setSR(int sr){
   SR = sr;
 }
 
-void Pin::setSlack(double S){
+void Pin::setSlack(float S){
   slack = S;
 }
 
 // Getter
 string Pin::getName() const{
-  return Name;
+  return name;
 }
 
-double Pin::getX() const{
+string Pin::getNet() const{
+  return net;
+}
+
+float Pin::getX() const{
   return coor.getX();
 }
 
-double Pin::getY() const{
+float Pin::getY() const{
   return coor.getY();
 }
 
@@ -41,6 +56,15 @@ int Pin::getSR() const{
   return SR;
 }
 
-double Pin::getSlack() const{
+float Pin::getSlack() const{
   return slack;
+}
+
+// Print 
+void Pin::print(){
+  cout << name << " " << net << endl;
+}
+
+void Pin::printCoor(){
+  coor.print();
 }
