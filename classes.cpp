@@ -66,7 +66,8 @@ struct Rect {
 // 	unordered_map<string, unordered_set<string>> adj_list;
 // };
 struct Pin {
-	Point position;
+	Point relative_position;
+	FF* ff;
 	double slack;
 	int switching_rate;
 };

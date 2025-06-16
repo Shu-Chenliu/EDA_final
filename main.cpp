@@ -16,137 +16,71 @@ using namespace std;
 int main() {
   random_device rd;
   mt19937 gen(rd());
-  vector<FF*> flip_flops = {
-    new FF(1, 1, 10, 10, "ff0",
-      { Pin{ Point(5, 5), 10.0, 2 } },
-      { Pin{ Point(15, 15), 8.0, 3 } }
-    ),
-    new FF(1, 1, 12, 11, "ff1",
-      { Pin{ Point(11, 10), 7.0, 1 } },
-      { Pin{ Point(16, 16), 9.0, 2 } }
-    ),
-    new FF(1, 1, 11, 9,  "ff2", 
-      { Pin{ Point(6, 6), 5.0, 1 } },
-      { Pin{ Point(14, 14), 6.0, 2 } }
-    ),
-    new FF(1, 1, 9,  12, "ff3", 
-      { Pin{ Point(4, 4), 3.0, 1 } },
-      { Pin{ Point(13, 13), 4.0, 2 } }
-    ),
-    new FF(1, 1, 15, 15, "ff4",
-      { Pin{ Point(10, 10), 12.0, 2 } },
-      { Pin{ Point(20, 20), 11.0, 3 } }
-    ),
-    new FF(1, 1, 17, 16, "ff5",
-      { Pin{ Point(14, 15), 10.0, 1 }, 
-        Pin{ Point(18, 17), 9.0, 2 } },
-      { Pin{ Point(22, 22), 8.0, 3 } }
-    ),
-    new FF(1, 1, 18, 19, "ff6",
-      { Pin{ Point(13, 14), 8.0, 1 }, 
-        Pin{ Point(17, 18), 9.0, 2 },
-        Pin{ Point(20, 21), 7.0, 3 } },
-      { Pin{ Point(21, 22), 7.0, 2 },
-        Pin{ Point(24, 25), 6.0, 3 } }
-    ),
-    new FF(1, 1, 100, 100, "ff7", 
-      { Pin{ Point(95, 95), 90.0, 2 }, 
-        Pin{ Point(95, 93), 90.0, 2 } },
-      { Pin{ Point(105, 105), 85.0, 3 } }
-    ),
-    new FF(1, 1, 102, 101, "ff8", 
-      { Pin{ Point(97, 96), 88.0, 1 } },
-      { Pin{ Point(106, 107), 84.0, 2 } }
-    ),
-    new FF(1, 12, 101, 99, "ff9", 
-      { Pin{ Point(96, 94), 87.0, 1 } },
-      { Pin{ Point(104, 103), 83.0, 2 } }
-    ),
-    new FF(1, 1, 99, 102, "ff10", 
-      { Pin{ Point(95, 93), 86.0, 1 } },
-      { Pin{ Point(103, 108), 82.0, 2 } }
-    ),
-    new FF(1, 1, 250, 250, "ff11", 
-      { Pin{ Point(245, 245), 240.0, 2 } },
-      { Pin{ Point(255, 255), 235.0, 3 }, 
-        Pin{ Point(255, 253), 235.0, 2 },
-        Pin{ Point(255, 252), 235.0, 2 } }
-    ),
-    new FF(1, 15, 251, 249, "ff12", 
-      { Pin{ Point(246, 244), 238.0, 1 } },
-      { Pin{ Point(256, 254), 234.0, 2 } }
-    ),
-    new FF(1, 17, 60, 305, "ff13", 
-      { Pin{ Point(55, 300), 50.0, 2 } },
-      { Pin{ Point(65, 310), 45.0, 3 } }
-    ),
-    new FF(1, 12, 62, 307, "ff14", 
-      { Pin{ Point(57, 302), 48.0, 1 } },
-      { Pin{ Point(67, 312), 43.0, 2 } }
-    ),
-    new FF(1, 1, 61, 303, "ff15", 
-      { Pin{ Point(56, 301), 49.0, 1 } },
-      { Pin{ Point(66, 308), 44.0, 2 } }
-    ),
-    new FF(1, 1, 59, 308, "ff16", 
-      { Pin{ Point(54, 306), 51.0, 1 } },
-      { Pin{ Point(64, 313), 46.0, 2 } }
-    ),
-    new FF(1, 14, 80, 405, "ff17", 
-      { Pin{ Point(75, 400), 70.0, 2 } },
-      { Pin{ Point(85, 410), 65.0, 3 } }
-    ),
-    new FF(1, 11, 82, 407, "ff18", 
-      { Pin{ Point(77, 402), 68.0, 1 } },
-      { Pin{ Point(87, 412), 63.0, 2 } }
-    ),
-    new FF(1, 13, 81, 403, "ff19", 
-      { Pin{ Point(76, 401), 69.0, 1 } },
-      { Pin{ Point(86, 408), 64.0, 2 } }
-    ),
-    new FF(1, 16, 79, 408, "ff20", 
-      { Pin{ Point(74, 406), 71.0, 1 } },
-      { Pin{ Point(84, 413), 66.0, 2 } }
-    ),
-    new FF(1, 11, 300, 300, "ff21", 
-      { Pin{ Point(295, 295), 290.0, 2 } },
-      { Pin{ Point(305, 305), 285.0, 3 } }
-    ),
-    new FF(1, 17, 302, 301, "ff22", 
-      { Pin{ Point(297, 296), 288.0, 1 } },
-      { Pin{ Point(306, 307), 284.0, 2 }, 
-          Pin{ Point(306, 306), 284.0, 2 },
-          Pin{ Point(306, 305), 284.0, 2 } }
-    ),
-    new FF(1, 4, 301, 299, "ff23", 
-      { Pin{ Point(296, 294), 287.0, 1 } },
-      { Pin{ Point(305, 304), 283.0, 2 } }
-    ),
-    new FF(1, 11, 299, 302, "ff24", 
-      { Pin{ Point(295, 293), 286.0, 1 } },
-      { Pin{ Point(304, 308), 282.0, 2 } }
-    ),
-    new FF(1, 13, 400, 400, "ff25", 
-      { Pin{ Point(395, 395), 390.0, 2 } },
-      { Pin{ Point(405, 405), 385.0, 3 } }
-    ),
-    new FF(1, 2, 402, 401, "ff26", 
-      { Pin{ Point(397, 396), 388.0, 1 } },
-      { Pin{ Point(406, 407), 384.0, 2 }, 
-        Pin{ Point(406, 406), 384.0, 2 },
-        Pin{ Point(406, 405), 384.0, 2 } }
-    ),
-    new FF(1, 7, 401, 399, "ff27", 
-      { Pin{ Point(396, 394), 387.0, 1 }, 
-        Pin{ Point(398, 398), 386.0, 1 }, 
-        Pin{ Point(400, 400), 385.0, 1 } },
-      { Pin{ Point(405, 404), 383.0, 2 } }
-    ),
-    new FF(1, 8, 399, 402, "ff28", 
-      { Pin{ Point(395, 393), 386.0, 1 } },
-      { Pin{ Point(404, 408), 382.0, 2 } }
-    )
+  vector<FF*> flip_flops;
+
+  // Step 1: 建立 FF 物件（先不加 fanins/fanouts）
+  flip_flops.push_back(new FF(1, 1, 10, 10, "ff0"));
+  flip_flops.push_back(new FF(1, 1, 12, 11, "ff1"));
+  flip_flops.push_back(new FF(1, 1, 11, 9,  "ff2"));
+  flip_flops.push_back(new FF(1, 1, 9,  12, "ff3"));
+  flip_flops.push_back(new FF(1, 1, 15, 15, "ff4"));
+  flip_flops.push_back(new FF(1, 1, 17, 16, "ff5"));
+  flip_flops.push_back(new FF(1, 1, 18, 19, "ff6"));
+
+  // Step 2: 為每個 FF 補上 fanins 與 fanouts 的 Pin，並填入 ff 指標
+  flip_flops[0]->fanins = {
+      Pin{ Point(5, 5), flip_flops[0], 10.0, 2 }
   };
+  flip_flops[0]->fanouts = {
+      Pin{ Point(15, 15), flip_flops[0], 8.0, 3 }
+  };
+
+  flip_flops[1]->fanins = {
+      Pin{ Point(11, 10), flip_flops[1], 7.0, 1 }
+  };
+  flip_flops[1]->fanouts = {
+      Pin{ Point(16, 16), flip_flops[1], 9.0, 2 }
+  };
+
+  flip_flops[2]->fanins = {
+      Pin{ Point(6, 6), flip_flops[2], 5.0, 1 }
+  };
+  flip_flops[2]->fanouts = {
+      Pin{ Point(14, 14), flip_flops[2], 6.0, 2 }
+  };
+
+  flip_flops[3]->fanins = {
+      Pin{ Point(4, 4), flip_flops[3], 3.0, 1 }
+  };
+  flip_flops[3]->fanouts = {
+      Pin{ Point(13, 13), flip_flops[3], 4.0, 2 }
+  };
+
+  flip_flops[4]->fanins = {
+      Pin{ Point(10, 10), flip_flops[4], 12.0, 2 }
+  };
+  flip_flops[4]->fanouts = {
+      Pin{ Point(20, 20), flip_flops[4], 11.0, 3 }
+  };
+
+  flip_flops[5]->fanins = {
+      Pin{ Point(14, 15), flip_flops[5], 10.0, 1 },
+      Pin{ Point(18, 17), flip_flops[5], 9.0, 2 }
+  };
+  flip_flops[5]->fanouts = {
+      Pin{ Point(22, 22), flip_flops[5], 8.0, 3 }
+  };
+
+  flip_flops[6]->fanins = {
+      Pin{ Point(13, 14), flip_flops[6], 8.0, 1 },
+      Pin{ Point(17, 18), flip_flops[6], 9.0, 2 },
+      Pin{ Point(20, 21), flip_flops[6], 7.0, 3 }
+  };
+  flip_flops[6]->fanouts = {
+      Pin{ Point(21, 22), flip_flops[6], 7.0, 2 },
+      Pin{ Point(24, 25), flip_flops[6], 6.0, 3 }
+  };
+
   for(size_t i=0;i<flip_flops.size();i++){
     
     uniform_int_distribution<> num_next_dis(0, 3);
@@ -202,7 +136,7 @@ int main() {
     if (ff->position.y > bottom) bottom = ff->position.y;
   }
   size_t size=flip_flops.size();
-  for(size_t j=0;j<1;j++){
+  for(size_t j=0;j<size*size;j++){
     uniform_int_distribution<> num_size((int)flip_flops.size() / 3, (int)flip_flops.size()*2 / 3);
     int SIZE_LIMIT = num_size(gen) ; // Example size limit for clusters
     int MAX_ITER = flip_flops.size() * 2; // Example maximum iterations
