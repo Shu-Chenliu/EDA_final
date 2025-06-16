@@ -4,11 +4,6 @@
 #include "MST.h"
 using namespace std;
 
-// Structure to represent an edge
-
-
-// Disjoint Set Union (Union-Find)
-
 
 // Kruskal's algorithm
 int kruskal(int n, vector<Edge>& edges, vector<Edge>& mst) {
@@ -27,16 +22,7 @@ int kruskal(int n, vector<Edge>& edges, vector<Edge>& mst) {
 
 // Example usage
 int MST::MinimumSpanningTreeCost() {
-    // int n = 5; // Number of nodes (0-based index)
-    // vector<Edge> edges = {
-    //     {0, 1, 10},
-    //     {0, 2, 6},
-    //     {0, 3, 5},
-    //     {1, 3, 15},
-    //     {2, 3, 4}
-    // };
-
-
+    
     vector<Edge> mst;
     int weight = kruskal(n, edges, mst);
 
