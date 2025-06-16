@@ -190,7 +190,7 @@ int main() {
   // do MST
   MST mst_before(edges, (int)flip_flops.size());
   total_wire_length = mst_before.MinimumSpanningTreeCost();
-  cout << "Initial total wire length: " << total_wire_length << endl;
+  cout << "Initial MST wire length: " << total_wire_length << endl;
 
 
   int left = 0, right = 0, top = 0, bottom = 0;
@@ -220,7 +220,7 @@ int main() {
   // do MST
   MST mst_after(edges, (int)flip_flops.size());
   total_wire_length = mst_after.MinimumSpanningTreeCost();
-  cout << "Total wire length after k-means: " << total_wire_length << endl;
+  cout << "MST wire length after k-means: " << total_wire_length << endl;
   
 
 
