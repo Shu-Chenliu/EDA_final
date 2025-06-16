@@ -6,9 +6,11 @@
 #include <algorithm>
 #include <cstdlib>
 #include <set>
+#include <random>  // For random device and engine
 #include "MBFFgeneration.h"
 #include "kmean.h"
-#include <random>  // For random device and engine
+#include "MST.cpp"
+
 
 using namespace std;
 int main() {
@@ -170,6 +172,23 @@ int main() {
   //          << "), cluster=" << flip_flops[i]->cluster
   //          << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
   // }
+  // initial wire cost for TNS
+  double total_wire_length = 0;
+  vector<Edge> edges;
+  // turn wire to edge
+  for (size_t i = 0; i < flip_flops.size(); ++i) {
+    for (size_t j = 0; j < flip_flops[i]->next.size(); ++j) {
+      edges.push_back(Edge(
+        i,
+        flip_flops[i]->next[j],
+        abs(flip_flops[i]->position.x - flip_flops[i]->next[j]->position.x) +
+        abs(flip_flops[i]->position.y - flip_flops[i]->next[j]->position.y)
+      ));
+      
+    }
+  }
+
+
   int left = 0, right = 0, top = 0, bottom = 0;
   for (auto ff : flip_flops) {
     if (ff->position.x < left) left = ff->position.x;
@@ -181,7 +200,7 @@ int main() {
   int MAX_ITER = flip_flops.size() * 2; // Example maximum iterations
   int DISP_LIMIT = (right - left + bottom - top) / 3;
   kmean kmean(SIZE_LIMIT,MAX_ITER,DISP_LIMIT);
-  // update flip flops position
+  
   
 
   vector<Cluster> clusters=kmean.kmeansWeighted(flip_flops);

@@ -9,6 +9,7 @@ struct Edge {
     bool operator<(const Edge& other) const {
         return weight < other.weight;
     }
+    Edge(int s, int e, int w) : start(s), end(e), weight(w) {}
 };
 
 // Disjoint Set Union (Union-Find)
