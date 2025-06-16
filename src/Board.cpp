@@ -326,7 +326,7 @@ void Board::readV(string file){
   vector<string> str;
   while (getline(f, s)){
     str = split(s);
-    if (str.size() < 9 ){ continue; }
+    if (str.size() < 8 ){ continue; }
     else if (str[0] == "module"){
       do{
         getline(f, s);
@@ -350,7 +350,10 @@ void Board::readV(string file){
           }
         }
       } while (find(str.begin(), str.end(), ";") == str.end() );
-      cout << c->getName() << endl;
+      // cout << c->getName() << endl;
+      for (int i=0; i<(int)c->getPins().size(); i++){
+        // cout << " - " << c->getPins()[i].getName() << " " << c->getPins()[i].getNet() << endl;
+      }
     }
   }
   

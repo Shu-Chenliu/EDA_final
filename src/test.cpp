@@ -68,7 +68,7 @@ int main(){
   B.readDef(file);
   B.readV(file);
 
-  B.print(1, 0, 0, 0);
+  B.print(1, 1, 0, 0);
 
   // readFile("testcase1/123.txt");
 }

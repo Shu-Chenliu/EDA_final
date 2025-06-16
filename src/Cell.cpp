@@ -4,7 +4,9 @@ Cell::Cell() :
   name(""),
   model(""),
   delay(0),
-  power(0){}
+  power(0){
+    // pins.reserve(5);
+  }
 
 Cell::Cell(string Name, string Model, float X, float Y) : 
   name(Name),
@@ -12,6 +14,7 @@ Cell::Cell(string Name, string Model, float X, float Y) :
   delay(0),
   power(0){
     coor.setCoor(X, Y);
+    // pins.reserve(5);
   }
 
 Cell::~Cell(){}
