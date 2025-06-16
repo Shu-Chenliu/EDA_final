@@ -5,7 +5,7 @@ using namespace std;
 
 // Structure to represent an edge
 struct Edge {
-    int u, v, weight;
+    int start, end, weight;
     bool operator<(const Edge& other) const {
         return weight < other.weight;
     }
@@ -53,7 +53,7 @@ int kruskal(int n, vector<Edge>& edges, vector<Edge>& mst) {
     int total_weight = 0;
 
     for(const Edge& e : edges) {
-        if(dsu.unite(e.u, e.v)) {
+        if(dsu.unite(e.start, e.end)) {
             mst.push_back(e);
             total_weight += e.weight;
         }
@@ -78,7 +78,7 @@ int main() {
     cout << "Total weight of MST: " << weight << endl;
     cout << "Edges in MST:\n";
     for(const Edge& e : mst) {
-        cout << e.u << " - " << e.v << " : " << e.weight << endl;
+        cout << e.start << " - " << e.end << " : " << e.weight << endl;
     }
 
     return 0;

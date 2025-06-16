@@ -158,6 +158,12 @@ int main() {
   int MAX_ITER = flip_flops.size() * 2; // Example maximum iterations
   int DISP_LIMIT = (right - left + bottom - top) / 3;
   kmean kmean(SIZE_LIMIT,MAX_ITER,DISP_LIMIT);
+  // update flip flops position
+  for (auto ff : flip_flops) {
+    ff->relocatedX = ff->position.x;
+    ff->relocatedY = ff->position.y;
+  }
+
   vector<Cluster> clusters=kmean.kmeansWeighted(flip_flops);
   srand(time(0));
   for(size_t i=0;i<1;i++){
