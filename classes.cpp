@@ -80,8 +80,8 @@ struct FF {
 	vector<Pin> fanins;
 	vector<Pin> fanouts;
 	
-	vector<FF*> next;
-	FF(int drive, double a, double x, double y, const string& n = "", const vector<Pin>& fi = {}, const vector<Pin>& fo = {},const vector<FF*>&next={})
+	vector<int> next;
+	FF(int drive, double a, double x, double y, const string& n = "", const vector<Pin>& fi = {}, const vector<Pin>& fo = {},const vector<int>& next={})
   : name(n), original_drive(drive),area(a), position(x, y), fanins(fi), fanouts(fo), next(next) {}
 
 };

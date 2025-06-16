@@ -162,7 +162,7 @@ int main() {
 
     // 取前 x 個當作 next
     for (int j = 0; j < x && j < (int)indices.size(); ++j) {
-      flip_flops[i]->next.push_back(flip_flops[indices[j]]);
+      flip_flops[i]->next.push_back(indices[j]);
       cout<<indices[j]<<" ";
     }
     cout<<endl;
