@@ -1,5 +1,6 @@
 #include "Board.h"
 #include <bits/stdc++.h>
+#include <fstream>
 
 Board::Board() : 
   Alpha(1),
@@ -212,9 +213,10 @@ void Board::readDef(string file){
           setBinH(norm(str[12]));
         } 
       }
-      else if (getBinH()== -1){
+      else if (getBinH() == 0){
         if (dir == &binNumY)  setBinH(norm(str[4])-getBinShiftY());
         else  setBinW(norm(str[3])-getBinShiftX());
+        *dir += 1;
       }
       else{
         *dir += 1;
@@ -419,4 +421,35 @@ void Board::print(bool basic, bool cells, bool pins, bool nets){
     NetList.print();
     cout << "\n==================================\n\n";
   }
+}
+
+// Output
+void Board::forMatplotlib(const string& file){
+  ofstream f (file + ".txt");
+
+  if (f.is_open()){
+    f << size.getW() << " " << size.getH() << endl;
+    f << binShift.getX() << " " << binShift.getY() << " ";
+    f << binNumX << " " << binNumY << " " << binSize.getW() << " " << binSize.getH() << endl;
+    
+    f << (int)inPins.size() << endl;
+    for (auto& ip : inPins){
+      f << ip.getX() << " " << ip.getY() << " " << ip.getW() << " " << ip.getH() << endl;
+    }
+
+    f << (int)outPins.size() << endl;
+    for (auto& op : outPins){
+      f << op.getX() << " " << op.getY() << " " << op.getW() << " " << op.getH() << endl;
+    }
+
+    f << cellNum << endl;
+    for (auto& c : Cells){
+      f << c.getX() << " " << c.getY() << endl;
+    }
+
+    cout << "Finish write for Matplotlib~~" << endl;
+    f.close();
+  }
+
+  else cout << "Unable to open file";
 }
