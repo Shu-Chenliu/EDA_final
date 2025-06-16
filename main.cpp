@@ -8,6 +8,8 @@
 #include <set>
 #include "MBFFgeneration.h"
 #include "kmean.h"
+#include <random>  // For random device and engine
+
 using namespace std;
 int main() {
   vector<FF*> flip_flops = {
@@ -141,7 +143,28 @@ int main() {
       { Pin{ Point(404, 408), 382.0, 2 } }
     )
   };
+  for(int i=0;i<flip_flops.size();i++){
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> num_next_dis(0, 3);
+    int x = num_next_dis(gen);
+    vector<int> indices;
+    cout<<i<<":";
+    for (int j = 0; j < flip_flops.size(); ++j) {
+      if (j != i)
+        indices.push_back(j);
+    }
 
+    // 打亂 index
+    shuffle(indices.begin(), indices.end(), gen);
+
+    // 取前 x 個當作 next
+    for (int j = 0; j < x && j < indices.size(); ++j) {
+      flip_flops[i]->next.push_back(flip_flops[indices[j]]);
+      cout<<indices[j]<<" ";
+    }
+    cout<<endl;
+  }
   // for (size_t i = 0; i < flip_flops.size(); ++i) {
   //     cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
   //          << "), cluster=" << flip_flops[i]->cluster
@@ -158,6 +181,12 @@ int main() {
   int MAX_ITER = flip_flops.size() * 2; // Example maximum iterations
   int DISP_LIMIT = (right - left + bottom - top) / 3;
   kmean kmean(SIZE_LIMIT,MAX_ITER,DISP_LIMIT);
+  // update flip flops position
+  for (auto ff : flip_flops) {
+    ff->relocatedX = ff->position.x;
+    ff->relocatedY = ff->position.y;
+  }
+
   vector<Cluster> clusters=kmean.kmeansWeighted(flip_flops);
   srand(time(0));
   for(size_t i=0;i<1;i++){
