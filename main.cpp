@@ -6,9 +6,11 @@
 #include <algorithm>
 #include <cstdlib>
 #include <set>
+#include <random>  // For random device and engine
 #include "MBFFgeneration.h"
 #include "kmean.h"
-#include <random>  // For random device and engine
+#include "MST.h"
+
 
 using namespace std;
 int main() {
@@ -171,6 +173,27 @@ int main() {
   //          << "), cluster=" << flip_flops[i]->cluster
   //          << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
   // }
+  // initial wire cost for TNS
+  int total_wire_length = 0;
+  vector<Edge> edges;
+  // turn wire to edge
+  for (size_t i = 0; i < flip_flops.size(); ++i) {
+    for (size_t j = 0; j < flip_flops[i]->next.size(); ++j) {
+      edges.push_back(Edge(
+        i,
+        flip_flops[i]->next[j],
+        (int)abs(flip_flops[i]->position.x - flip_flops[flip_flops[i]->next[j]]->position.x) +
+        abs(flip_flops[i]->position.y - flip_flops[flip_flops[i]->next[j]]->position.y)
+      )); // Manhattan distance
+      
+    }
+  }
+  // do MST
+  MST mst_before(edges, (int)flip_flops.size());
+  total_wire_length = mst_before.MinimumSpanningTreeCost();
+  cout << "Initial total wire length: " << total_wire_length << endl;
+
+
   int left = 0, right = 0, top = 0, bottom = 0;
   for (auto ff : flip_flops) {
     if (ff->position.x < left) left = ff->position.x;
