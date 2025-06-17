@@ -8,20 +8,24 @@ MBFF::~MBFF(){
 
 }
 
-void MBFF::setMembers(set<string>& members){
-  members=members;
+void MBFF::setMembers(set<string> member){
+  for(const auto&m:member){
+    members.insert(m);
+  }
 }
 void MBFF::setPosition(Coor coor){
   position=coor;
 }
-void MBFF::setPins(vector<Pin> pins){
-  pins=pins;
+void MBFF::setPins(vector<Pin> p){
+  for(int i=0;i<p.size();i++){
+    pins.push_back(p[i]);
+  }
 }
-void MBFF::setFeasibleRegion(Rect feasible_region){
-  feasible_region=feasible_region;
+void MBFF::setFeasibleRegion(Rect fr){
+  feasible_region=fr;
 }
-void MBFF::setPreferredRegion(Rect preferred_region){
-  preferred_region=preferred_region;
+void MBFF::setPreferredRegion(Rect pr){
+  preferred_region=pr;
 }
 vector<Pin> MBFF::getPins() const{
   return pins;

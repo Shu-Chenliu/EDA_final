@@ -19,7 +19,7 @@
 
 using namespace std;
 int main() {
-  Board board(Rect(0,441,0,448));
+  Board board(Rect(441,448,0,0));
 
   random_device rd;
   mt19937 gen(rd());
@@ -63,91 +63,91 @@ int main() {
   // }
 
 
-  vector<Pin> pins = { Pin("pin1", "", flip_flops[0]) };
+  vector<Pin> pins = { Pin("pin1", "", flip_flops[0],2,2) };
   flip_flops[0]->addPins(pins);
-  vector<Pin> pins2 = { Pin("pin2", "", flip_flops[1]), 
-                        Pin("pin3", "", flip_flops[1]),
-                        Pin("pin4", "", flip_flops[1]) };
+  vector<Pin> pins2 = { Pin("pin2", "", flip_flops[1],2,2), 
+                        Pin("pin3", "", flip_flops[1],2,2),
+                        Pin("pin4", "", flip_flops[1],2,2) };
   flip_flops[1]->addPins(pins2);
-  vector<Pin> pins3 = { Pin("pin5", "", flip_flops[2]), 
-                        Pin("pin6", "", flip_flops[2]) };
+  vector<Pin> pins3 = { Pin("pin5", "", flip_flops[2],2,2), 
+                        Pin("pin6", "", flip_flops[2],2,2) };
   flip_flops[2]->addPins(pins3);
-  vector<Pin> pins4 = { Pin("pin7", "", flip_flops[3])};
+  vector<Pin> pins4 = { Pin("pin7", "", flip_flops[3],2,2)};
   flip_flops[3]->addPins(pins4);
-  vector<Pin> pins5 = { Pin("pin8", "", flip_flops[4])};
+  vector<Pin> pins5 = { Pin("pin8", "", flip_flops[4],2,2)};
   flip_flops[4]->addPins(pins5);
-  vector<Pin> pins6 = { Pin("pin9", "", flip_flops[5]), 
-                        Pin("pin10", "", flip_flops[5]) };
+  vector<Pin> pins6 = { Pin("pin9", "", flip_flops[5],2,2), 
+                        Pin("pin10", "", flip_flops[5],2,2) };
   flip_flops[5]->addPins(pins6);
-  vector<Pin> pins7 = { Pin("pin11", "", flip_flops[6]), 
-                        Pin("pin12", "", flip_flops[6]) };
+  vector<Pin> pins7 = { Pin("pin11", "", flip_flops[6],2,2), 
+                        Pin("pin12", "", flip_flops[6],2,2) };
   flip_flops[6]->addPins(pins7);
-  vector<Pin> pins8 = { Pin("pin13", "", flip_flops[7]), 
-                        Pin("pin14", "", flip_flops[7]) };
+  vector<Pin> pins8 = { Pin("pin13", "", flip_flops[7],2,2), 
+                        Pin("pin14", "", flip_flops[7],2,2) };
   flip_flops[7]->addPins(pins8);
-  vector<Pin> pins9 = { Pin("pin15", "", flip_flops[8]), 
-                        Pin("pin16", "", flip_flops[8]) };
+  vector<Pin> pins9 = { Pin("pin15", "", flip_flops[8],2,2), 
+                        Pin("pin16", "", flip_flops[8],2,2) };
   flip_flops[8]->addPins(pins9);
-  vector<Pin> pins10 = { Pin("pin17", "", flip_flops[9]), 
-                        Pin("pin18", "", flip_flops[9]) };
+  vector<Pin> pins10 = { Pin("pin17", "", flip_flops[9],2,2), 
+                        Pin("pin18", "", flip_flops[9],2,2) };
   flip_flops[9]->addPins(pins10);
-  vector<Pin> pins11 = { Pin("pin19", "", flip_flops[10]), 
-                        Pin("pin20", "", flip_flops[10]) };
+  vector<Pin> pins11 = { Pin("pin19", "", flip_flops[10],2,2), 
+                        Pin("pin20", "", flip_flops[10],2,2) };
   flip_flops[10]->addPins(pins11);
-  vector<Pin> pins12 = { Pin("pin21", "", flip_flops[11]), 
-                        Pin("pin22", "", flip_flops[11]),
-                        Pin("pin23", "", flip_flops[11]),
-                        Pin("pin24", "", flip_flops[11]) };
+  vector<Pin> pins12 = { Pin("pin21", "", flip_flops[11],2,2), 
+                        Pin("pin22", "", flip_flops[11],2,2),
+                        Pin("pin23", "", flip_flops[11],2,2),
+                        Pin("pin24", "", flip_flops[11],2,2) };
   flip_flops[11]->addPins(pins12);
-  vector<Pin> pins13 = { Pin("pin25", "", flip_flops[12]), 
-                        Pin("pin26", "", flip_flops[12]) };
+  vector<Pin> pins13 = { Pin("pin25", "", flip_flops[12],2,2), 
+                        Pin("pin26", "", flip_flops[12],2,2) };
   flip_flops[12]->addPins(pins13);
-  vector<Pin> pins14 = { Pin("pin27", "", flip_flops[13])}; 
+  vector<Pin> pins14 = { Pin("pin27", "", flip_flops[13],2,2)}; 
   flip_flops[13]->addPins(pins14);
-  vector<Pin> pins15 = { Pin("pin28", "", flip_flops[14])}; 
+  vector<Pin> pins15 = { Pin("pin28", "", flip_flops[14],2,2)}; 
   flip_flops[14]->addPins(pins15);
-  vector<Pin> pins16 = { Pin("pin29", "", flip_flops[15]), 
-                        Pin("pin30", "", flip_flops[15]) };
+  vector<Pin> pins16 = { Pin("pin29", "", flip_flops[15],2,2), 
+                        Pin("pin30", "", flip_flops[15],2,2) };
   flip_flops[15]->addPins(pins16);
-  vector<Pin> pins17 = { Pin("pin31", "", flip_flops[16]), 
-                        Pin("pin32", "", flip_flops[16]) };
+  vector<Pin> pins17 = { Pin("pin31", "", flip_flops[16],2,2), 
+                        Pin("pin32", "", flip_flops[16],2,2) };
   flip_flops[16]->addPins(pins17);
-  vector<Pin> pins18 = { Pin("pin33", "", flip_flops[17]), 
-                        Pin("pin34", "", flip_flops[17]) };
+  vector<Pin> pins18 = { Pin("pin33", "", flip_flops[17],2,2), 
+                        Pin("pin34", "", flip_flops[17],2,2) };
   flip_flops[17]->addPins(pins18);
-  vector<Pin> pins19 = { Pin("pin35", "", flip_flops[18]), 
-                        Pin("pin36", "", flip_flops[18]) };
+  vector<Pin> pins19 = { Pin("pin35", "", flip_flops[18],2,2), 
+                        Pin("pin36", "", flip_flops[18],2,2) };
   flip_flops[18]->addPins(pins19);
-  vector<Pin> pins20 = { Pin("pin37", "", flip_flops[19]), 
-                        Pin("pin38", "", flip_flops[19]) };
+  vector<Pin> pins20 = { Pin("pin37", "", flip_flops[19],2,2), 
+                        Pin("pin38", "", flip_flops[19],2,2) };
   flip_flops[19]->addPins(pins20);
-  vector<Pin> pins21 = { Pin("pin39", "", flip_flops[20]), 
-                        Pin("pin40", "", flip_flops[20]) };
+  vector<Pin> pins21 = { Pin("pin39", "", flip_flops[20],2,2), 
+                        Pin("pin40", "", flip_flops[20],2,2) };
   flip_flops[20]->addPins(pins21);
-  vector<Pin> pins22 = { Pin("pin41", "", flip_flops[21]), 
-                        Pin("pin42", "", flip_flops[21]) };
+  vector<Pin> pins22 = { Pin("pin41", "", flip_flops[21],2,2), 
+                        Pin("pin42", "", flip_flops[21],2,2) };
   flip_flops[21]->addPins(pins22);
-  vector<Pin> pins23 = { Pin("pin43", "", flip_flops[22]), 
-                        Pin("pin44", "", flip_flops[22]) }; 
+  vector<Pin> pins23 = { Pin("pin43", "", flip_flops[22],2,2), 
+                        Pin("pin44", "", flip_flops[22],2,2) }; 
   flip_flops[22]->addPins(pins23);
-  vector<Pin> pins24 = { Pin("pin45", "", flip_flops[23]), 
-                        Pin("pin46", "", flip_flops[23]) };
+  vector<Pin> pins24 = { Pin("pin45", "", flip_flops[23],2,2), 
+                        Pin("pin46", "", flip_flops[23],2,2) };
   flip_flops[23]->addPins(pins24);
-  vector<Pin> pins25 = { Pin("pin47", "", flip_flops[24]), 
-                        Pin("pin48", "", flip_flops[24]),
-                        Pin("pin49", "", flip_flops[24]) };
+  vector<Pin> pins25 = { Pin("pin47", "", flip_flops[24],2,2), 
+                        Pin("pin48", "", flip_flops[24],2,2),
+                        Pin("pin49", "", flip_flops[24],2,2) };
   flip_flops[24]->addPins(pins25);
-  vector<Pin> pins26 = { Pin("pin50", "", flip_flops[25]), 
-                        Pin("pin51", "", flip_flops[25]) };
+  vector<Pin> pins26 = { Pin("pin50", "", flip_flops[25],2,2), 
+                        Pin("pin51", "", flip_flops[25],2,2) };
   flip_flops[25]->addPins(pins26);
-  vector<Pin> pins27 = { Pin("pin52", "", flip_flops[26]), 
-                        Pin("pin53", "", flip_flops[26]) };
+  vector<Pin> pins27 = { Pin("pin52", "", flip_flops[26],2,2), 
+                        Pin("pin53", "", flip_flops[26],2,2) };
   flip_flops[26]->addPins(pins27);
-  vector<Pin> pins28 = { Pin("pin54", "", flip_flops[27]), 
-                        Pin("pin55", "", flip_flops[27]) };
+  vector<Pin> pins28 = { Pin("pin54", "", flip_flops[27],2,2), 
+                        Pin("pin55", "", flip_flops[27],2,2) };
   flip_flops[27]->addPins(pins28);
-  vector<Pin> pins29 = { Pin("pin56", "", flip_flops[28]), 
-                        Pin("pin57", "", flip_flops[28]) };
+  vector<Pin> pins29 = { Pin("pin56", "", flip_flops[28],2,2), 
+                        Pin("pin57", "", flip_flops[28],2,2) };
   flip_flops[28]->addPins(pins29);
   
   for(size_t i=0;i<flip_flops.size();i++){

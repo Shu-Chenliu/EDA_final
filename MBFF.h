@@ -35,7 +35,7 @@ class MBFF{
   public:
     MBFF();
     ~MBFF();
-    void setMembers(set<string>& member);
+    void setMembers(set<string> member);
     void setPosition(Coor coor);
     void setPins(vector<Pin> pins);
     void setFeasibleRegion(Rect feasible_region);

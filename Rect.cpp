@@ -33,8 +33,8 @@ void Rect::setX(float x){
 void Rect::setY(float y){
   coor.setY(y);
 }
-void Rect::setName(string name){
-  name=name;
+void Rect::setName(string n){
+  name=n;
 }
 // Getter
 float Rect::getW() const{

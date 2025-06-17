@@ -20,6 +20,7 @@ class Pin{
     Pin();
     Pin(string Name, string Net);
     Pin(string Name, string Net,FF* ff);
+    Pin(string Name, string Net,FF* ff,float x,float y);
     ~Pin();
 
     // Setter

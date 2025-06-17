@@ -61,7 +61,7 @@ Rect feasibleRegion(int driving_strength,FF* flipflop){
 vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 	vector<set<string>> maximal_cliques;
 	vector<int> x_boundaries;
-
+	cout<<"maximal clique"<<endl;
 	for (const auto& r : rects) {
 		if(r.getX()+r.getW()==0){
 			continue;
@@ -96,7 +96,6 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 		for (const auto& event : events) {
 			bool is_entering = event.second[0] == '+';
 			string name = event.second.substr(1);
-
 			if (is_entering) {
 				active.insert(name);
 			} else {
@@ -270,6 +269,7 @@ int weightedMedian(vector<pair<int, int>>& coords_weights) {
 
 Rect computePreferredRegion(const MBFF& mbff) {
 	vector<pair<int, int>> x_weights, y_weights;
+	cout<<mbff.getPins().size();
 	for (auto& pin : mbff.getPins()) {
 		x_weights.emplace_back(pin.getX()+mbff.getX(), pin.getSR());
 		y_weights.emplace_back(pin.getY()+mbff.getY(), pin.getSR());
@@ -364,7 +364,7 @@ vector<MBFF> MBFFgeneration::locationAssignment(Board& board) {
 			mbff.setPins(ff->getPins());
 		}
 		mbff.setPosition(Coor(x/clique.size(),y/clique.size()));
-		mbff.setFeasibleRegion(feasibleRegionForClique(mbff)); // intersect all FF feasible regions
+		mbff.setFeasibleRegion(feasibleRegionForClique(mbff)); // intersect all FF feasible regions]
 		mbff.setPreferredRegion(computePreferredRegion(mbff));
 		assignMBFFLocation(mbff, bins);
 

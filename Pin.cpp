@@ -9,15 +9,16 @@ Pin::Pin() :
 Pin::Pin(string Name, string Net) : 
   name(Name),
   net(Net),
-  SR(0),
-  slack(0)
+  SR(1),
+  slack(1)
   {}
-Pin::Pin(string Name, string Net,FF* ff) : 
+Pin::Pin(string Name, string Net,FF* ff,float x,float y) : 
   name(Name),
   net(Net),
-  SR(0),
-  slack(0),
-  ff(ff)
+  SR(1),
+  slack(10),
+  ff(ff),
+  coor(Coor(x,y))
   {}
 
 Pin::~Pin(){}

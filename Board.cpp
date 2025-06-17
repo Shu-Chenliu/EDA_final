@@ -12,6 +12,7 @@ Board::Board() :
   unit(1000){}
 Board::Board(Rect size) : 
   size(size),
+  binSize(Rect(1,1,0,0)),
   Alpha(1),
   Beta(1),
   Gamma(1),
