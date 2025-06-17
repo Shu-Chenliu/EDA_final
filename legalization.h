@@ -5,9 +5,9 @@
 #include <queue>
 #include <unordered_set>
 #include <cmath>
-#include "Board.h"
-#include "FF.h"
-#include "MBFF.h"
+#include "inc/Board.h"
+#include "inc/FF.h"
+#include "inc/MBFF.h"
 using namespace std;
 class Legalization{
   public:
