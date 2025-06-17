@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 # Load
-f = open('testcase1/testcase1.txt')
+f = open('../testcase1/testcase1.txt')
 input = []
 
 for line in f.readlines():

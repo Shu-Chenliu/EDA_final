@@ -6,6 +6,10 @@
 #include <algorithm>
 #include <cstdlib>
 #include <set>
+#include <bits/stdc++.h>
+#include <string>
+#include <sstream>
+#include <typeinfo>
 #include <random>  // For random device and engine
 #include "Board.h"
 #include "Coor.h"
@@ -18,9 +22,44 @@
 
 
 using namespace std;
-int main() {
-  Board board(Rect(441,448,0,0));
 
+vector<string> split(const string& s){
+  istringstream iss(s);
+  string ss;
+  vector<string> str;
+  while (iss >> ss){
+    str.push_back(ss);
+  }
+  return str;
+}
+
+void readFile(string file){
+  ifstream f(file);
+
+  if (!f.is_open()) {
+    cerr << "Fail to open" << endl;
+    return;
+  }
+
+  string s;
+  vector<string> str;
+  while (getline(f, s)){
+    cout << "/" << s << "/" << endl;
+    str = split(s);
+    for (int i=0; i<(int)str.size(); i++){
+      cout << " ~" << str[i] << "~ " << endl;
+    }
+  }
+  f.close();
+  return;
+} 
+int main() {
+  Board board;
+  string file = "../testcase1/testcase1";
+  board.readWeight(file);
+  board.readDef(file);
+  board.readV(file);
+  board.forMatplotlib(file);
   random_device rd;
   mt19937 gen(rd());
   vector<FF*> flip_flops;
