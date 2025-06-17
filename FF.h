@@ -8,7 +8,7 @@ class FF : public Cell{
     int bit;
     int clk;
     int scan;
-    Coor relcateCoor;
+    Coor relocateCoor;
     int cluster;
     vector<int> next;
 

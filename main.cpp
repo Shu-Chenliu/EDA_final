@@ -27,6 +27,43 @@ int main() {
 
   // Step 1: 建立 FF 物件（先不加 fanins/fanouts）
   flip_flops.push_back(new FF("ff0","",10,10,1,1));
+  flip_flops.push_back(new FF("ff1","",20,10,1,1));
+  flip_flops.push_back(new FF("ff2","",13,10,1,1));
+  flip_flops.push_back(new FF("ff3","",40,62,1,1));
+  flip_flops.push_back(new FF("ff4","",50,95,1,1));
+  flip_flops.push_back(new FF("ff5","",60,1,1,1));
+  flip_flops.push_back(new FF("ff6","",7,205,1,1));
+  flip_flops.push_back(new FF("ff7","",94,128,1,1));
+  flip_flops.push_back(new FF("ff8","",100,100,1,1));
+  flip_flops.push_back(new FF("ff9","",120,120,1,1));
+  flip_flops.push_back(new FF("ff10","",130,130,1,1));
+  flip_flops.push_back(new FF("ff11","",140,140,1,1));
+  flip_flops.push_back(new FF("ff12","",12, 94,1,1));
+  flip_flops.push_back(new FF("ff13","",15, 95,1,1));
+  flip_flops.push_back(new FF("ff14","",204, 80,1,1));
+  flip_flops.push_back(new FF("ff15","",205, 190,1,1));
+  flip_flops.push_back(new FF("ff16","",300, 200,1,1));
+  flip_flops.push_back(new FF("ff17","",400, 300,1,1));
+  flip_flops.push_back(new FF("ff18","",205, 44, 1,1));
+  flip_flops.push_back(new FF("ff19","",370, 400,1,1));
+  flip_flops.push_back(new FF("ff20","",500, 53, 1,1));
+  flip_flops.push_back(new FF("ff21","",100, 41, 1,1));
+  flip_flops.push_back(new FF("ff22","",200, 100, 1,1));
+  flip_flops.push_back(new FF("ff23","",300, 200, 1,1));
+  flip_flops.push_back(new FF("ff24","",400, 300, 1,1));
+  flip_flops.push_back(new FF("ff25","",500, 400, 1,1));
+  flip_flops.push_back(new FF("ff26","",67, 194, 1,1));
+  flip_flops.push_back(new FF("ff27","",80, 200, 1,1));
+  flip_flops.push_back(new FF("ff28","",90, 210, 1,1));
+  flip_flops.push_back(new FF("ff29","",100, 220, 1,1));
+  flip_flops.push_back(new FF("ff30","",110, 230, 1,1));
+  // cout << "Total flip flops: " << flip_flops.size() << endl;
+  // for (size_t i = 0; i < flip_flops.size(); ++i) {
+  //   cout << "FF " << i << ": " << flip_flops[i]->getName() << " at (" 
+  //        << flip_flops[i]->getX() << ", " << flip_flops[i]->getY() << ")" << endl;
+  // }
+
+
   vector<Pin> pins = { Pin("pin1", "", flip_flops[0]) };
   flip_flops[0]->addPins(pins);
   
@@ -49,7 +86,8 @@ int main() {
       flip_flops[i]->getNext().push_back(indices[j]);
       cout<<indices[j]<<" ";
     }
-    cout<<endl;
+    cout << "getNext: " << flip_flops[i]->getNext().size() << endl;
+ 
   }
   // for (size_t i = 0; i < flip_flops.size(); ++i) {
   //     cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
@@ -60,6 +98,7 @@ int main() {
   int total_wire_length = 0;
   vector<Edge> edges;
   // turn wire to edge
+  cout << "FF size: " << flip_flops.size() << endl;
   for (size_t i = 0; i < flip_flops.size(); ++i) {
     for (size_t j = 0; j < flip_flops[i]->getNext().size(); ++j) {
       edges.push_back(Edge(
@@ -68,6 +107,14 @@ int main() {
         (int)abs(flip_flops[i]->getX() - flip_flops[flip_flops[i]->getNext()[j]]->getX()) +
         abs(flip_flops[i]->getY() - flip_flops[flip_flops[i]->getNext()[j]]->getY())
       )); // Manhattan distance
+
+    
+      cout << "Edge from " << flip_flops[i]->getName() << " to " 
+           << flip_flops[flip_flops[i]->getNext()[j]]->getName() 
+           << " with weight "
+           << abs(flip_flops[i]->getX() - flip_flops[flip_flops[i]->getNext()[j]]->getX()) +
+           abs(flip_flops[i]->getY() - flip_flops[flip_flops[i]->getNext()[j]]->getY())
+           << endl;
       
     }
   }

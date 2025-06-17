@@ -202,12 +202,27 @@ void relocateFlops(vector<FF*>& flip_flops, vector<Cluster>& clusters) {
                 // c.flip_flops[i]->relocatedY = ry;
                 used.insert({rx, ry});
                 ++i;
+
+                cout << "Relocating flop " << c.flip_flops[i]->getName() 
+                     << " to (" << c.flip_flops[i]->getRelocateCoor().getX() << ", " 
+                     << c.flip_flops[i]->getRelocateCoor().getY() << ") in cluster centered at (" 
+                     << c.cx << ", " << c.cy << ")\n";
+
+
             }
         }
     }
 }
 
 vector<Cluster> kmean::kmeansWeighted(vector<FF*>& flip_flops) {
+    for (auto& ff : flip_flops) {
+        cout << "Flop " << ff->getName() << ": original=(" << ff->getX() << "," << ff->getY()
+             << "), cluster=" << ff->getCluster()
+             << ", relocated=(" << ff->getRelocateCoor().getX() << "," << ff->getRelocateCoor().getY() << ")\n";
+    }
+
+
+
     int initialK = max(1, int(flip_flops.size() / SIZE_LIMIT)); // Initial number of clusters 
     vector<Cluster> clusters;
     initializeCenters(flip_flops, clusters, initialK);

@@ -41,7 +41,7 @@ int FF::getScan() const{
   return scan;
 }
 Coor FF::getRelocateCoor() const{
-  return relcateCoor;
+  return relocateCoor;
 }
 int FF::getCluster() const{
   return cluster;
