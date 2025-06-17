@@ -1,23 +1,24 @@
-# Compiler
+# Compiler and flags
 CXX = g++
 CXXFLAGS = -std=c++11 -O2 -Wall
 
 # Target executable
 TARGET = main.out
 
-# Source and object files
-SRCS = kmean.cpp MBFFgeneration.cpp classes.cpp main.cpp MST.cpp
-OBJS = $(SRCS:.cpp=.o)
+# Automatically find all .cpp and .h files in current directory
+SRCS := $(wildcard *.cpp)
+HEADERS := $(wildcard *.h)
+OBJS := $(SRCS:.cpp=.o)
 
 # Default target
 all: $(TARGET)
 
 # Link object files to create final binary
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Compile .cpp to .o
-%.o: %.cpp
+# Compile each .cpp to .o (auto-depend on header files)
+%.o: %.cpp $(HEADERS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Clean up build artifacts

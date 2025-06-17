@@ -2,16 +2,21 @@
 #define MBFFGENERATION_H
 
 #include "classes.cpp"
+#include "Board.h"
 #include "Coor.h"
 #include "Rect.h"
 #include "Pin.h"
 #include "FF.h"
+#include "MBFF.h"
 #include <set>
 #include <cstdlib> // Needed for rand() and srand()
 #include <ctime>
 using namespace std;
 
-
+struct Cluster {
+  double cx, cy;
+  vector<FF*> flip_flops;
+};
 class MBFFgeneration
 {
 	public:
@@ -22,7 +27,7 @@ class MBFFgeneration
 		// vector<set<string>> findMaximalCliques(int driving_strength);
 		vector<set<string>> generateMBFF();
 		Rect feasibleRegionForClique(MBFF mbff);
-		vector<MBFF> locationAssignment(Rect chip_area);
+		vector<MBFF> locationAssignment(Board& board);
 		void MBFFsizing(vector<MBFF>& mbffs);
 		int cost(set<string> c);
 		pair<int,pair<set<string>,set<string>>> MBFFcost(set<string> c);

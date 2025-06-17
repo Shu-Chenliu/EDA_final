@@ -16,7 +16,15 @@ Cell::Cell(string Name, string Model, float X, float Y) :
     coor.setCoor(X, Y);
     // pins.reserve(5);
   }
-
+Cell::Cell(string Name, string Model, float X, float Y,float w,float h) : 
+  name(Name),
+  model(Model),
+  delay(0),
+  power(0),
+  size(Rect(w,h,0,0)){
+    coor.setCoor(X, Y);
+    // pins.reserve(5);
+  }
 Cell::~Cell(){}
 
 // Setter

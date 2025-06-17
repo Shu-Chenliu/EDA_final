@@ -18,6 +18,7 @@ class Pin{
 
   public:
     Pin();
+    Pin(string Name, string Net);
     Pin(string Name, string Net,FF* ff);
     ~Pin();
 

@@ -44,7 +44,7 @@ class Board{
   public:
     Board();
     ~Board();
-
+    Board(Rect size);
     // Setter
     void setSize(float W, float H);
     void setBinW(float W);
@@ -62,6 +62,7 @@ class Board{
     void setOutPins(vector<IOPin> &pins);
 
     // Getter
+    Rect getSize() const;
     float getW() const;
     float getH() const;
     float getBinW() const;

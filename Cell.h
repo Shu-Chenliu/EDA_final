@@ -17,12 +17,13 @@ class Cell {
     Rect size;
     float power;
     float delay;
-    
+    //TODO: add area and a consturctor
     vector<Pin> pins;
 
   public:
     Cell();
     Cell(string Name, string Model, float X, float Y);
+    Cell(string Name, string Model, float X, float Y,float w,float h);
     ~Cell();
 
     // Setter

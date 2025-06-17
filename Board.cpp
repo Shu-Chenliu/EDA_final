@@ -10,7 +10,15 @@ Board::Board() :
   TPO(0),
   Area(1),
   unit(1000){}
-
+Board::Board(Rect size) : 
+  size(size),
+  Alpha(1),
+  Beta(1),
+  Gamma(1),
+  TNS(0),
+  TPO(0),
+  Area(1),
+  unit(1000){}
 Board::~Board(){}
 
 // Private
@@ -82,6 +90,9 @@ void Board::setOutPins(vector<IOPin> &pins){
 }
 
 // Getter
+Rect Board::getSize() const{
+  return size;
+}
 float Board::getW() const{
   return size.getW();
 }

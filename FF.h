@@ -10,9 +10,11 @@ class FF : public Cell{
     int scan;
     Coor relcateCoor;
     int cluster;
+    vector<int> next;
 
   public:
     FF();
+    FF(string name,string modal,float x,float y,float w,float h);
     ~FF();
 
     // Setter
@@ -27,6 +29,7 @@ class FF : public Cell{
     int getScan() const;
     Coor getRelocateCoor() const;
     int getCluster() const;
+    vector<int> getNext() const;
 };
 
 #endif

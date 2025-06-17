@@ -270,9 +270,9 @@ int weightedMedian(vector<pair<int, int>>& coords_weights) {
 
 Rect computePreferredRegion(const MBFF& mbff) {
 	vector<pair<int, int>> x_weights, y_weights;
-	for (auto& pin : mbff.fanins) {
-		x_weights.emplace_back(pin.getX()+mbff.position.getX(), pin.getSR());
-		y_weights.emplace_back(pin.getY()+mbff.position.getY(), pin.getSR());
+	for (auto& pin : mbff.getPins()) {
+		x_weights.emplace_back(pin.getX()+mbff.getX(), pin.getSR());
+		y_weights.emplace_back(pin.getY()+mbff.getY(), pin.getSR());
 	}
 
 	int x_center = weightedMedian(x_weights);
@@ -282,35 +282,30 @@ Rect computePreferredRegion(const MBFF& mbff) {
 	return Rect(x_center - margin, x_center + margin, y_center - margin, y_center + margin);
 }
 //TODO:  change chip area to board
-vector<Bin> generateBins(Rect chip_area, int bin_width, int bin_height) {
+vector<Bin> generateBins(Board board) {
 	vector<Bin> bins;
-	int x_bins = (chip_area.x_max - chip_area.x_min) / bin_width;
-	int y_bins = (chip_area.y_max - chip_area.y_min) / bin_height;
+	int x_bins = (board.getW()) / board.getBinW();
+	int y_bins = (board.getH()) / board.getBinH();
 
 	for (int i = 0; i < x_bins; ++i) {
 		for (int j = 0; j < y_bins; ++j) {
-			Rect area(
-				chip_area.x_min + i * bin_width,
-				chip_area.x_min + (i + 1) * bin_width,
-				chip_area.y_min + j * bin_height,
-				chip_area.y_min + (j + 1) * bin_height
-			);
+			Rect area(board.getBinW(),board.getBinH(),board.getSize().getX()+i*board.getBinW(),board.getSize().getY()+j * board.getBinH());
 			bins.push_back({i, j, area});
 		}
 	}
 	return bins;
 }
 void assignMBFFLocation(MBFF& mbff, vector<Bin>& bins) {
-	cout << "  [Bin Assignment] For MBFF with " << mbff.members.size() << " members" << endl;
+	cout << "  [Bin Assignment] For MBFF with " << mbff.getMembers().size() << " members" << endl;
 	for (auto& bin : bins) {
-		if (bin.area.intersect(mbff.preferred_region)) {
+		if (bin.area.intersect(mbff.getPreferredRegion())) {
 			bin.rank = 0;
-		} else if (bin.area.intersect(mbff.feasible_region)) {
+		} else if (bin.area.intersect(mbff.getFeasibleRegion())) {
 			// Calculate Manhattan distance to preferred region center
-			int cx = (mbff.preferred_region.getX() + mbff.preferred_region.getX()+mbff.preferred_region.getW()) / 2;
-			int cy = (mbff.preferred_region.getY() + mbff.preferred_region.getY()+mbff.preferred_region.getH()) / 2;
-			int bx = (bin.area.getX() + bin.area.getX()+bin.area.getW()) / 2;
-			int by = (bin.area.getY() + bin.area.getY()+bin.area.getH()) / 2;
+			int cx = (mbff.getPreferredRegion().getX()*2+mbff.getPreferredRegion().getW()) / 2;
+			int cy = (mbff.getPreferredRegion().getY()*2+mbff.getPreferredRegion().getH()) / 2;
+			int bx = (bin.area.getX()*2+bin.area.getW()) / 2;
+			int by = (bin.area.getY()*2+bin.area.getH()) / 2;
 			bin.rank = abs(cx - bx) + abs(cy - by);
 		} else {
 			bin.rank = -1; // invalid
@@ -329,7 +324,7 @@ void assignMBFFLocation(MBFF& mbff, vector<Bin>& bins) {
 
 	if (best_bin) {
 		best_bin->occupied = true;
-		mbff.feasible_region = best_bin->area;
+		mbff.setFeasibleRegion(best_bin->area);
 		cout << "    Assigned to bin (" << best_bin->x_idx << "," << best_bin->y_idx << ") rank = " << best_bin->rank << endl;
 	} else {
 		cout << "    [Warning] No available bin found!" << endl;
@@ -338,8 +333,8 @@ void assignMBFFLocation(MBFF& mbff, vector<Bin>& bins) {
 Rect MBFFgeneration::feasibleRegionForClique(MBFF mbff){
 	int new_x_min = INT_MAX, new_x_max = INT_MIN;
   int new_y_min = INT_MAX, new_y_max = INT_MIN;
-	for(const auto&ff:mbff.members){
-		Rect region= feasibleRegion(mbff.driving_strength,map[ff]);
+	for(const auto&ff:mbff.getMembers()){
+		Rect region= feasibleRegion(mbff.getDrivingStrength(),map[ff]);
 		new_x_min=max(new_x_min,(int)region.getX());
 		new_x_max=min(new_x_max,(int)region.getX()+(int)region.getW());
 		new_y_min=max(new_y_min,(int)region.getY());
@@ -347,10 +342,9 @@ Rect MBFFgeneration::feasibleRegionForClique(MBFF mbff){
 	}
 	return Rect(new_x_min,new_x_max,new_y_min,new_y_max);
 }
-vector<MBFF> MBFFgeneration::locationAssignment(Rect chip_area) {
+vector<MBFF> MBFFgeneration::locationAssignment(Board& board) {
 	cout << "[DEBUG] Start MBFF Location Assignment" << endl;
-	int bin_width = 1, bin_height = 1;
-	vector<Bin> bins = generateBins(chip_area, bin_width, bin_height);
+	vector<Bin> bins = generateBins(board);
 	cout << "  -> Total bins generated: " << bins.size() << endl;
 	vector<set<string>> non_conflictMBFF=generateMBFF();
 	vector<MBFF> placed_mbffs;
@@ -358,21 +352,20 @@ vector<MBFF> MBFFgeneration::locationAssignment(Rect chip_area) {
 	for (auto& clique : non_conflictMBFF) {
 		cout << "  [MBFF#" << (++count) << "] Placing..." << endl;
 		MBFF mbff;
-		mbff.members = clique;
+		mbff.setMembers(clique);
 		//TODO: assign MBFF position to average x and y
-		double x=0;
-		double y=0;
+		float x=0;
+		float y=0;
 		for (auto& name : clique) {
 			cout<<name<<endl;
 			FF* ff = map[name];
 			x+=ff->getRelocateCoor().getX();
 			y+=ff->getRelocateCoor().getY();
-			mbff.fanins.insert(mbff.fanins.end(), ff->fanins.begin(), ff->fanins.end());
-			mbff.fanouts.insert(mbff.fanouts.end(), ff->fanouts.begin(), ff->fanouts.end());
+			mbff.setPins(ff->getPins());
 		}
-		mbff.position=Coor(x/clique.size(),y/clique.size());
-		mbff.feasible_region = feasibleRegionForClique(mbff); // intersect all FF feasible regions
-		mbff.preferred_region = computePreferredRegion(mbff);
+		mbff.setPosition(Coor(x/clique.size(),y/clique.size()));
+		mbff.setFeasibleRegion(feasibleRegionForClique(mbff)); // intersect all FF feasible regions
+		mbff.setPreferredRegion(computePreferredRegion(mbff));
 		assignMBFFLocation(mbff, bins);
 
 		placed_mbffs.push_back(mbff);
@@ -384,14 +377,14 @@ void downsizeMBFFs(vector<MBFF>& mbffs, double avg_slack, double beta) {
 	for (MBFF& mbff : mbffs) {
 		int l = 0;
 		// Step 1~5: 根據 slack 做降速處理
-		for (MBFFBit& bit : mbff.bits) {
+		for (MBFFBit& bit : mbff.getBits()) {
 			if (!bit.is_empty && bit.slack > beta * avg_slack) {
 				bit.strength = LOW;
 				l++;
 			}
 		}
 		// Step 6~8: 處理空 bit（都可降速）
-		for (MBFFBit& bit : mbff.bits) {
+		for (MBFFBit& bit : mbff.getBits()) {
 			if (bit.is_empty) {
 				bit.strength = LOW;
 				l++;
@@ -408,7 +401,7 @@ double computeAvgSlack(const vector<MBFF>& mbffs) {
 	double total_slack = 0;
 	int count = 0;
 	for (const auto& mbff : mbffs) {
-		for (const auto& bit : mbff.bits) {
+		for (const auto& bit : mbff.getBits()) {
 			if (!bit.is_empty) {
 				total_slack += bit.slack;
 				count++;

@@ -20,7 +20,7 @@
 #include "Pin.h"
 #include "FF.h"
 using namespace std;
-struct FF;
+// struct FF;
 // struct Point {
 //   double x, y;
 // 	Point() : x(0), y(0) {}
@@ -95,36 +95,36 @@ struct FF;
 
 // };
 
-struct Cluster {
-  double cx, cy;
-  vector<FF*> flip_flops;
-};
+// struct Cluster {
+//   double cx, cy;
+//   vector<FF*> flip_flops;
+// };
 
-enum DriveStrength { LOW, HIGH };
+// enum DriveStrength { LOW, HIGH };
 
-struct MBFFBit {
-	string name;
-	double slack;
-	bool is_empty = false;
-	DriveStrength strength;
-};
-struct MBFF {
-	set<string> members;
-	vector<Pin> fanins, fanouts;
-	Rect feasible_region;
-	Rect preferred_region;
-	int driving_strength;
-	vector<MBFFBit> bits;
-	Coor position;
-	// ... slot assignment fields
-};
-struct Bin {
-	int x_idx, y_idx;
-	Rect area;
-	int rank;
-	bool occupied;
-	Bin(int x, int y, const Rect& r)
-		: x_idx(x), y_idx(y), area(r), rank(-1), occupied(false) {}
-};
+// struct MBFFBit {
+// 	string name;
+// 	double slack;
+// 	bool is_empty = false;
+// 	DriveStrength strength;
+// };
+// struct MBFF {
+// 	set<string> members;
+// 	vector<Pin> fanins, fanouts;
+// 	Rect feasible_region;
+// 	Rect preferred_region;
+// 	int driving_strength;
+// 	vector<MBFFBit> bits;
+// 	Coor position;
+// 	// ... slot assignment fields
+// };
+// struct Bin {
+// 	int x_idx, y_idx;
+// 	Rect area;
+// 	int rank;
+// 	bool occupied;
+// 	Bin(int x, int y, const Rect& r)
+// 		: x_idx(x), y_idx(y), area(r), rank(-1), occupied(false) {}
+// };
 
 #endif
