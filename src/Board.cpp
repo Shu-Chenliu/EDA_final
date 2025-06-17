@@ -348,7 +348,8 @@ void Board::readV(string file){
       } while (find(str.begin(), str.end(), ";") == str.end());
     }
     else{
-      bool isNew = true;
+      bool isNew = true, isFF = false;
+      int bit = 0;
       Cell *c = getCell(str[1]);
       if(!c)  cout << "empty ptr" << endl;
       do{
@@ -361,13 +362,18 @@ void Board::readV(string file){
           if (str[i][0] == '.'){
             erase(str[i+2], '\\');
             c->addPin(Pin(str[i].substr(1), str[i+2]));
+            if (str[i].substr(1) == "CK")  isFF = true;
+            else if (str[i][1] == 'D')  bit++;
           }
         }
       } while (find(str.begin(), str.end(), ";") == str.end() );
-      // cout << c->getName() << endl;
-      for (int i=0; i<(int)c->getPins().size(); i++){
-        // cout << " - " << c->getPins()[i].getName() << " " << c->getPins()[i].getNet() << endl;
+      if (isFF){
+        FFs.push_back(pair<Cell*, int>(c, bit));
       }
+      // cout << c->getName() << endl;
+      // for (int i=0; i<(int)c->getPins().size(); i++){
+      //   cout << " - " << c->getPins()[i].getName() << " " << c->getPins()[i].getNet() << endl;
+      // }
     }
   }
   

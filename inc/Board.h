@@ -32,9 +32,10 @@ class Board{
     int pinNum;  //
 
     vector<Cell> Cells;
+    unordered_map<string, Cell*> CellList;
+    vector<pair<Cell*, int>> FFs;
     vector<IOPin> inPins;
     vector<IOPin> outPins;  // merge IOPins ?
-    unordered_map<string, Cell*> CellList;
     Netlist NetList;
 
     vector<string> split(const string& s); 
