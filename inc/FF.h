@@ -24,6 +24,7 @@ class FF : public Cell{
     void setRelocateCoor(Coor coor);
     void setCluster(int cluster);
     void addNext(int index);
+    
     // Getter
     int getBit() const;
     int getClk() const;
