@@ -52,9 +52,11 @@ void kmean::assignPoints(vector<FF*>& flip_flops, vector<Cluster>& clusters, boo
                 best = k;
             }
         }
+        cout<<best;
         flip_flops[i]->setCluster(best);
         clusters[best].flip_flops.push_back(flip_flops[i]);
     }
+    cout<<"finish assign points\n";
 }
 
 void initCentersRecursive(const vector<FF*>& flip_flops, vector<Cluster>& clusters, vector<int> indices, int K, bool splitX = true) {
@@ -197,17 +199,18 @@ void relocateFlops(vector<FF*>& flip_flops, vector<Cluster>& clusters) {
                 int ry = py + dy + row;
 
                 while (used.count({rx, ry})) rx++;  // ensure unique placement
-                c.flip_flops[i]->setRelocateCoor(Coor(rx,ry));
+                Coor coor(rx,ry);
+                c.flip_flops[i]->setRelocateCoor(coor);
                 // c.flip_flops[i]->relocatedX = rx;
                 // c.flip_flops[i]->relocatedY = ry;
                 used.insert({rx, ry});
-                ++i;
+                
 
                 cout << "Relocating flop " << c.flip_flops[i]->getName() 
                      << " to (" << c.flip_flops[i]->getRelocateCoor().getX() << ", " 
                      << c.flip_flops[i]->getRelocateCoor().getY() << ") in cluster centered at (" 
                      << c.cx << ", " << c.cy << ")\n";
-
+                ++i;
 
             }
         }
@@ -226,7 +229,6 @@ vector<Cluster> kmean::kmeansWeighted(vector<FF*>& flip_flops) {
     int initialK = max(1, int(flip_flops.size() / SIZE_LIMIT)); // Initial number of clusters 
     vector<Cluster> clusters;
     initializeCenters(flip_flops, clusters, initialK);
-
     // for (int iter = 0; iter < MAX_ITER; ++iter) {
     //     assignPoints(flip_flops, clusters, iter > 0); // unweighted in first iteration
     //     resolveOverflow(flip_flops, clusters);
@@ -270,8 +272,9 @@ vector<Cluster> kmean::kmeansWeighted(vector<FF*>& flip_flops) {
         // } else {
         //     cout << "No updates in iteration " << iter << "\n";
         // }
-        
+        cout<<"finish"<<endl;
         resolveOverDisplacement(flip_flops, clusters);
+        
         relocateFlops(flip_flops, clusters);
         updateCenters(flip_flops, clusters);
 

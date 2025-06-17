@@ -7,7 +7,11 @@ FF::FF() :
   cluster(-1)
   {}
 FF::FF(string name,string modal,float x,float y,float w,float h):
-  Cell(name,modal,x,y,w,h){}
+  Cell(name,modal,x,y,w,h),
+  bit(1),
+  clk(1),
+  scan(-1),
+  cluster(-1){}
 FF::~FF(){}
 
 // Setter
@@ -23,10 +27,13 @@ void FF::setScan(int n){
   scan = n;
 }
 void FF::setRelocateCoor(Coor coor){
-  coor=coor;
+  relocateCoor=coor;
 }
-void FF::setCluster(int cluster){
-  cluster=cluster;
+void FF::setCluster(int c){
+  cluster=c;
+}
+void FF::addNext(int x){
+  next.push_back(x);
 }
 // Getter
 int FF::getBit() const{

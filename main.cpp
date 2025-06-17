@@ -83,7 +83,7 @@ int main() {
 
     // 取前 x 個當作 next
     for (int j = 0; j < x && j < (int)indices.size(); ++j) {
-      flip_flops[i]->getNext().push_back(indices[j]);
+      flip_flops[i]->addNext(indices[j]);
       cout<<indices[j]<<" ";
     }
     cout << "getNext: " << flip_flops[i]->getNext().size() << endl;
