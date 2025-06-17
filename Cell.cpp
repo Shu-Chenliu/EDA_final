@@ -4,7 +4,8 @@ Cell::Cell() :
   name(""),
   model(""),
   delay(0),
-  power(0){
+  power(0),
+  minSlack(INT_MAX){
     // pins.reserve(5);
   }
 
@@ -12,7 +13,8 @@ Cell::Cell(string Name, string Model, float X, float Y) :
   name(Name),
   model(Model),
   delay(0),
-  power(0){
+  power(0),
+  minSlack(INT_MAX){
     coor.setCoor(X, Y);
     // pins.reserve(5);
   }
@@ -21,7 +23,8 @@ Cell::Cell(string Name, string Model, float X, float Y,float w,float h) :
   model(Model),
   delay(0),
   power(0),
-  size(Rect(w,h,0,0)){
+  size(Rect(w,h,0,0)),
+  minSlack(INT_MAX){
     coor.setCoor(X, Y);
     // pins.reserve(5);
   }
@@ -62,10 +65,18 @@ void Cell::setDelay(float d){
 
 void Cell::addPin(Pin pin){
   pins.push_back(pin);
+  if(pin.getSlack()<minSlack){
+    minSlack=pin.getSlack();
+  }
 }
 
 void Cell::addPins(vector<Pin>& Pins){
-  pins.insert(end(pins), begin(Pins), end(Pins));
+  for(int i=0;i<Pins.size();i++){
+    pins.push_back(Pins[i]);
+    if(Pins[i].getSlack()<minSlack){
+      minSlack=Pins[i].getSlack();
+    }
+  }
 }
 
 // Getter
@@ -108,7 +119,9 @@ int Cell::getPinNum() const{
 const vector<Pin> &Cell::getPins() const{
   return pins;
 }
-
+int Cell::getMinSlack()const{
+  return minSlack;
+}
 // Print
 void Cell::print(){
   cout << name << " ";

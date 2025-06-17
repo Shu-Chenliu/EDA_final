@@ -2,7 +2,6 @@
 #define FF_H
 
 #include "Cell.h"
-
 class FF : public Cell{
   private:
     int bit;

@@ -19,7 +19,8 @@
 #include "MBFFgeneration.h"
 #include "kmean.h"
 #include "MST.h"
-
+#include "legalization.h"
+//TODO: write bin class
 
 using namespace std;
 
@@ -53,6 +54,19 @@ void readFile(string file){
   f.close();
   return;
 } 
+vector<Bin> generateBins(Board board) {
+	vector<Bin> bins;
+	int x_bins = (board.getW()) / board.getBinW();
+	int y_bins = (board.getH()) / board.getBinH();
+
+	for (int i = 0; i < x_bins; ++i) {
+		for (int j = 0; j < y_bins; ++j) {
+			Rect area(board.getBinW(),board.getBinH(),board.getSize().getX()+i*board.getBinW(),board.getSize().getY()+j * board.getBinH());
+			bins.push_back({i,j,area});
+		}
+	}
+	return bins;
+}
 int main() {
   Board board;
   string file = "../testcase1/testcase1";
@@ -60,6 +74,8 @@ int main() {
   board.readDef(file);
   board.readV(file);
   board.forMatplotlib(file);
+  vector<Bin> bins=generateBins(board);
+  cout<<"generate"<<bins.size()<<"bins"<<endl;
   random_device rd;
   mt19937 gen(rd());
   vector<FF*> flip_flops;
@@ -188,7 +204,8 @@ int main() {
   vector<Pin> pins29 = { Pin("pin56", "", flip_flops[28],2,2), 
                         Pin("pin57", "", flip_flops[28],2,2) };
   flip_flops[28]->addPins(pins29);
-  
+  Legalization legalize;
+  legalize.legalizePlacing(flip_flops,bins,board);
   for(size_t i=0;i<flip_flops.size();i++){
     
     uniform_int_distribution<> num_next_dis(0, 3);
@@ -254,6 +271,7 @@ int main() {
     if (ff->getY() > bottom) bottom = ff->getY();
   }
   size_t size=flip_flops.size();
+  //TODO: stop when 2 local minimum occur
   for(size_t j=0;j<1;j++){
     uniform_int_distribution<> num_size((int)flip_flops.size() / 3, (int)flip_flops.size()*2 / 3);
     int SIZE_LIMIT = num_size(gen) ; // Example size limit for clusters
@@ -287,7 +305,7 @@ int main() {
       double beta = 0.95;
       MBFFgeneration generator(flipflop, maxDrivingStrength, beta);
       // vector<set<string>> mbff_result = generator.generateMBFF();
-      vector<MBFF> placed_mbffs=generator.locationAssignment(board);
+      vector<MBFF> placed_mbffs=generator.locationAssignment(bins);
       generator.MBFFsizing(placed_mbffs);
     }
   }
