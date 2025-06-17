@@ -146,6 +146,7 @@ int MBFFgeneration::cost(set<string> c){
 		}
 	}
 	//TODO: delta 算法要改
+	//TODO: add MST method
 	double delta_area=c.size()/3;
 	double delta_power=total_switching*0.15;
 	double delta_tns=total_slack*0.15;
@@ -279,22 +280,9 @@ Rect computePreferredRegion(const MBFF& mbff) {
 	int y_center = weightedMedian(y_weights);
 	int margin = 5; // or some constant
 
-	return Rect(x_center - margin, x_center + margin, y_center - margin, y_center + margin);
+	return Rect(margin, margin, x_center, y_center);
 }
-//TODO:  change chip area to board
-vector<Bin> generateBins(Board board) {
-	vector<Bin> bins;
-	int x_bins = (board.getW()) / board.getBinW();
-	int y_bins = (board.getH()) / board.getBinH();
 
-	for (int i = 0; i < x_bins; ++i) {
-		for (int j = 0; j < y_bins; ++j) {
-			Rect area(board.getBinW(),board.getBinH(),board.getSize().getX()+i*board.getBinW(),board.getSize().getY()+j * board.getBinH());
-			bins.push_back({i, j, area});
-		}
-	}
-	return bins;
-}
 void assignMBFFLocation(MBFF& mbff, vector<Bin>& bins) {
 	cout << "  [Bin Assignment] For MBFF with " << mbff.getMembers().size() << " members" << endl;
 	for (auto& bin : bins) {
@@ -342,9 +330,8 @@ Rect MBFFgeneration::feasibleRegionForClique(MBFF mbff){
 	}
 	return Rect(new_x_min,new_x_max,new_y_min,new_y_max);
 }
-vector<MBFF> MBFFgeneration::locationAssignment(Board& board) {
+vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins) {
 	cout << "[DEBUG] Start MBFF Location Assignment" << endl;
-	vector<Bin> bins = generateBins(board);
 	cout << "  -> Total bins generated: " << bins.size() << endl;
 	vector<set<string>> non_conflictMBFF=generateMBFF();
 	vector<MBFF> placed_mbffs;

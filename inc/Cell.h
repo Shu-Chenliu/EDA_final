@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <climits>
 #include "Coor.h"
 #include "Pin.h"
 #include "Rect.h"
@@ -19,6 +20,7 @@ class Cell {
     float delay;
     //TODO: add area and a consturctor
     vector<Pin> pins;
+    int minSlack;
 
   public:
     Cell();
@@ -51,7 +53,7 @@ class Cell {
 
     int getPinNum() const;
     const vector<Pin> &getPins() const;
-
+    int getMinSlack() const;
     // Print
     void print();
 };

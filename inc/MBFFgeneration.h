@@ -1,13 +1,17 @@
 #ifndef MBFFGENERATION_H
 #define MBFFGENERATION_H
 
-#include "classes.cpp"
+// #include "classes.cpp"
 #include "Board.h"
 #include "Coor.h"
 #include "Rect.h"
 #include "Pin.h"
 #include "FF.h"
 #include "MBFF.h"
+#include <algorithm>
+#include <map>
+#include <queue>
+#include <unordered_set>
 #include <set>
 #include <cstdlib> // Needed for rand() and srand()
 #include <ctime>
@@ -27,7 +31,7 @@ class MBFFgeneration
 		// vector<set<string>> findMaximalCliques(int driving_strength);
 		vector<set<string>> generateMBFF();
 		Rect feasibleRegionForClique(MBFF mbff);
-		vector<MBFF> locationAssignment(Board& board);
+		vector<MBFF> locationAssignment(vector<Bin>& bins);
 		void MBFFsizing(vector<MBFF>& mbffs);
 		int cost(set<string> c);
 		pair<int,pair<set<string>,set<string>>> MBFFcost(set<string> c);

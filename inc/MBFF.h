@@ -3,6 +3,7 @@
 #include <iostream>
 #include <set>
 #include <vector>
+#include <climits>
 #include "Rect.h"
 #include "Pin.h"
 #include "Coor.h"
@@ -32,6 +33,7 @@ class MBFF{
     int driving_strength;
     vector<MBFFBit> bits;
     Coor position;
+    int minSlack;
   public:
     MBFF();
     ~MBFF();
