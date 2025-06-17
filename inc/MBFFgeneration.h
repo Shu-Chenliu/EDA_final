@@ -1,13 +1,17 @@
 #ifndef MBFFGENERATION_H
 #define MBFFGENERATION_H
 
-#include "classes.cpp"
+// #include "classes.cpp"
 #include "Board.h"
 #include "Coor.h"
 #include "Rect.h"
 #include "Pin.h"
 #include "FF.h"
 #include "MBFF.h"
+#include <algorithm>
+#include <map>
+#include <queue>
+#include <unordered_set>
 #include <set>
 #include <cstdlib> // Needed for rand() and srand()
 #include <ctime>
