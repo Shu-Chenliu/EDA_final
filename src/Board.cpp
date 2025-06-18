@@ -179,6 +179,14 @@ Cell* Board::getCell(const string& name) {
     return it != CellList.end() ? it->second : nullptr;
 }
 
+Netlist Board::getNetList() const{
+  return NetList;
+}
+
+vector<pair<Cell*, int>> Board::getFFs() const {
+  return FFs;
+}
+
 // Read files
 void Board::readWeight(string file){
   ifstream f(file + "_weight");
@@ -465,12 +473,7 @@ void Board::print(bool basic, bool cells, bool pins, bool nets){
     cout << "\n==================================\n\n";
   }
 }
-Netlist Board::getNetList(){
-  return NetList;
-}
-vector<pair<Cell*, int>> Board::getFFs() const {
-  return FFs;
-}
+
 // Output
 void Board::forMatplotlib(const string& file){
   ofstream f (file + ".txt");

@@ -23,7 +23,7 @@ class Netlist{
     void addNet(string name, vector<Net> pins);
 
     // Getter
-    // vector<string> getNets() const;
+    vector<string> getNets() const;
     vector<Net> members(string net) const;
 
     // Pring

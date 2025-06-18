@@ -10,9 +10,12 @@ void Netlist::addNet(string name, vector<Net> pins){
 }
 
 // Getter
-// vector<string> Netlist::getNets() const{
-//   return Nets;
-// }
+vector<string> Netlist::getNets() const{
+  vector<string> Nets;
+  for (auto& net : pinMap){
+    Nets.push_back(net.first);
+  }
+}
 
 vector<Net> Netlist::members(string net) const{
   auto it = pinMap.find(net);
