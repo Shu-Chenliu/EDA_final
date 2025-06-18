@@ -45,14 +45,23 @@ void Board::erase(string& s, char c){
 }
 
 vector<string> isIn = {"D", "SI", "CK", "A", "A1", "A2"};
+vector<string> isOut = {"Q", "QN", "SE", "X"};
 bool Board::findDir(const string& s){
   if (find(isIn.begin(), isIn.end(), s) != isIn.end()){
     // Is in
     return true;
   }
-  else{
+  else if (find(isOut.begin(), isOut.end(), s) != isOut.end()){
     // Is out
     return false;
+  }
+  else{
+    if (s.substr(0,2) == "in")  return false;
+    else if (s.substr(0,3) == "out")  return true;
+    else{
+      cout << "% " << s << " not found" << endl;
+      return false;
+    }
   }
 }
 
