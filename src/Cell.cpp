@@ -70,7 +70,7 @@ void Cell::addPin(Pin pin){
   }
 }
 
-void Cell::addPins(vector<Pin>& Pins){
+void Cell::addPins(const vector<Pin>& Pins){
   for(int i=0;i<Pins.size();i++){
     pins.push_back(Pins[i]);
     if(Pins[i].getSlack()<minSlack){

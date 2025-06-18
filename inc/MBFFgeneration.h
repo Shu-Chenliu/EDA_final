@@ -8,6 +8,7 @@
 #include "Pin.h"
 #include "FF.h"
 #include "MBFF.h"
+#include "MST.h"
 #include <algorithm>
 #include <map>
 #include <queue>
@@ -15,6 +16,7 @@
 #include <set>
 #include <cstdlib> // Needed for rand() and srand()
 #include <ctime>
+#include <limits>
 using namespace std;
 
 struct Cluster {

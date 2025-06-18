@@ -38,7 +38,7 @@ class Cell {
     void setDelay(float d);
 
     void addPin(Pin pin);
-    void addPins(vector<Pin>& Pins);
+    void addPins(const vector<Pin>& Pins);
 
     // Getter
     string getName() const;

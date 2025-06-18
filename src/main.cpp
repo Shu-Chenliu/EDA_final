@@ -80,7 +80,7 @@ int main() {
   mt19937 gen(rd());
   
   vector<pair<Cell*, int>> board_FFs = board.getFFs();
-   
+  unordered_map<string,pair<FF*,int>> FFnameMap;
   
   vector<FF*> flip_flops;
   // FFs -> flip_flops
@@ -91,26 +91,40 @@ int main() {
     ff->setBit(bit);
     ff->setClk(1);  // Assuming clk is always 1 for simplicity
     ff->setScan(0); // Assuming scan is always 0 for simplicity
-    ff->setRelocateCoor(Coor(cell->getX(), cell->getY()));
+    ff->setRelocateCoor(Coor(-1,-1));
+    ff->addPins(cell->getPins());
     flip_flops.push_back(ff);
-    
+    FFnameMap[cell->getName()]={ff,i};
   }
-
+  cout<<"finish converting cells to FFs"<<endl;
   // cout << "Total flip flops: " << flip_flops.size() << endl;
   // for (size_t i = 0; i < flip_flops.size(); ++i) {
   //   cout << "FF " << i << ": " << flip_flops[i]->getName() << " at (" 
   //        << flip_flops[i]->getX() << ", " << flip_flops[i]->getY() << ")" << endl;
   // }
-  //TODO: netlist parse
   for(const auto&netName:netlist.getNets()){
-    // vector<Net> member=netlist.members(netName);
-    // for(const auto&net:member){
-    //   string ff1Name=net;
-    // }
+    vector<Net> member=netlist.members(netName);
+    vector<string> ffIn;
+    vector<string> ffOut;
+    for(const auto&net:member){
+      if(net.getIO()){
+        ffIn.push_back(net.getCellName());
+      }
+      else{
+        ffOut.push_back(net.getCellName());
+      }
+    }
+    for(const auto&in:ffIn){
+      FF* ff=FFnameMap[in].first;
+      for(const auto&out:ffOut){
+        ff->addNext(FFnameMap[out].second);
+      }
+    }
   }
+  cout<<"finish adding pins"<<endl;
   Legalization legalize;
   legalize.legalizePlacing(flip_flops,bins,board);
-  
+  cout<<"finish legalizing"<<endl;
   // for (size_t i = 0; i < flip_flops.size(); ++i) {
   //     cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
   //          << "), cluster=" << flip_flops[i]->cluster

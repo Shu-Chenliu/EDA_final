@@ -157,12 +157,17 @@ int MBFFgeneration::cost(set<string> c){
 }
 pair<int, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c) {
 	int size = c.size();
-	int currCost = INT_MAX;
-	set<string> currClique;
 
 	vector<string> elements(c.begin(), c.end()); // for random selection
-
+	int minCost = numeric_limits<int>::max();
+  int currentCost = 0;
+  int beforeCost = 0;
+  int state = 0; // 1: increase, -1: decrease, 0: no change
+  bool local_minimum_occur = false;
+  int KmeanIteration = 1;
+	set<string> minClique;
 	for (int i = 0; i < size * size; i++) {
+		beforeCost=currentCost;
 		set<string> ff;
 		for (const auto& ffs : elements) {
 			int randomNum = rand() % 2;
@@ -176,13 +181,45 @@ pair<int, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c
 			ff.insert(elements[randomIndex]);
 		}
 
-		int randomCost = cost(ff);
-		if (currCost > randomCost) {
-			currCost = randomCost;
-			currClique = ff;
-		}
+		currentCost = cost(ff);
+		if (i == 0) {
+      minCost = currentCost;
+      beforeCost = currentCost;
+			minClique=ff;
+      cout << "============ Initial cost: " << minCost << " =============" << endl;
+    } else {
+      cout << "============Current cost: " << currentCost << ", Previous cost: " << beforeCost << " ============="<< endl;
+      if (currentCost < beforeCost && state == 1) {
+        state = -1; // Decrease
+      } else if (currentCost > beforeCost && state == -1) {
+        state = 1; // Increase
+        if (local_minimum_occur){
+          if(beforeCost<minCost){
+						minCost=beforeCost;
+						minClique=ff;
+					}
+          cout << "Local minimum occurred, stopping optimization." << endl;
+          cout << "Minimum cost found: " << minCost << endl;
+          break; // Stop the loop
+
+        }else{
+          local_minimum_occur = true;
+          if(beforeCost<minCost){
+						minCost=beforeCost;
+						minClique=ff;
+					}
+          cout << "Local minimum not occurred, continue optimization." << endl;
+          cout << "Minimum cost so far: " << minCost << endl;
+        }
+      } else if (currentCost < beforeCost) {
+        state = -1; // Increase
+        local_minimum_occur = false;
+      } else if (currentCost > beforeCost) {
+        state = 1; // Decrease
+      } 
+    }
 	}
-	return {currCost, {currClique,c}};
+	return {minCost, {minClique,c}};
 }
 vector<set<string>> MBFFgeneration::generateMBFF(){
 	cout << "[DEBUG] Start MBFF Generation" << endl;
