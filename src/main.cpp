@@ -78,10 +78,14 @@ int main() {
   Netlist netlist=board.getNetList();
   random_device rd;
   mt19937 gen(rd());
-  
+  float exactTNS=board.getTNS();
+  float exactPower=board.getTPO();
+  float exactArea=board.getArea();
   vector<pair<Cell*, int>> board_FFs = board.getFFs();
   unordered_map<string,pair<FF*,int>> FFnameMap;
-  
+  float alpha=board.getAlpha();
+  float beta=board.getBeta();
+  float gamma=board.getGamma();
   vector<FF*> flip_flops;
   // FFs -> flip_flops
   for (int i = 0; i < board_FFs.size(); ++i) {
@@ -102,6 +106,7 @@ int main() {
   //   cout << "FF " << i << ": " << flip_flops[i]->getName() << " at (" 
   //        << flip_flops[i]->getX() << ", " << flip_flops[i]->getY() << ")" << endl;
   // }
+  int numberFO=0;
   for(const auto&netName:netlist.getNets()){
     vector<Net> member=netlist.members(netName);
     vector<string> ffIn;
@@ -112,6 +117,7 @@ int main() {
       }
       else{
         ffOut.push_back(net.getCellName());
+        numberFO++;
       }
     }
     for(const auto&in:ffIn){
@@ -121,10 +127,11 @@ int main() {
       }
     }
   }
+  float kp,ka,kt;
+  kp=exactPower/(float)numberFO;
+  ka=exactArea/(float)flip_flops.size();
   cout<<"finish adding pins"<<endl;
-  Legalization legalize;
-  legalize.legalizePlacing(flip_flops,bins,board);
-  cout<<"finish legalizing"<<endl;
+  
   // for (size_t i = 0; i < flip_flops.size(); ++i) {
   //     cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
   //          << "), cluster=" << flip_flops[i]->cluster
@@ -158,8 +165,10 @@ int main() {
   MST mst_before(edges, (int)flip_flops.size());
   total_wire_length = mst_before.MinimumSpanningTreeCost();
   cout << "Initial MST wire length: " << total_wire_length << endl;
-
-
+  kt=exactTNS/total_wire_length;
+  Legalization legalize;
+  legalize.legalizePlacing(flip_flops,bins,board);
+  cout<<"finish legalizing"<<endl;
   int left = 0, right = 0, top = 0, bottom = 0;
   for (auto ff : flip_flops) {
     if (ff->getX() < left) left = ff->getX();
@@ -221,8 +230,8 @@ int main() {
     for(size_t i=0;i<1;i++){
       vector<FF*> flipflop=clusters[i].flip_flops;
       int maxDrivingStrength = 4;
-      double beta = 0.95;
-      MBFFgeneration generator(flipflop, maxDrivingStrength, beta);
+      double b = 0.95;
+      MBFFgeneration generator(flipflop, maxDrivingStrength, b,alpha,beta,gamma);
       // vector<set<string>> mbff_result = generator.generateMBFF();
       vector<MBFF> placed_mbffs=generator.locationAssignment(bins);
       generator.MBFFsizing(placed_mbffs);

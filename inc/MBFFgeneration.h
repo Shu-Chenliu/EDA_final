@@ -25,8 +25,9 @@ struct Cluster {
 };
 class MBFFgeneration
 {
+	//TODO: update maxdriving strength
 	public:
-		MBFFgeneration(vector<FF*> flipflops,int maxDrivingStrength,double beta);
+		MBFFgeneration(vector<FF*> flipflops,int maxDrivingStrength,double b,float alpha,float beta,float gamma);
 		~MBFFgeneration();
 		// Rect feasibleRegion(int driving_strength,FF* flipflop);
 		// void generateGraph(int driving_strength);
@@ -47,8 +48,10 @@ class MBFFgeneration
 		// unordered_map<string, Rect> ff_regions;
 		vector<set<string>> mbff_candidates;
 		unordered_map<string,FF*> map;
-		double beta;
-
+		double b;
+		float alpha;
+		float beta;
+		float gamma;
 };
 
 #endif

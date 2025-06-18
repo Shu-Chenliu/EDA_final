@@ -1,7 +1,7 @@
 #include "MBFFgeneration.h"
 
-MBFFgeneration::MBFFgeneration(vector<FF*> flipflops, int maxDrivingStrength,double beta)
-	: flipflops(flipflops), maxDrivingStrength(maxDrivingStrength), beta(beta) {
+MBFFgeneration::MBFFgeneration(vector<FF*> flipflops, int maxDrivingStrength,double b,float alpha,float beta,float gamma)
+	: flipflops(flipflops), maxDrivingStrength(maxDrivingStrength), b(b),alpha(alpha),beta(beta),gamma(gamma) {
 		for(size_t i=0;i<flipflops.size();i++){
 			map[flipflops[i]->getName()]=flipflops[i];
 		}
@@ -150,9 +150,10 @@ int MBFFgeneration::cost(set<string> c){
 	double delta_area=c.size()/3;
 	double delta_power=total_switching*0.15;
 	double delta_tns=total_slack*0.15;
+	//TODO :add kp,kt,ka
 	totalCost-=delta_area;
 	totalCost-=delta_power;
-	totalCost-=delta_tns;
+	totalCost-=alpha*delta_tns;
 	return (int)totalCost;
 }
 pair<int, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c) {
