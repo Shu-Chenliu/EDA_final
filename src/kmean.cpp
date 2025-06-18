@@ -52,11 +52,9 @@ void kmean::assignPoints(vector<FF*>& flip_flops, vector<Cluster>& clusters, boo
                 best = k;
             }
         }
-        cout<<best;
         flip_flops[i]->setCluster(best);
         clusters[best].flip_flops.push_back(flip_flops[i]);
     }
-    cout<<"finish assign points\n";
 }
 
 void initCentersRecursive(const vector<FF*>& flip_flops, vector<Cluster>& clusters, vector<int> indices, int K, bool splitX = true) {
