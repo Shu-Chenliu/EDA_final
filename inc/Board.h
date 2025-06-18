@@ -88,7 +88,8 @@ class Board{
     void readDef(string file);
     void readSdc(string file);
     void readV(string file);
-
+    Netlist getNetList();
+    vector<pair<Cell*, int>> getFFs() const;
     // Print
     void print(bool basic = true, bool cells = true, bool pins = true, bool nets = true);
 

@@ -1,4 +1,4 @@
-#include "Board.h"
+#include "../inc/Board.h"
 #include <bits/stdc++.h>
 #include <fstream>
 
@@ -440,7 +440,12 @@ void Board::print(bool basic, bool cells, bool pins, bool nets){
     cout << "\n==================================\n\n";
   }
 }
-
+Netlist Board::getNetList(){
+  return NetList;
+}
+vector<pair<Cell*, int>> Board::getFFs() const {
+  return FFs;
+}
 // Output
 void Board::forMatplotlib(const string& file){
   ofstream f (file + ".txt");

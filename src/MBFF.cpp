@@ -30,6 +30,9 @@ void MBFF::setFeasibleRegion(Rect fr){
 void MBFF::setPreferredRegion(Rect pr){
   preferred_region=pr;
 }
+void MBFF::addNext(int index){
+  next.push_back(index);
+}
 vector<Pin> MBFF::getPins() const{
   return pins;
 }

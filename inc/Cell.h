@@ -18,7 +18,6 @@ class Cell {
     Rect size;
     float power;
     float delay;
-    //TODO: add area and a consturctor
     vector<Pin> pins;
     int minSlack;
 
