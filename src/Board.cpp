@@ -155,6 +155,10 @@ Cell* Board::getCell(const string& name) {
     return it != CellList.end() ? it->second : nullptr;
 }
 
+vector<pair<Cell*, int>> Board::getFFs() const {
+    return FFs;
+}
+
 // Read files
 void Board::readWeight(string file){
   ifstream f(file + "_weight");
@@ -328,6 +332,7 @@ void Board::readSdc(string file){
 
   f.close();
 }
+
 
 void Board::readV(string file){
   ifstream f(file + ".v");

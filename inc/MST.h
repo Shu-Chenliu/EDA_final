@@ -11,6 +11,7 @@ struct Edge {
     }
     Edge(int s, int e, int w) : start(s), end(e), weight(w) {}
 };
+// Disjoint Set Union (DSU) or Union-Find structure
 class DSU {
     vector<int> parent, rank;
 

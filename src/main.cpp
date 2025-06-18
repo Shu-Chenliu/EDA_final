@@ -69,16 +69,48 @@ vector<Bin> generateBins(Board board) {
 }
 int main() {
   Board board;
-  string file = "../testcase1/testcase1";
-  board.readWeight(file);
-  board.readDef(file);
-  board.readV(file);
-  board.forMatplotlib(file);
-  vector<Bin> bins=generateBins(board);
-  cout<<"generate"<<bins.size()<<"bins"<<endl;
+  // string file = "../testcase1/testcase1";
+  // board.readWeight(file);
+  // board.readDef(file);
+  // board.readV(file);
+  // board.forMatplotlib(file);
+  // vector<Bin> bins=generateBins(board);
+  // cout<<"generate"<<bins.size()<<"bins"<<endl;
   random_device rd;
   mt19937 gen(rd());
+  board.setSize(1000, 1000);
+  board.setBinW(100);
+  board.setBinH(100);
+  board.setBinShift(0, 0);
+  board.setAlpha(1);
+  board.setBeta(1);
+  board.setGamma(1);
+  board.setTNS(0);
+  board.setTPO(0);
+  board.setArea(1);
+ 
+  vector<Bin> bins = generateBins(board);
+
+  // get FFs from board
+  vector<pair<Cell*, int>> board_FFs = board.getFFs();
+   
+  
   vector<FF*> flip_flops;
+  // FFs -> flip_flops
+  for (int i = 0; i < board_FFs.size(); ++i) {
+    Cell* cell = board_FFs[i].first;
+    int bit = board_FFs[i].second;
+    FF* ff = new FF(cell->getName(), cell->getModel(), cell->getX(), cell->getY(), cell->getW(), cell->getH());
+    ff->setBit(bit);
+    ff->setClk(1);  // Assuming clk is always 1 for simplicity
+    ff->setScan(0); // Assuming scan is always 0 for simplicity
+    ff->setRelocateCoor(Coor(cell->getX(), cell->getY()));
+    flip_flops.push_back(ff);
+    
+  }
+
+
+
 
   // Step 1: 建立 FF 物件（先不加 fanins/fanouts）
   flip_flops.push_back(new FF("ff0","",10,10,1,1));
@@ -272,32 +304,54 @@ int main() {
   }
   size_t size=flip_flops.size();
   //TODO: stop when 2 local minimum occur
-  for(size_t j=0;j<1;j++){
+  int minCost = numeric_limits<int>::max();
+  int currentCost = 0;
+  int beforeCost = 0;
+  int state = 0; // 1: increase, -1: decrease, 0: no change
+  bool local_minimum_occur = false;
+  int KmeanIteration = 10;
+  vector<int> MST_costs;
+
+
+
+  for(size_t j=0;j<KmeanIteration;j++){
+    
+    beforeCost = currentCost;
+    
     uniform_int_distribution<> num_size((int)flip_flops.size() / 3, (int)flip_flops.size()*2 / 3);
     int SIZE_LIMIT = num_size(gen) ; // Example size limit for clusters
     int MAX_ITER = flip_flops.size() * 2; // Example maximum iterations
     uniform_int_distribution<> num_disp((int)(right - left + bottom - top) / 3, (int)(right - left + bottom - top) *2/ 3);
     int DISP_LIMIT = num_disp(gen);
     kmean kmean(SIZE_LIMIT,MAX_ITER,DISP_LIMIT);
-    // update flip flops position
-    
-
     vector<Cluster> clusters=kmean.kmeansWeighted(flip_flops);
+    cout << "K-means clustering completed with " << clusters.size() << " clusters." << endl;
     edges.clear();
-    for (size_t i = 0; i < flip_flops.size(); ++i) {
-      for (size_t j = 0; j < flip_flops[i]->getNext().size(); ++j) {
+    for (size_t ii = 0; ii < flip_flops.size(); ++ii) {
+      for (size_t jj = 0; jj < flip_flops[ii]->getNext().size(); ++jj) {
         edges.push_back(Edge(
-          i,
-          flip_flops[i]->getNext()[j],
-          (int)abs(flip_flops[i]->getRelocateCoor().getX() - flip_flops[flip_flops[i]->getNext()[j]]->getRelocateCoor().getX()) +
-          abs(flip_flops[i]->getRelocateCoor().getY() - flip_flops[flip_flops[i]->getNext()[j]]->getRelocateCoor().getY())
+          ii,
+          flip_flops[ii]->getNext()[jj],
+          (int)abs(flip_flops[ii]->getRelocateCoor().getX() - flip_flops[flip_flops[ii]->getNext()[jj]]->getRelocateCoor().getX()) +
+          abs(flip_flops[ii]->getRelocateCoor().getY() - flip_flops[flip_flops[ii]->getNext()[jj]]->getRelocateCoor().getY())
         )); // Manhattan distance
+
+        // cout << "Edge from " << ii << " (" << flip_flops[ii]->getName() << ") to " 
+        //      << flip_flops[ii]->getNext()[jj] << " (" << flip_flops[flip_flops[ii]->getNext()[jj]]->getName()
+        //      << ") with weight "
+        //      << abs(flip_flops[ii]->getRelocateCoor().getX() - flip_flops[flip_flops[ii]->getNext()[jj]]->getRelocateCoor().getX()) +
+        //      abs(flip_flops[ii]->getRelocateCoor().getY() - flip_flops[flip_flops[ii]->getNext()[jj]]->getRelocateCoor().getY())
+        //      << endl;
+             
       }
     }
+
     // do MST
     MST mst_after(edges, (int)flip_flops.size());
-    total_wire_length = mst_after.MinimumSpanningTreeCost();
-    cout << "MST wire length after k-means: " << total_wire_length << endl;
+    currentCost = mst_after.MinimumSpanningTreeCost();
+    MST_costs.push_back(currentCost);
+    cout << "MST wire length after k-means: " << currentCost << endl;
+
     srand(time(0));
     for(size_t i=0;i<1;i++){
       vector<FF*> flipflop=clusters[i].flip_flops;
@@ -308,8 +362,39 @@ int main() {
       vector<MBFF> placed_mbffs=generator.locationAssignment(bins);
       generator.MBFFsizing(placed_mbffs);
     }
+
+
+    // estimate cost
+    if (j == 0) {
+      minCost = currentCost;
+      beforeCost = currentCost;
+      cout << "============ Initial cost: " << minCost << " =============" << endl;
+    } else {
+      cout << "============ Current cost: " << currentCost << ", Previous cost: " << beforeCost << " ============="<< endl;
+      if (currentCost < beforeCost && state == 1) {
+        state = -1; // Decrease
+      } else if (currentCost > beforeCost && state == -1) {
+        state = 1; // Increase
+        if (local_minimum_occur){
+          minCost = min(minCost, beforeCost);
+          cout << "Iteration " << j << ": Local minimum occurred, stopping optimization." << endl;
+          cout << "Cost: " << minCost << endl;
+          break; // Stop the loop
+
+        }else{
+          local_minimum_occur = true;
+          minCost = min(minCost, beforeCost);
+          cout << "Iteration " << j << ": Local minimum not occurred, continue optimization." << endl;
+          cout << "Minimum cost so far: " << minCost << endl;
+        }
+      } else if (currentCost < beforeCost) {
+        state = -1; // Increase
+        local_minimum_occur = false;
+      } else if (currentCost > beforeCost) {
+        state = 1; // Decrease
+      }   
+    }
   }
-  
 
   for (auto ff : flip_flops) {
     ff->setRelocateCoor(Coor(ff->getX(),ff->getY()));

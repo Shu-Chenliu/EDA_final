@@ -52,11 +52,10 @@ void kmean::assignPoints(vector<FF*>& flip_flops, vector<Cluster>& clusters, boo
                 best = k;
             }
         }
-        cout<<best;
         flip_flops[i]->setCluster(best);
         clusters[best].flip_flops.push_back(flip_flops[i]);
     }
-    cout<<"finish assign points\n";
+
 }
 
 void initCentersRecursive(const vector<FF*>& flip_flops, vector<Cluster>& clusters, vector<int> indices, int K, bool splitX = true) {
@@ -206,10 +205,10 @@ void relocateFlops(vector<FF*>& flip_flops, vector<Cluster>& clusters) {
                 used.insert({rx, ry});
                 
 
-                cout << "Relocating flop " << c.flip_flops[i]->getName() 
-                     << " to (" << c.flip_flops[i]->getRelocateCoor().getX() << ", " 
-                     << c.flip_flops[i]->getRelocateCoor().getY() << ") in cluster centered at (" 
-                     << c.cx << ", " << c.cy << ")\n";
+                // cout << "Relocating flop " << c.flip_flops[i]->getName() 
+                //      << " to (" << c.flip_flops[i]->getRelocateCoor().getX() << ", " 
+                //      << c.flip_flops[i]->getRelocateCoor().getY() << ") in cluster centered at (" 
+                //      << c.cx << ", " << c.cy << ")\n";
                 ++i;
 
             }
@@ -218,11 +217,11 @@ void relocateFlops(vector<FF*>& flip_flops, vector<Cluster>& clusters) {
 }
 
 vector<Cluster> kmean::kmeansWeighted(vector<FF*>& flip_flops) {
-    for (auto& ff : flip_flops) {
-        cout << "Flop " << ff->getName() << ": original=(" << ff->getX() << "," << ff->getY()
-             << "), cluster=" << ff->getCluster()
-             << ", relocated=(" << ff->getRelocateCoor().getX() << "," << ff->getRelocateCoor().getY() << ")\n";
-    }
+    // for (auto& ff : flip_flops) {
+    //     cout << "Flop " << ff->getName() << ": original=(" << ff->getX() << "," << ff->getY()
+    //          << "), cluster=" << ff->getCluster()
+    //          << ", relocated=(" << ff->getRelocateCoor().getX() << "," << ff->getRelocateCoor().getY() << ")\n";
+    // }
 
 
 

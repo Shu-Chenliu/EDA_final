@@ -77,6 +77,7 @@ class Board{
     float getTNS() const;
     float getTPO() const;
     float getArea() const;
+    vector<pair<Cell*, int>> getFFs() const;
 
     Cell* getCell(const string& name);
 
