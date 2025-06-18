@@ -33,7 +33,9 @@ void Legalization::legalizePlacing(vector<FF*>& flipflops, vector<Bin>& bins, Bo
         visited.insert(start_y * x_bins + start_x);
 
         bool placed = false;
-        const vector<pair<int, int>> directions = {{board.getBinW(), 0}, {-board.getBinW(), 0}, {0, board.getBinH()}, {0, -board.getBinH()}};
+        const vector<pair<int, int>> directions = {
+            {1, 0}, {-1, 0}, {0, 1}, {0, -1}
+        };
 
         while (!q.empty()) {
             auto [cx, cy] = q.front(); 
