@@ -179,17 +179,13 @@ Cell* Board::getCell(const string& name) {
     return it != CellList.end() ? it->second : nullptr;
 }
 
-<<<<<<< HEAD
-vector<pair<Cell*, int>> Board::getFFs() const {
-    return FFs;
-=======
+
 Netlist Board::getNetList() const{
   return NetList;
 }
 
 vector<pair<Cell*, int>> Board::getFFs() const {
   return FFs;
->>>>>>> 062d7addc8ebe3089b56c230771f30b87c04479d
 }
 
 // Read files
