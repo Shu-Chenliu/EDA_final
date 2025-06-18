@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 # Load
-f = open('../testcase1/testcase1.txt')
+f = open('testcase1/testcase1.txt')
 input = []
 
 for line in f.readlines():
@@ -36,14 +36,14 @@ rowSpan, colSpan = input[1][4], input[1][5]
 inPins = int(input[2][0])
 ip = []
 for i in range(inPins):
-  ip.append(patches.Rectangle((input[3+i][0], input[3+i][1]), input[3+i][2], input[3+i][3], color='red'))
+  ip.append(patches.Circle((input[3+i][0], input[3+i][1]), radius=1, color='red'))
   ax.add_patch(ip[i])
 
 ### outPins
 outPins = int(input[3+inPins][0])
 op = []
 for i in range(inPins):
-  op.append(patches.Rectangle((input[3+inPins+1+i][0], input[3+inPins+1+i][1]), input[3+inPins+1+i][2], input[3+inPins+1+i][3], color='blue'))
+  op.append(patches.Circle((input[3+inPins+1+i][0], input[3+inPins+1+i][1]), radius=1, color='blue'))
   ax.add_patch(op[i])
 
 ## Cell
