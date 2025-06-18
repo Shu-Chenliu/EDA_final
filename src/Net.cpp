@@ -4,6 +4,11 @@ Net::Net() :
   cellName(""),
   pinName(""),
   io(false){}
+
+Net::Net(const string& cell, const string& pin, const bool& dir) : 
+  cellName(cell),
+  pinName(pin),
+  io(dir){}
   
 Net::~Net(){}
 
