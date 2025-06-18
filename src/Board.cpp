@@ -179,12 +179,17 @@ Cell* Board::getCell(const string& name) {
     return it != CellList.end() ? it->second : nullptr;
 }
 
+<<<<<<< HEAD
+vector<pair<Cell*, int>> Board::getFFs() const {
+    return FFs;
+=======
 Netlist Board::getNetList() const{
   return NetList;
 }
 
 vector<pair<Cell*, int>> Board::getFFs() const {
   return FFs;
+>>>>>>> 062d7addc8ebe3089b56c230771f30b87c04479d
 }
 
 // Read files
@@ -360,6 +365,7 @@ void Board::readSdc(string file){
 
   f.close();
 }
+
 
 void Board::readV(string file){
   ifstream f(file + ".v");
