@@ -321,7 +321,7 @@ void Board::readDef(string file){
           }
           auto ptr = find(str.begin(), str.end(), "(");
           while (ptr != str.end()){
-            pins.push_back(Net(*(ptr+1), *(ptr+2), findDir(*(ptr+1))));
+            pins.push_back(Net(*(ptr+1), *(ptr+2), findDir(*(ptr+2))));
             ptr = find(ptr+1, str.end(), "(");
           }
         } while (find(str.begin(), str.end(), ";") == str.end());
