@@ -1,6 +1,7 @@
 #include "../inc/Board.h"
 #include <bits/stdc++.h>
 #include <fstream>
+#include "Net.h"
 
 Board::Board() : 
   Alpha(1),
@@ -10,6 +11,7 @@ Board::Board() :
   TPO(0),
   Area(1),
   unit(1000){}
+
 Board::Board(Rect size) : 
   size(size),
   binSize(Rect(1,1,0,0)),
@@ -20,6 +22,7 @@ Board::Board(Rect size) :
   TPO(0),
   Area(1),
   unit(1000){}
+
 Board::~Board(){}
 
 // Private
@@ -39,6 +42,18 @@ float Board::norm(const string& s){
 
 void Board::erase(string& s, char c){
   s.erase(remove(s.begin(), s.end(), c), s.end());
+}
+
+vector<string> isIn = {"D", "SI", "CK", "A", "A1", "A2"};
+bool Board::findDir(const string& s){
+  if (find(isIn.begin(), isIn.end(), s) != isIn.end()){
+    // Is in
+    return true;
+  }
+  else{
+    // Is out
+    return false;
+  }
 }
 
 // Setter
@@ -296,7 +311,7 @@ void Board::readDef(string file){
       int n = stoi(str[1]);
       for (int i=0; i<n; i++){
         string netName;
-        vector<pair<string, string>> pins;
+        vector<Net> pins;
         do{
           getline(f, s);
           str = split(s);
@@ -306,7 +321,7 @@ void Board::readDef(string file){
           }
           auto ptr = find(str.begin(), str.end(), "(");
           while (ptr != str.end()){
-            pins.push_back(pair<string, string>(*(ptr+1), *(ptr+2)));
+            pins.push_back(Net(*(ptr+1), *(ptr+2), findDir(*(ptr+2))));
             ptr = find(ptr+1, str.end(), "(");
           }
         } while (find(str.begin(), str.end(), ";") == str.end());
@@ -360,7 +375,8 @@ void Board::readV(string file){
         }
         for (int i=0; i<(int)str.size(); i++){
           if (str[i][0] == '.'){
-            erase(str[i+2], '\\');
+            // 0: pin name, +2: cell name
+            erase(str[i+2], '\\');  
             c->addPin(Pin(str[i].substr(1), str[i+2]));
             if (str[i].substr(1) == "CK")  isFF = true;
             else if (str[i][1] == 'D')  bit++;

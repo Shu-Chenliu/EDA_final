@@ -13,6 +13,7 @@ class Net{
 
   public:
     Net();
+    Net(const string& cell, const string& pin, const bool& dir);
     ~Net();
 
     // Setter
