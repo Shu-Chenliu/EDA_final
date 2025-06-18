@@ -157,12 +157,17 @@ int MBFFgeneration::cost(set<string> c){
 }
 pair<int, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c) {
 	int size = c.size();
-	int currCost = INT_MAX;
-	set<string> currClique;
 
 	vector<string> elements(c.begin(), c.end()); // for random selection
-
+	int minCost = numeric_limits<int>::max();
+  int currentCost = 0;
+  int beforeCost = 0;
+  int state = 0; // 1: increase, -1: decrease, 0: no change
+  bool local_minimum_occur = false;
+  int KmeanIteration = 1;
+	set<string> minClique;
 	for (int i = 0; i < size * size; i++) {
+		beforeCost=currentCost;
 		set<string> ff;
 		for (const auto& ffs : elements) {
 			int randomNum = rand() % 2;
@@ -176,13 +181,45 @@ pair<int, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c
 			ff.insert(elements[randomIndex]);
 		}
 
-		int randomCost = cost(ff);
-		if (currCost > randomCost) {
-			currCost = randomCost;
-			currClique = ff;
-		}
+		currentCost = cost(ff);
+		if (i == 0) {
+      minCost = currentCost;
+      beforeCost = currentCost;
+			minClique=ff;
+      cout << "============ Initial cost: " << minCost << " =============" << endl;
+    } else {
+      cout << "============Current cost: " << currentCost << ", Previous cost: " << beforeCost << " ============="<< endl;
+      if (currentCost < beforeCost && state == 1) {
+        state = -1; // Decrease
+      } else if (currentCost > beforeCost && state == -1) {
+        state = 1; // Increase
+        if (local_minimum_occur){
+          if(beforeCost<minCost){
+						minCost=beforeCost;
+						minClique=ff;
+					}
+          cout << "Local minimum occurred, stopping optimization." << endl;
+          cout << "Minimum cost found: " << minCost << endl;
+          break; // Stop the loop
+
+        }else{
+          local_minimum_occur = true;
+          if(beforeCost<minCost){
+						minCost=beforeCost;
+						minClique=ff;
+					}
+          cout << "Local minimum not occurred, continue optimization." << endl;
+          cout << "Minimum cost so far: " << minCost << endl;
+        }
+      } else if (currentCost < beforeCost) {
+        state = -1; // Increase
+        local_minimum_occur = false;
+      } else if (currentCost > beforeCost) {
+        state = 1; // Decrease
+      } 
+    }
 	}
-	return {currCost, {currClique,c}};
+	return {minCost, {minClique,c}};
 }
 vector<set<string>> MBFFgeneration::generateMBFF(){
 	cout << "[DEBUG] Start MBFF Generation" << endl;
@@ -217,7 +254,6 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 	for(const auto& maxclique:mbff_candidates){
 		pq.push(MBFFcost(maxclique));
 	}
-	//TODO: 處理剩下烙單的ff
 	unordered_set<string> marked;
 	while(!pq.empty()){
 		pair<int,pair<set<string>,set<string>>> m=pq.top();
@@ -340,7 +376,6 @@ vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins) {
 		cout << "  [MBFF#" << (++count) << "] Placing..." << endl;
 		MBFF mbff;
 		mbff.setMembers(clique);
-		//TODO: assign MBFF position to average x and y
 		float x=0;
 		float y=0;
 		for (auto& name : clique) {
@@ -401,4 +436,26 @@ void MBFFgeneration::MBFFsizing(vector<MBFF>& mbffs){
 	double avg_slack = computeAvgSlack(mbffs);
 	cout << "[DEBUG] Average Slack: " << avg_slack << endl;
 	downsizeMBFFs(mbffs, avg_slack,beta);
+}
+void MBFFgeneration::handleConnection(vector<MBFF>& mbffs){
+	for(int i=0;i<mbffs.size();i++){
+		unordered_set<int> nextConn;
+		for(const auto&memberName:mbffs[i].getMembers()){
+			FF* ff=map[memberName];
+			vector<string> nexts=ff->getNextName();
+			for(int j=0;j<mbffs.size();j++){
+				if(i!=j){
+					for(const auto&next:nexts){
+						if(mbffs[j].getMembers().count(next)){
+							nextConn.insert(j);
+							break;
+						}
+					}
+				}
+			}
+		}
+		for(const auto& index:nextConn){
+			mbffs[i].addNext(index);
+		}
+	}
 }

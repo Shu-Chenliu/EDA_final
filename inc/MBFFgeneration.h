@@ -8,6 +8,7 @@
 #include "Pin.h"
 #include "FF.h"
 #include "MBFF.h"
+#include "MST.h"
 #include <algorithm>
 #include <map>
 #include <queue>
@@ -15,6 +16,7 @@
 #include <set>
 #include <cstdlib> // Needed for rand() and srand()
 #include <ctime>
+#include <limits>
 using namespace std;
 
 struct Cluster {
@@ -35,6 +37,7 @@ class MBFFgeneration
 		void MBFFsizing(vector<MBFF>& mbffs);
 		int cost(set<string> c);
 		pair<int,pair<set<string>,set<string>>> MBFFcost(set<string> c);
+		void handleConnection(vector<MBFF>& mbffs);
 		
 	protected:
 	private:

@@ -6,12 +6,13 @@
 #include <vector>
 #include <unordered_map>
 #include "Pin.h"
+#include "Net.h"
 using namespace std;
 
 class Netlist{
   private:
-    vector<string> Nets;
-    unordered_map<string, vector<pair<string, string>>> pinMap;
+    // vector<string> Nets;
+    unordered_map<string, vector<Net>> pinMap;
     // net_name -> ( cell_name/PIN, pin_name )
 
   public:
@@ -19,11 +20,11 @@ class Netlist{
     ~Netlist();
 
     // Setter
-    void addNet(string name, vector<pair<string, string>> pins);
+    void addNet(string name, vector<Net> pins);
 
     // Getter
     vector<string> getNets() const;
-    vector<pair<string, string>> members(string net) const;
+    vector<Net> members(string net) const;
 
     // Pring
     void print();

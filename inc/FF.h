@@ -10,6 +10,7 @@ class FF : public Cell{
     Coor relocateCoor;
     int cluster;
     vector<int> next;
+    vector<string> nextName;
 
   public:
     FF();
@@ -31,6 +32,7 @@ class FF : public Cell{
     Coor getRelocateCoor() const;
     int getCluster() const;
     vector<int> getNext() const;
+    vector<string> getNextName() const;
 };
 
 #endif

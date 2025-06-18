@@ -4,5 +4,5 @@ b11901009 b11901052 b11901129
 
 ```bash
 make
-./main.out
+./bin/test
 ```

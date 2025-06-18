@@ -41,6 +41,7 @@ class Board{
     vector<string> split(const string& s); 
     float norm(const string& s);
     void erase(string& s, char c);
+    bool findDir(const string& s);
   
   public:
     Board();
@@ -83,6 +84,9 @@ class Board{
 
     const vector<IOPin> &getInPins() const;
     const vector<IOPin> &getOutPins() const;
+
+    Netlist getNetList() const;
+    vector<pair<Cell*, int>> getFFs() const;
 
     // Read files
     void readWeight(string file);

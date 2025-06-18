@@ -4,7 +4,7 @@ Pin::Pin() :
   name(""),
   net(""),
   SR(0),
-  slack(0){}
+  slack(1){}
 
 Pin::Pin(string Name, string Net) : 
   name(Name),
@@ -16,7 +16,7 @@ Pin::Pin(string Name, string Net,FF* ff,float x,float y) :
   name(Name),
   net(Net),
   SR(1),
-  slack(10),
+  slack(1),
   ff(ff),
   coor(Coor(x,y))
   {}
