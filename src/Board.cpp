@@ -51,7 +51,7 @@ bool Board::findDir(const string& s){
     // Is in
     return true;
   }
-  else if (find(isOut.begin(), isOut.end(), s) != isOut.end()){
+  else if (find(isOut.begin(), isOut.end(), s) != isOut.end() || s == "clk"){
     // Is out
     return false;
   }
