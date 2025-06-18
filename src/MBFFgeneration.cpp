@@ -217,7 +217,6 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 	for(const auto& maxclique:mbff_candidates){
 		pq.push(MBFFcost(maxclique));
 	}
-	//TODO: 處理剩下烙單的ff
 	unordered_set<string> marked;
 	while(!pq.empty()){
 		pair<int,pair<set<string>,set<string>>> m=pq.top();
@@ -340,7 +339,6 @@ vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins) {
 		cout << "  [MBFF#" << (++count) << "] Placing..." << endl;
 		MBFF mbff;
 		mbff.setMembers(clique);
-		//TODO: assign MBFF position to average x and y
 		float x=0;
 		float y=0;
 		for (auto& name : clique) {
@@ -401,4 +399,26 @@ void MBFFgeneration::MBFFsizing(vector<MBFF>& mbffs){
 	double avg_slack = computeAvgSlack(mbffs);
 	cout << "[DEBUG] Average Slack: " << avg_slack << endl;
 	downsizeMBFFs(mbffs, avg_slack,beta);
+}
+void MBFFgeneration::handleConnection(vector<MBFF>& mbffs){
+	for(int i=0;i<mbffs.size();i++){
+		unordered_set<int> nextConn;
+		for(const auto&memberName:mbffs[i].getMembers()){
+			FF* ff=map[memberName];
+			vector<string> nexts=ff->getNextName();
+			for(int j=0;j<mbffs.size();j++){
+				if(i!=j){
+					for(const auto&next:nexts){
+						if(mbffs[j].getMembers().count(next)){
+							nextConn.insert(j);
+							break;
+						}
+					}
+				}
+			}
+		}
+		for(const auto& index:nextConn){
+			mbffs[i].addNext(index);
+		}
+	}
 }

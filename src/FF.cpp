@@ -56,3 +56,6 @@ int FF::getCluster() const{
 vector<int> FF::getNext()const{
   return next;
 }
+vector<string> FF::getNextName()const{
+  return nextName;
+}

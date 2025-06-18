@@ -34,6 +34,7 @@ class MBFF{
     vector<MBFFBit> bits;
     Coor position;
     int minSlack;
+    vector<int> next;
   public:
     MBFF();
     ~MBFF();
@@ -42,6 +43,7 @@ class MBFF{
     void setPins(vector<Pin> pins);
     void setFeasibleRegion(Rect feasible_region);
     void setPreferredRegion(Rect preferred_region);
+    void addNext(int index);
     vector<Pin> getPins() const;
     Coor getCoor() const;
     float getX() const;
@@ -50,6 +52,7 @@ class MBFF{
     Rect getPreferredRegion()const;
     Rect getFeasibleRegion()const;
     int getDrivingStrength()const;
+    vector<int> getNext() const;
     vector<MBFFBit> getBits()const;
 };
 

@@ -35,6 +35,7 @@ class MBFFgeneration
 		void MBFFsizing(vector<MBFF>& mbffs);
 		int cost(set<string> c);
 		pair<int,pair<set<string>,set<string>>> MBFFcost(set<string> c);
+		void handleConnection(vector<MBFF>& mbffs);
 		
 	protected:
 	private:
