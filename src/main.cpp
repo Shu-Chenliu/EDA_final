@@ -71,7 +71,7 @@ vector<Bin> generateBins(Board board) {
 
 
 
-void save_cost_to_file(const std::vector<float>& cost, const std::string& filename = "cost.txt") {
+void save_cost_to_file(const std::vector<double>& cost, const std::string& filename = "cost.txt") {
     std::ofstream file(filename);
     for (size_t i = 0; i < cost.size(); ++i) {
         file << i << " " << cost[i] << "\n";

@@ -20,7 +20,7 @@ void MBFF::setPosition(Coor coor){
   position=coor;
 }
 void MBFF::setPins(vector<Pin> p){
-  for(int i=0;i<p.size();i++){
+  for(int i=0;i<(int)p.size();i++){
     pins.push_back(p[i]);
     if(p[i].getSlack()<minSlack){
       minSlack=p[i].getSlack();
