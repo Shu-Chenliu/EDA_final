@@ -36,8 +36,8 @@ class MBFFgeneration
 		Rect feasibleRegionForClique(MBFF mbff);
 		vector<MBFF> locationAssignment(vector<Bin>& bins,Board& board);
 		void MBFFsizing(vector<MBFF>& mbffs);
-		int cost(set<string> c);
-		pair<int,pair<set<string>,set<string>>> MBFFcost(set<string> c);
+		double cost(set<string> c);
+		pair<double,pair<set<string>,set<string>>> MBFFcost(set<string> c);
 		void handleConnection(vector<MBFF>& mbffs);
 		void downsizeMBFFs(vector<MBFF>& mbffs, double avg_slack);
 		
