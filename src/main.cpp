@@ -78,6 +78,19 @@ void save_cost_to_file(const std::vector<double>& cost, const std::string& filen
     file.close();
 }
 
+void save_results_to_file(const vector<MBFF>& mbffs, const string& filename = "results.txt") {
+    ofstream file(filename);
+    file << "809.94 610\n5 5 10810 1000 0.074 0.6\n"; // Example header, adjust as needed
+    file << mbffs.size() << "\n";
+    for (const auto& mbff : mbffs) {
+        file << mbff.getX() << " " << mbff.getY() << " "
+             << mbff.getW() << " " << mbff.getH() << "\n";
+        
+    }
+    file << "0" << "\n"; // Assuming no additional information, adjust as needed
+    file.close();
+}
+
 void save_all_costs_to_file(const std::vector<double>& cost1,
                             const std::vector<double>& cost2,
                             const std::vector<double>& cost3,
@@ -274,7 +287,7 @@ int main() {
     // MST_costs.push_back(currentMSTCost);
     // cout << "MST wire length after k-means: " << currentMSTCost << endl;
     srand(time(0));
-    for(size_t i=0;i< (int)clusters.size();i++){
+    for(int i=0;i< (int)clusters.size();i++){
       vector<FF*> flipflop=clusters[i].flip_flops;
       double b = 0.95;
       MBFFgeneration generator(flipflop, maxDrivingStrength, b,alpha,beta,gamma,kt,kp,ka);
@@ -328,8 +341,13 @@ int main() {
 
     for (const auto& mbff : current_mbffs) {
       currentAreaCost += mbff.getSavedArea();
-      currentPowerCost += mbff.getSavedPower();
+      // currentPowerCost += mbff.getSavedPower();
     }
+    // new method estimate power
+    for (int ii = 0; ii < (int)current_mbffs.size(); ++ii) {
+      currentPowerCost += (double)(current_mbffs[ii].getNext().size()) / (double)sqrt(current_mbffs[ii].getMembers().size());
+    }
+
 
     legalize.legalizePlacing(current_mbffs, bins, board);
     // MST of MBFF
@@ -402,6 +420,9 @@ int main() {
   }
   save_cost_to_file(cost);
   save_all_costs_to_file(MST_costs, Power_cost, Area_cost, cost);
+  save_results_to_file(best_mbffs);
+
+
 
 
   for (auto ff : flip_flops) {
