@@ -7,6 +7,7 @@
 #include "Rect.h"
 #include "Pin.h"
 #include "Coor.h"
+#include "Bin.h"
 using namespace std;
 enum DriveStrength { LOW, HIGH };
 
@@ -15,14 +16,6 @@ struct MBFFBit {
 	double slack;
 	bool is_empty = false;
 	DriveStrength strength;
-};
-struct Bin {
-	int x_idx, y_idx;
-	Rect area;
-	int rank;
-	bool occupied;
-	Bin(int x, int y, const Rect& r)
-		: x_idx(x), y_idx(y), area(r), rank(-1), occupied(false) {}
 };
 class MBFF{
   private:

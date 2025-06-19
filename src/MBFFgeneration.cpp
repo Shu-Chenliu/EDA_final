@@ -208,7 +208,7 @@ pair<double, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string
   bool local_minimum_occur = false;
   int KmeanIteration = 1;
 	set<string> minClique;
-	for (int i = 0; i < size * size; i++) {
+	for (int i = 0; i < size; i++) {
 		beforeCost=currentCost;
 		set<string> ff;
 		for (const auto& ffs : elements) {
@@ -363,17 +363,17 @@ Rect computePreferredRegion(const MBFF& mbff) {
 void assignMBFFLocation(MBFF& mbff, vector<Bin>& bins) {
 	cout << "  [Bin Assignment] For MBFF with " << mbff.getMembers().size() << " members" << endl;
 	for (auto& bin : bins) {
-		if (bin.area.intersect(mbff.getPreferredRegion())) {
-			bin.rank = 0;
-		} else if (bin.area.intersect(mbff.getFeasibleRegion())) {
+		if (bin.getArea().intersect(mbff.getPreferredRegion())) {
+			bin.setRank(0);
+		} else if (bin.getArea().intersect(mbff.getFeasibleRegion())) {
 			// Calculate Manhattan distance to preferred region center
 			int cx = (mbff.getPreferredRegion().getX()*2+mbff.getPreferredRegion().getW()) / 2;
 			int cy = (mbff.getPreferredRegion().getY()*2+mbff.getPreferredRegion().getH()) / 2;
-			int bx = (bin.area.getX()*2+bin.area.getW()) / 2;
-			int by = (bin.area.getY()*2+bin.area.getH()) / 2;
-			bin.rank = abs(cx - bx) + abs(cy - by);
+			int bx = (bin.getArea().getX()*2+bin.getArea().getW()) / 2;
+			int by = (bin.getArea().getY()*2+bin.getArea().getH()) / 2;
+			bin.setRank(abs(cx - bx) + abs(cy - by));
 		} else {
-			bin.rank = -1; // invalid
+			bin.setRank(-1); // invalid
 		}
 	}
 
@@ -381,16 +381,16 @@ void assignMBFFLocation(MBFF& mbff, vector<Bin>& bins) {
 	int min_rank = INT_MAX;
 	Bin* best_bin = nullptr;
 	for (auto& bin : bins) {
-		if (!bin.occupied && bin.rank >= 0 && bin.rank < min_rank) {
-			min_rank = bin.rank;
+		if (!bin.getOccupied() && bin.getRank() >= 0 && bin.getRank() < min_rank) {
+			min_rank = bin.getRank();
 			best_bin = &bin;
 		}
 	}
 
 	if (best_bin) {
-		best_bin->occupied = true;
-		mbff.setFeasibleRegion(best_bin->area);
-		cout << "    Assigned to bin (" << best_bin->x_idx << "," << best_bin->y_idx << ") rank = " << best_bin->rank << endl;
+		best_bin->setOccupied(true);
+		mbff.setFeasibleRegion(best_bin->getArea());
+		cout << "    Assigned to bin (" << best_bin->getxIndex() << "," << best_bin->getyIndex() << ") rank = " << best_bin->getRank() << endl;
 	} else {
 		cout << "    [Warning] No available bin found!" << endl;
 	}

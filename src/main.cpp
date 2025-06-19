@@ -21,6 +21,7 @@
 #include "kmean.h"
 #include "MST.h"
 #include "legalization.h"
+#include "Bin.h"
 //TODO: write bin class
 
 using namespace std;
@@ -63,7 +64,7 @@ vector<Bin> generateBins(Board board) {
 	for (int i = 0; i < x_bins; ++i) {
 		for (int j = 0; j < y_bins; ++j) {
 			Rect area(board.getBinW(),board.getBinH(),board.getSize().getX()+i*board.getBinW(),board.getSize().getY()+j * board.getBinH());
-			bins.push_back({i,j,area});
+			bins.push_back(Bin(i,j,area));
 		}
 	}
 	return bins;
@@ -269,6 +270,7 @@ int main() {
       generator.MBFFsizing(placed_mbffs);
       generator.handleConnection(placed_mbffs);
       current_mbffs.insert(current_mbffs.end(), placed_mbffs.begin(), placed_mbffs.end());
+
     }
 
     currentAreaCost = 0;
