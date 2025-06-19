@@ -1,7 +1,7 @@
 #include "MBFFgeneration.h"
 
-MBFFgeneration::MBFFgeneration(vector<FF*> flipflops, int maxDrivingStrength,double b,float alpha,float beta,float gamma)
-	: flipflops(flipflops), maxDrivingStrength(maxDrivingStrength), b(b),alpha(alpha),beta(beta),gamma(gamma) {
+MBFFgeneration::MBFFgeneration(vector<FF*> flipflops, int maxDrivingStrength,double b,float alpha,float beta,float gamma,float kt,float kp,float ka)
+	: flipflops(flipflops), maxDrivingStrength(maxDrivingStrength), b(b),alpha(alpha),beta(beta),gamma(gamma),kt(kt),kp(kp),ka(ka) {
 		for(size_t i=0;i<flipflops.size();i++){
 			map[flipflops[i]->getName()]=flipflops[i];
 		}
@@ -9,6 +9,14 @@ MBFFgeneration::MBFFgeneration(vector<FF*> flipflops, int maxDrivingStrength,dou
 
 MBFFgeneration::~MBFFgeneration()
 {
+}
+int nextPowerOfTwo(int x) {
+	if (x <= 0) return 1;
+	int power = 1;
+	while (power < x) {
+			power <<= 1;  // 等同於 power *= 2
+	}
+	return power;
 }
 int slackToWireLength(int slack){
 	return slack;
@@ -49,6 +57,12 @@ double clockSavingPercent(int bitwidth) {
 	else if (bitwidth <= 4) return 0.45;
 	else if (bitwidth <= 8) return 0.55;
 	else return 0.65;  // upper bound
+}
+double estimateMBFFArea(int bitwidth, double avgFFArea) {
+	double overhead_ratio = 0.1;  // 一個簡單預設：MBFF 有額外 MUX/route 等 overhead
+	double sharing_efficiency = 0.8; // clock routing、control logic 的共享效率
+
+	return bitwidth * avgFFArea * sharing_efficiency + avgFFArea * overhead_ratio;
 }
 // void MBFFgeneration::generateGraph(int driving_strength){
 // 	for(int i=0;i<flipflops.size();i++){
@@ -139,28 +153,47 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 int MBFFgeneration::cost(set<string> c){
 	double totalCost=0;
 	double totalArea=0;
-	double total_slack = 0;
-  int total_switching = 0;
+	double totalPower=0;
 	int count=0;
+	vector<string> v(c.begin(),c.end());
+	unordered_map<string, int> nameToIndex;
+	for (int i = 0; i < v.size(); ++i) {
+			nameToIndex[v[i]] = i;
+	}
+	vector<Edge> edges;
+	int i=0;
+	cout << "FF size: " << c.size() << endl;
+  for (int i=0;i<v.size();i++) {
+		FF* ff=map[v[i]];
+    for (size_t j = 0; j < ff->getNextName().size(); ++j) {
+			if(!c.count(ff->getNextName()[j])){
+				continue;
+			}
+      edges.push_back(Edge(
+        i,
+        nameToIndex[ff->getNextName()[j]],
+        (int)abs(ff->getX() - map[ff->getNextName()[j]]->getX()) +
+        abs(ff->getY() - map[ff->getNextName()[j]]->getY())
+      )); // Manhattan distance
+    }
+  }
 	// double areaAfter=0;
 	for(const auto&name:c){
 		FF* ff=map[name];
 		totalArea+=ff->getW()*ff->getH();
-		for(const auto&pin:ff->getPins()){
-			total_slack+=pin.getSlack();
-			total_switching+=pin.getSR();
-			count++;
-		}
+		totalPower+=ff->getPower();
 	}
 	//TODO: delta 算法要改
-	//TODO: add MST method
-	double delta_area=c.size()/3;
-	double delta_power=total_switching*0.15;
-	double delta_tns=total_slack*0.15;
+	double mbff_area = estimateMBFFArea(nextPowerOfTwo(c.size()), totalArea/(double)c.size());
+	double savedArea=totalArea-mbff_area;
+	double savedPower=0.4*clockSavingPercent(nextPowerOfTwo(c.size()));
+	MST mst_estimate(edges,(int)c.size());
+	double delta_tns=mst_estimate.MinimumSpanningTreeCost();
 	//TODO :add kp,kt,ka
-	totalCost-=delta_area;
-	totalCost-=delta_power;
-	totalCost-=alpha*delta_tns;
+	totalCost-=gamma*savedArea*ka;
+	totalCost-=beta*savedPower*kp;
+	totalCost-=alpha*delta_tns*kt;
+	cout<<"totalCost: "<<totalCost<<endl;
 	return (int)totalCost;
 }
 pair<int, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c) {
@@ -168,6 +201,7 @@ pair<int, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c
 
 	vector<string> elements(c.begin(), c.end()); // for random selection
 	int minCost = numeric_limits<int>::max();
+	//currectCost is mostly 0
   int currentCost = 0;
   int beforeCost = 0;
   int state = 0; // 1: increase, -1: decrease, 0: no change
@@ -243,7 +277,6 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 			regions.push_back(region);
 		}
 		cout << "    Collected " << regions.size() << " feasible regions." << endl;
-		//TODO: add total driving strength
 		vector<set<string>> cliques = findMaximalCliquesSweepLine(regions);
 		cout << "    Found " << cliques.size() << " maximal cliques." << endl;
 		// Store the cliques
@@ -374,21 +407,9 @@ Rect MBFFgeneration::feasibleRegionForClique(MBFF mbff){
 	}
 	return Rect(new_x_min,new_x_max,new_y_min,new_y_max);
 }
-int nextPowerOfTwo(int x) {
-	if (x <= 0) return 1;
-	int power = 1;
-	while (power < x) {
-			power <<= 1;  // 等同於 power *= 2
-	}
-	return power;
-}
-double estimateMBFFArea(int bitwidth, double avgFFArea) {
-	double overhead_ratio = 0.1;  // 一個簡單預設：MBFF 有額外 MUX/route 等 overhead
-	double sharing_efficiency = 0.8; // clock routing、control logic 的共享效率
 
-	return bitwidth * avgFFArea * sharing_efficiency + avgFFArea * overhead_ratio;
-}
-vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins) {
+
+vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins,Board& board) {
 	cout << "[DEBUG] Start MBFF Location Assignment" << endl;
 	cout << "  -> Total bins generated: " << bins.size() << endl;
 	vector<set<string>> non_conflictMBFF=generateMBFF();
@@ -422,7 +443,8 @@ vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins) {
 		double saved=0.4*clockSavingPercent(nextPowerOfTwo(clique.size()));
 		mbff.addSavedPower((1-saved)*totalPower);
 		assignMBFFLocation(mbff, bins);
-
+		mbff.setH(board.getBinH());
+		mbff.setW(mbff_area/mbff.getH());
 		placed_mbffs.push_back(mbff);
 	}
 	cout << "[DEBUG] All MBFFs placed: " << placed_mbffs.size() << endl;
@@ -441,7 +463,8 @@ void MBFFgeneration::downsizeMBFFs(vector<MBFF>& mbffs, double avg_slack) {
 		}
 		// Step 6~8: 處理空 bit（都可降速）
 		l+=nextPowerOfTwo(mbff.getMembers().size())-mbff.getMembers().size();
-		mbff.addSavedPower(l);
+		double powerSavingCoeff = 0.2;
+		mbff.addSavedPower(l*powerSavingCoeff);
 		// int k = mbff.bits.size();
 		// int h = k - l;
 		// Step 10: 已原地更新 MBFF，可加上 power report 或 output log

@@ -32,8 +32,12 @@ void FF::setRelocateCoor(Coor coor){
 void FF::setCluster(int c){
   cluster=c;
 }
-void FF::addNext(int x){
+void FF::addNext(int x,string name){
   next.push_back(x);
+  nextName.push_back(name);
+}
+void FF::clearNext(){
+  next.clear();
 }
 // Getter
 int FF::getBit() const{

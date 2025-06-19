@@ -23,7 +23,8 @@ class FF : public Cell{
     void setScan(int n);
     void setRelocateCoor(Coor coor);
     void setCluster(int cluster);
-    void addNext(int index);
+    void addNext(int index,string name);
+    void clearNext();
     
     // Getter
     int getBit() const;

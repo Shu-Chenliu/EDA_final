@@ -71,7 +71,7 @@ vector<Bin> generateBins(Board board) {
 
 
 
-void save_cost_to_file(const std::vector<int>& cost, const std::string& filename = "cost.txt") {
+void save_cost_to_file(const std::vector<float>& cost, const std::string& filename = "cost.txt") {
     std::ofstream file(filename);
     for (size_t i = 0; i < cost.size(); ++i) {
         file << i << " " << cost[i] << "\n";
@@ -103,7 +103,8 @@ int main() {
   float gamma=board.getGamma();
   vector<FF*> flip_flops;
   // FFs -> flip_flops
-  for (int i = 0; i < (int)board_FFs.size(); ++i) {
+  int maxDrivingStrength = 1;
+  for (size_t i = 0; i < board_FFs.size(); ++i) {
     Cell* cell = board_FFs[i].first;
     int bit = board_FFs[i].second;
     FF* ff = new FF(cell->getName(), cell->getModel(), cell->getX(), cell->getY(), cell->getW(), cell->getH());
@@ -114,6 +115,7 @@ int main() {
     ff->addPins(cell->getPins());
     flip_flops.push_back(ff);
     FFnameMap[cell->getName()]={ff,i};
+    maxDrivingStrength=max(maxDrivingStrength,bit);
   }
   cout<<"finish converting cells to FFs"<<endl;
 
@@ -137,29 +139,38 @@ int main() {
       }
     }
     cout << "Net: " << netName << " has " << ffIn.size() << " inputs and " << ffOut.size() << " outputs." << endl;
-    for (int in = 0; in < (int)ffIn.size(); ++in) {
-      // cout << "in = " << in << endl;
-      FF* ff=FFnameMap[in].first;
-      
-      for (int out = 0; out < (int)ffOut.size(); ++out) {
-        ff->addNext(FFnameMap[out].second);
-        // cout << "out = " << out << endl;
-      }
-    }
-    // for(const auto&in:ffIn){
-    //   cout << "Input FF: " << in << endl;
+    // for (int in = 0; in < (int)ffIn.size(); ++in) {
+    //   // cout << "in = " << in << endl;
     //   FF* ff=FFnameMap[in].first;
       
-    //   for(const auto&out:ffOut){
+    //   for (int out = 0; out < (int)ffOut.size(); ++out) {
     //     ff->addNext(FFnameMap[out].second);
-    //     cout << "  -> Next FF: " << out << endl;
+    //     // cout << "out = " << out << endl;
     //   }
     // }
+    for(const auto&in:ffIn){
+      cout << "Input FF: " << in << endl;
+      if (FFnameMap.find(in) == FFnameMap.end()) {
+          cerr << "[ERROR] FFnameMap missing key: " << in << endl;
+          continue; // 或 return 或 throw
+      }
+      FF* ff=FFnameMap[in].first;
+      for(const auto&out:ffOut){
+        if (FFnameMap.find(out) == FFnameMap.end()) {
+            cerr << "[ERROR] FFnameMap missing key: " << out << endl;
+            continue; // 或 return 或 throw
+        }
+        ff->addNext(FFnameMap[out].second,out);
+        cout << "  -> Next FF: " << out << endl;
+      }
+    }
   }
   cout << "FO count: " << numberFO << endl;
   float kp,ka,kt;
+  //TODO: fix estimate method
   kp=exactPower/(float)numberFO;
   ka=exactArea/(float)flip_flops.size();
+  cout<<"estimate param"<<kp<<" "<<ka<<endl;
   cout<<"finish adding pins"<<endl;
   
   
@@ -195,7 +206,6 @@ int main() {
     if (ff->getY() > bottom) bottom = ff->getY();
   }
   size_t size=flip_flops.size();
-  //TODO: stop when 2 local minimum occur
   int minCost = numeric_limits<int>::max();
   int currentCost = 0;
   int beforeCost = 0;
@@ -205,7 +215,7 @@ int main() {
   int currentMSTCost = 0;
   double currentPowerCost = 0;
   double currentAreaCost = 0;
-  vector<int> MST_costs;
+  vector<float> MST_costs;
   // save results
   vector<MBFF> best_mbffs;
   vector<MBFF> before_mbffs;
@@ -252,12 +262,10 @@ int main() {
     srand(time(0));
     for(size_t i=0;i< (int)clusters.size();i++){
       vector<FF*> flipflop=clusters[i].flip_flops;
-      //TODO: handle maxDrivingStrength
-      int maxDrivingStrength = 4;
       double b = 0.95;
-      MBFFgeneration generator(flipflop, maxDrivingStrength, b,alpha,beta,gamma);
+      MBFFgeneration generator(flipflop, maxDrivingStrength, b,alpha,beta,gamma,kt,kp,ka);
       // vector<set<string>> mbff_result = generator.generateMBFF();
-      vector<MBFF> placed_mbffs=generator.locationAssignment(bins);
+      vector<MBFF> placed_mbffs=generator.locationAssignment(bins,board);
       generator.MBFFsizing(placed_mbffs);
       generator.handleConnection(placed_mbffs);
       current_mbffs.insert(current_mbffs.end(), placed_mbffs.begin(), placed_mbffs.end());
@@ -268,7 +276,8 @@ int main() {
     }
     Area_cost.push_back(currentAreaCost);
     
-    
+    //TODO: add power and area estimation
+    //TODO: update legalization
 
     // currentCost = board.getAlpha() * MST_costs.back() * kt +
     //               board.getBeta() * Power_cost.back() * kp +

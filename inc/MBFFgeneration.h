@@ -27,14 +27,14 @@ class MBFFgeneration
 {
 	//TODO: update maxdriving strength
 	public:
-		MBFFgeneration(vector<FF*> flipflops,int maxDrivingStrength,double b,float alpha,float beta,float gamma);
+		MBFFgeneration(vector<FF*> flipflops,int maxDrivingStrength,double b,float alpha,float beta,float gamma,float kt,float kp,float ka);
 		~MBFFgeneration();
 		// Rect feasibleRegion(int driving_strength,FF* flipflop);
 		// void generateGraph(int driving_strength);
 		// vector<set<string>> findMaximalCliques(int driving_strength);
 		vector<set<string>> generateMBFF();
 		Rect feasibleRegionForClique(MBFF mbff);
-		vector<MBFF> locationAssignment(vector<Bin>& bins);
+		vector<MBFF> locationAssignment(vector<Bin>& bins,Board& board);
 		void MBFFsizing(vector<MBFF>& mbffs);
 		int cost(set<string> c);
 		pair<int,pair<set<string>,set<string>>> MBFFcost(set<string> c);
@@ -53,6 +53,9 @@ class MBFFgeneration
 		float alpha;
 		float beta;
 		float gamma;
+		float kp;
+		float ka;
+		float kt;
 };
 
 #endif

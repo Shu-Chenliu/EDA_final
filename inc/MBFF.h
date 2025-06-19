@@ -32,6 +32,8 @@ class MBFF{
     Rect preferred_region;
     int driving_strength;
     Coor position;
+    float W;
+    float H;
     int minSlack;
     vector<int> next;
     double savedPower;
@@ -45,6 +47,10 @@ class MBFF{
     void setFeasibleRegion(Rect feasible_region);
     void setPreferredRegion(Rect preferred_region);
     void setDrivingStrength(int ds);
+    void setX(float x);
+    void setY(float y);
+    void setW(float w);
+    void setH(float h);
     void addSavedPower(double power);
     void addSavedArea(double area);
     void addNext(int index);
@@ -52,6 +58,8 @@ class MBFF{
     Coor getCoor() const;
     float getX() const;
     float getY()const;
+    float getW()const;
+    float getH()const;
     set<string> getMembers()const;
     Rect getPreferredRegion()const;
     Rect getFeasibleRegion()const;
@@ -59,6 +67,7 @@ class MBFF{
     vector<int> getNext() const;
     double getSavedPower();
     double getSavedArea();
+    int getMinSlack()const;
 };
 
 

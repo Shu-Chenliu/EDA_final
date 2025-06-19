@@ -36,6 +36,18 @@ void MBFF::setPreferredRegion(Rect pr){
 void MBFF::setDrivingStrength(int ds){
   driving_strength=ds;
 }
+void MBFF::setX(float x){
+  position.setX(x);
+}
+void MBFF::setY(float y){
+  position.setY(y);
+}
+void MBFF::setH(float h){
+  H=h;
+}
+void MBFF::setW(float w){
+  W=w;
+}
 void MBFF::addSavedPower(double power){
   savedPower+=power;
 }
@@ -68,4 +80,13 @@ Rect MBFF::getFeasibleRegion()const{
 }
 int MBFF::getDrivingStrength()const{
   return driving_strength;
+}
+int MBFF::getMinSlack()const{
+  return minSlack;
+}
+float MBFF::getW()const{
+  return W;
+}
+float MBFF::getH()const{
+  return H;
 }
