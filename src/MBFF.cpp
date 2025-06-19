@@ -96,3 +96,6 @@ double MBFF::getSavedPower()const{
 double MBFF::getSavedArea()const {
   return savedArea;
 }
+vector<int> MBFF::getNext()const{
+  return next;
+}
