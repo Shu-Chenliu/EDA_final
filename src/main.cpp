@@ -80,7 +80,18 @@ void save_cost_to_file(const std::vector<double>& cost, const std::string& filen
     file.close();
 }
 
-
+void save_all_costs_to_file(const std::vector<double>& cost1,
+                            const std::vector<double>& cost2,
+                            const std::vector<double>& cost3,
+                            const std::vector<double>& cost4,
+                            const std::string& filename = "cost_all.txt") {
+    std::ofstream file(filename);
+    size_t n = cost1.size(); // assume all vectors are the same size
+    for (size_t i = 0; i < n; ++i) {
+        file << i << " " << cost1[i] << " " << cost2[i] << " " << cost3[i] << " " << cost4[i] << "\n";
+    }
+    file.close();
+}
 
 
 int main() {
@@ -352,12 +363,7 @@ int main() {
     }
   }
   save_cost_to_file(cost);
-
-
-
-
-
-  
+  save_all_costs_to_file(MST_costs, Power_cost, Area_cost, cost);
 
 
   for (auto ff : flip_flops) {
