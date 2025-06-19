@@ -255,7 +255,7 @@ int main() {
 
 
   for(int j=0;j<KmeanIteration;j++){
-    
+    cout<<"iteration:" <<j<<endl;
     beforeCost = currentCost;
     before_mbffs = current_mbffs;
     current_mbffs.clear();
@@ -341,12 +341,12 @@ int main() {
 
     for (const auto& mbff : current_mbffs) {
       currentAreaCost += mbff.getSavedArea();
-      // currentPowerCost += mbff.getSavedPower();
+      currentPowerCost += mbff.getSavedPower();
     }
     // new method estimate power
-    for (int ii = 0; ii < (int)current_mbffs.size(); ++ii) {
-      currentPowerCost += (double)(current_mbffs[ii].getNext().size()) / (double)sqrt(current_mbffs[ii].getMembers().size());
-    }
+    // for (int ii = 0; ii < (int)current_mbffs.size(); ++ii) {
+    //   currentPowerCost += (double)(current_mbffs[ii].getNext().size()) / (double)sqrt(current_mbffs[ii].getMembers().size());
+    // }
 
 
     legalize.legalizePlacing(current_mbffs, bins, board);
@@ -366,14 +366,15 @@ int main() {
     currentMSTCost = mst_after.MinimumSpanningTreeCost();
     MST_costs.push_back(currentMSTCost);
     cout << "MST wire length after k-means: " << currentMSTCost << endl;
-
+    Power_cost.push_back(currentPowerCost);
+    Area_cost.push_back(currentAreaCost);
     
     //TODO: add power and area estimation
     //TODO: update legalization
 
     currentCost = board.getAlpha() * MST_costs.back() * kt +
-                  board.getBeta() * Power_cost.back() * kp +
-                  board.getGamma() * Area_cost.back() * ka;
+                  board.getBeta() * (exactPower - Power_cost.back()) +
+                  board.getGamma() * (exactArea-Area_cost.back());
 
     cost.push_back(currentCost);
     // estimate cost
