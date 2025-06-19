@@ -80,6 +80,19 @@ void save_cost_to_file(const std::vector<double>& cost, const std::string& filen
     file.close();
 }
 
+void save_results_to_file(const vector<MBFF>& mbffs, const string& filename = "results.txt") {
+    ofstream file(filename);
+    file << "809.94 610\n5 5 10810 1000 0.074 0.6\n"; // Example header, adjust as needed
+    file << mbffs.size() << "\n";
+    for (const auto& mbff : mbffs) {
+        file << mbff.getX() << " " << mbff.getY() << " "
+             << mbff.getW() << " " << mbff.getH() << "\n";
+        
+    }
+    file << "0" << "\n"; // Assuming no additional information, adjust as needed
+    file.close();
+}
+
 void save_all_costs_to_file(const std::vector<double>& cost1,
                             const std::vector<double>& cost2,
                             const std::vector<double>& cost3,
@@ -369,6 +382,9 @@ int main() {
   }
   save_cost_to_file(cost);
   save_all_costs_to_file(MST_costs, Power_cost, Area_cost, cost);
+  save_results_to_file(best_mbffs);
+
+
 
 
   for (auto ff : flip_flops) {
