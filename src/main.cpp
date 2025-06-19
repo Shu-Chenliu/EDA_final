@@ -272,7 +272,7 @@ int main() {
     // cout << "MST wire length after k-means: " << currentMSTCost << endl;
 
     srand(time(0));
-    for(size_t i=0;i< (int)clusters.size();i++){
+    for(int i=0;i< (int)clusters.size();i++){
       vector<FF*> flipflop=clusters[i].flip_flops;
       double b = 0.95;
       MBFFgeneration generator(flipflop, maxDrivingStrength, b,alpha,beta,gamma,kt,kp,ka);
@@ -293,7 +293,7 @@ int main() {
     }
     // new method estimate power
     for (int ii = 0; ii < (int)current_mbffs.size(); ++ii) {
-      currentPowerCost += (double)(current_mbffs[ii].getNext.size()) / (double)(current_mbffs[ii].getMembers().size());
+      currentPowerCost += (double)(current_mbffs[ii].getNext().size()) / (double)sqrt(current_mbffs[ii].getMembers().size());
     }
 
 
