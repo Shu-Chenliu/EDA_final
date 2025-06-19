@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <cmath>
 #include <limits>
@@ -67,6 +68,20 @@ vector<Bin> generateBins(Board board) {
 	}
 	return bins;
 }
+
+
+
+void save_cost_to_file(const std::vector<int>& cost, const std::string& filename = "cost.txt") {
+    std::ofstream file(filename);
+    for (size_t i = 0; i < cost.size(); ++i) {
+        file << i << " " << cost[i] << "\n";
+    }
+    file.close();
+}
+
+
+
+
 int main() {
   Board board;
   string file = "../testcase1/testcase1";
@@ -101,42 +116,53 @@ int main() {
     FFnameMap[cell->getName()]={ff,i};
   }
   cout<<"finish converting cells to FFs"<<endl;
-  // cout << "Total flip flops: " << flip_flops.size() << endl;
-  // for (size_t i = 0; i < flip_flops.size(); ++i) {
-  //   cout << "FF " << i << ": " << flip_flops[i]->getName() << " at (" 
-  //        << flip_flops[i]->getX() << ", " << flip_flops[i]->getY() << ")" << endl;
-  // }
+
   int numberFO=0;
+  cout << "getNextSize: " << netlist.getNets().size() << endl;
   for(const auto&netName:netlist.getNets()){
+    cout << "Processing net: " << netName << endl;
     vector<Net> member=netlist.members(netName);
-    vector<string> ffIn;
+    cout << "Net: " << netName << " has " << member.size() << " members." << endl;
+    vector<string> ffIn;    
     vector<string> ffOut;
     for(const auto&net:member){
       if(net.getIO()){
         ffIn.push_back(net.getCellName());
+        cout << "Input FF: " << net.getCellName() << endl;
       }
       else{
         ffOut.push_back(net.getCellName());
+        cout << "Output FF: " << net.getCellName() << endl;
         numberFO++;
       }
     }
-    for(const auto&in:ffIn){
+    cout << "Net: " << netName << " has " << ffIn.size() << " inputs and " << ffOut.size() << " outputs." << endl;
+    for (int in = 0; in < (int)ffIn.size(); ++in) {
+      // cout << "in = " << in << endl;
       FF* ff=FFnameMap[in].first;
-      for(const auto&out:ffOut){
+      
+      for (int out = 0; out < (int)ffOut.size(); ++out) {
         ff->addNext(FFnameMap[out].second);
+        // cout << "out = " << out << endl;
       }
     }
+    // for(const auto&in:ffIn){
+    //   cout << "Input FF: " << in << endl;
+    //   FF* ff=FFnameMap[in].first;
+      
+    //   for(const auto&out:ffOut){
+    //     ff->addNext(FFnameMap[out].second);
+    //     cout << "  -> Next FF: " << out << endl;
+    //   }
+    // }
   }
+  cout << "FO count: " << numberFO << endl;
   float kp,ka,kt;
   kp=exactPower/(float)numberFO;
   ka=exactArea/(float)flip_flops.size();
   cout<<"finish adding pins"<<endl;
   
-  // for (size_t i = 0; i < flip_flops.size(); ++i) {
-  //     cout << "Flop " << i << ": original=(" << flip_flops[i]->position.x << "," << flip_flops[i]->position.y
-  //          << "), cluster=" << flip_flops[i]->cluster
-  //          << ", relocated=(" << flip_flops[i]->relocatedX << "," << flip_flops[i]->relocatedY << ")\n";
-  // }
+  
   // initial wire cost for TNS
   int total_wire_length = 0;
   vector<Edge> edges;
@@ -150,14 +176,6 @@ int main() {
         (int)abs(flip_flops[i]->getX() - flip_flops[flip_flops[i]->getNext()[j]]->getX()) +
         abs(flip_flops[i]->getY() - flip_flops[flip_flops[i]->getNext()[j]]->getY())
       )); // Manhattan distance
-
-    
-      cout << "Edge from " << flip_flops[i]->getName() << " to " 
-           << flip_flops[flip_flops[i]->getNext()[j]]->getName() 
-           << " with weight "
-           << abs(flip_flops[i]->getX() - flip_flops[flip_flops[i]->getNext()[j]]->getX()) +
-           abs(flip_flops[i]->getY() - flip_flops[flip_flops[i]->getNext()[j]]->getY())
-           << endl;
       
     }
   }
@@ -184,13 +202,24 @@ int main() {
   int state = 0; // 1: increase, -1: decrease, 0: no change
   bool local_minimum_occur = false;
   int KmeanIteration = 10;
+  int currentMSTCost = 0;
+  double currentPowerCost = 0;
+  double currentAreaCost = 0;
   vector<int> MST_costs;
+  // save results
+  vector<MBFF> best_mbffs;
+  vector<MBFF> before_mbffs;
+  vector<MBFF> current_mbffs;
+  vector<double> Power_cost;
+  vector<double> Area_cost;
 
 
 
   for(int j=0;j<KmeanIteration;j++){
     
     beforeCost = currentCost;
+    before_mbffs = current_mbffs;
+    current_mbffs.clear();
     
     uniform_int_distribution<> num_size((int)flip_flops.size() / 3, (int)flip_flops.size()*2 / 3);
     int SIZE_LIMIT = num_size(gen) ; // Example size limit for clusters
@@ -210,24 +239,18 @@ int main() {
           abs(flip_flops[ii]->getRelocateCoor().getY() - flip_flops[flip_flops[ii]->getNext()[jj]]->getRelocateCoor().getY())
         )); // Manhattan distance
 
-        // cout << "Edge from " << ii << " (" << flip_flops[ii]->getName() << ") to " 
-        //      << flip_flops[ii]->getNext()[jj] << " (" << flip_flops[flip_flops[ii]->getNext()[jj]]->getName()
-        //      << ") with weight "
-        //      << abs(flip_flops[ii]->getRelocateCoor().getX() - flip_flops[flip_flops[ii]->getNext()[jj]]->getRelocateCoor().getX()) +
-        //      abs(flip_flops[ii]->getRelocateCoor().getY() - flip_flops[flip_flops[ii]->getNext()[jj]]->getRelocateCoor().getY())
-        //      << endl;
              
       }
     }
 
     // do MST
     MST mst_after(edges, (int)flip_flops.size());
-    currentCost = mst_after.MinimumSpanningTreeCost();
-    MST_costs.push_back(currentCost);
-    cout << "MST wire length after k-means: " << currentCost << endl;
+    currentMSTCost = mst_after.MinimumSpanningTreeCost();
+    MST_costs.push_back(currentMSTCost);
+    cout << "MST wire length after k-means: " << currentMSTCost << endl;
 
     srand(time(0));
-    for(size_t i=0;i<1;i++){
+    for(size_t i=0;i< (int)clusters.size();i++){
       vector<FF*> flipflop=clusters[i].flip_flops;
       int maxDrivingStrength = 4;
       double b = 0.95;
@@ -236,13 +259,26 @@ int main() {
       vector<MBFF> placed_mbffs=generator.locationAssignment(bins);
       generator.MBFFsizing(placed_mbffs);
       generator.handleConnection(placed_mbffs);
+      current_mbffs.insert(current_mbffs.end(), placed_mbffs.begin(), placed_mbffs.end());
     }
 
+    for (auto& mbff : current_mbffs) {
+      currentAreaCost += mbff.getMembers().size() * pow(0.9, mbff.getMembers().size()); // Example area cost function
+    }
+    Area_cost.push_back(currentAreaCost);
+    
+    
 
+    // currentCost = board.getAlpha() * MST_costs.back() * kt +
+    //               board.getBeta() * Power_cost.back() * kp +
+    //               board.getGamma() * Area_cost.back() * ka;
+    currentCost = currentMSTCost;
+    
     // estimate cost
     if (j == 0) {
       minCost = currentCost;
       beforeCost = currentCost;
+      best_mbffs = current_mbffs;
       cout << "============ Initial cost: " << minCost << " =============" << endl;
     } else {
       cout << "============ Current cost: " << currentCost << ", Previous cost: " << beforeCost << " ============="<< endl;
@@ -252,6 +288,12 @@ int main() {
         state = 1; // Increase
         if (local_minimum_occur){
           minCost = min(minCost, beforeCost);
+          if (beforeCost < minCost) {
+            best_mbffs.clear();
+            best_mbffs = before_mbffs;
+          }
+        
+
           cout << "Iteration " << j << ": Local minimum occurred, stopping optimization." << endl;
           cout << "Cost: " << minCost << endl;
           break; // Stop the loop
@@ -259,6 +301,10 @@ int main() {
         }else{
           local_minimum_occur = true;
           minCost = min(minCost, beforeCost);
+          if (beforeCost < minCost) {
+            best_mbffs.clear();
+            best_mbffs = before_mbffs;
+          }
           cout << "Iteration " << j << ": Local minimum not occurred, continue optimization." << endl;
           cout << "Minimum cost so far: " << minCost << endl;
         }
@@ -270,6 +316,14 @@ int main() {
       }   
     }
   }
+  save_cost_to_file(MST_costs);
+
+
+
+
+
+  
+
 
   for (auto ff : flip_flops) {
     ff->setRelocateCoor(Coor(ff->getX(),ff->getY()));

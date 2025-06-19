@@ -15,6 +15,7 @@ vector<string> Netlist::getNets() const{
   for (auto& net : pinMap){
     Nets.push_back(net.first);
   }
+  return Nets;
 }
 
 vector<Net> Netlist::members(string net) const{
