@@ -39,6 +39,7 @@ class MBFFgeneration
 		int cost(set<string> c);
 		pair<int,pair<set<string>,set<string>>> MBFFcost(set<string> c);
 		void handleConnection(vector<MBFF>& mbffs);
+		void downsizeMBFFs(vector<MBFF>& mbffs, double avg_slack);
 		
 	protected:
 	private:

@@ -43,6 +43,13 @@ Rect feasibleRegion(int driving_strength,FF* flipflop){
 	}
 	return intersectRects(manhattanRegions);
 }
+double clockSavingPercent(int bitwidth) {
+	if (bitwidth <= 1) return 0.0;
+	else if (bitwidth == 2) return 0.3;
+	else if (bitwidth <= 4) return 0.45;
+	else if (bitwidth <= 8) return 0.55;
+	else return 0.65;  // upper bound
+}
 // void MBFFgeneration::generateGraph(int driving_strength){
 // 	for(int i=0;i<flipflops.size();i++){
 // 		Rect feasible_region=feasibleRegion(driving_strength,flipflops[i]);
@@ -224,7 +231,7 @@ pair<int, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c
 }
 vector<set<string>> MBFFgeneration::generateMBFF(){
 	cout << "[DEBUG] Start MBFF Generation" << endl;
-	for (int strength = 1; strength <= 1; ++strength) {
+	for (int strength = 1; strength <= maxDrivingStrength; ++strength) {
 		cout << "  -> Trying driving strength: " << strength << endl;
 		vector<Rect> regions;
 		// Build feasible regions
@@ -367,6 +374,20 @@ Rect MBFFgeneration::feasibleRegionForClique(MBFF mbff){
 	}
 	return Rect(new_x_min,new_x_max,new_y_min,new_y_max);
 }
+int nextPowerOfTwo(int x) {
+	if (x <= 0) return 1;
+	int power = 1;
+	while (power < x) {
+			power <<= 1;  // 等同於 power *= 2
+	}
+	return power;
+}
+double estimateMBFFArea(int bitwidth, double avgFFArea) {
+	double overhead_ratio = 0.1;  // 一個簡單預設：MBFF 有額外 MUX/route 等 overhead
+	double sharing_efficiency = 0.8; // clock routing、control logic 的共享效率
+
+	return bitwidth * avgFFArea * sharing_efficiency + avgFFArea * overhead_ratio;
+}
 vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins) {
 	cout << "[DEBUG] Start MBFF Location Assignment" << endl;
 	cout << "  -> Total bins generated: " << bins.size() << endl;
@@ -379,16 +400,27 @@ vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins) {
 		mbff.setMembers(clique);
 		float x=0;
 		float y=0;
+		int maxDS=1;
+		double totalPower=0;
+		float totalArea=0;
 		for (auto& name : clique) {
 			cout<<name<<endl;
 			FF* ff = map[name];
 			x+=ff->getRelocateCoor().getX();
 			y+=ff->getRelocateCoor().getY();
 			mbff.setPins(ff->getPins());
+			maxDS=max(maxDS,ff->getBit());
+			totalPower+=ff->getPower();
+			totalArea+=ff->getW()*ff->getH();
 		}
 		mbff.setPosition(Coor(x/clique.size(),y/clique.size()));
 		mbff.setFeasibleRegion(feasibleRegionForClique(mbff)); // intersect all FF feasible regions]
 		mbff.setPreferredRegion(computePreferredRegion(mbff));
+		mbff.setDrivingStrength(maxDS);
+		double mbff_area = estimateMBFFArea(nextPowerOfTwo(clique.size()), totalArea/(double)clique.size());
+		mbff.addSavedArea(totalArea-mbff_area);
+		double saved=0.4*clockSavingPercent(nextPowerOfTwo(clique.size()));
+		mbff.addSavedPower((1-saved)*totalPower);
 		assignMBFFLocation(mbff, bins);
 
 		placed_mbffs.push_back(mbff);
@@ -396,24 +428,20 @@ vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins) {
 	cout << "[DEBUG] All MBFFs placed: " << placed_mbffs.size() << endl;
 	return placed_mbffs;
 }
-void downsizeMBFFs(vector<MBFF>& mbffs, double avg_slack, double beta) {
+
+void MBFFgeneration::downsizeMBFFs(vector<MBFF>& mbffs, double avg_slack) {
 	for (MBFF& mbff : mbffs) {
 		int l = 0;
 		// Step 1~5: 根據 slack 做降速處理
-		for (MBFFBit& bit : mbff.getBits()) {
-			if (!bit.is_empty && bit.slack > beta * avg_slack) {
-				bit.strength = LOW;
+		for (Pin& pin : mbff.getPins()) {
+			if (pin.getSlack() > b * avg_slack) {
+				pin.setSlack(0);
 				l++;
 			}
 		}
 		// Step 6~8: 處理空 bit（都可降速）
-		for (MBFFBit& bit : mbff.getBits()) {
-			if (bit.is_empty) {
-				bit.strength = LOW;
-				l++;
-			}
-		}
-
+		l+=nextPowerOfTwo(mbff.getMembers().size())-mbff.getMembers().size();
+		mbff.addSavedPower(l);
 		// int k = mbff.bits.size();
 		// int h = k - l;
 		// Step 10: 已原地更新 MBFF，可加上 power report 或 output log
@@ -424,11 +452,9 @@ double computeAvgSlack(const vector<MBFF>& mbffs) {
 	double total_slack = 0;
 	int count = 0;
 	for (const auto& mbff : mbffs) {
-		for (const auto& bit : mbff.getBits()) {
-			if (!bit.is_empty) {
-				total_slack += bit.slack;
-				count++;
-			}
+		for (const auto& pin : mbff.getPins()) {
+			total_slack+=pin.getSlack();
+			count++;
 		}
 	}
 	return count > 0 ? total_slack / count : 0.0;
@@ -436,7 +462,7 @@ double computeAvgSlack(const vector<MBFF>& mbffs) {
 void MBFFgeneration::MBFFsizing(vector<MBFF>& mbffs){
 	double avg_slack = computeAvgSlack(mbffs);
 	cout << "[DEBUG] Average Slack: " << avg_slack << endl;
-	downsizeMBFFs(mbffs, avg_slack,beta);
+	downsizeMBFFs(mbffs, avg_slack);
 }
 void MBFFgeneration::handleConnection(vector<MBFF>& mbffs){
 	for(int i=0;i<mbffs.size();i++){

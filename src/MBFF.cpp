@@ -1,6 +1,9 @@
 #include "MBFF.h"
 
-MBFF::MBFF():minSlack(INT_MAX){
+MBFF::MBFF():
+  minSlack(INT_MAX),
+  savedPower(0),
+  savedArea(0){
 
 }
 
@@ -30,6 +33,15 @@ void MBFF::setFeasibleRegion(Rect fr){
 void MBFF::setPreferredRegion(Rect pr){
   preferred_region=pr;
 }
+void MBFF::setDrivingStrength(int ds){
+  driving_strength=ds;
+}
+void MBFF::addSavedPower(double power){
+  savedPower+=power;
+}
+void MBFF::addSavedArea(double area){
+  savedArea+=area;
+}
 void MBFF::addNext(int index){
   next.push_back(index);
 }
@@ -56,7 +68,4 @@ Rect MBFF::getFeasibleRegion()const{
 }
 int MBFF::getDrivingStrength()const{
   return driving_strength;
-}
-vector<MBFFBit> MBFF::getBits()const{
-  return bits;
 }

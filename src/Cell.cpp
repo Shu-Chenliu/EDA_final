@@ -4,7 +4,7 @@ Cell::Cell() :
   name(""),
   model(""),
   delay(0),
-  power(0),
+  power(10),
   minSlack(INT_MAX){
     // pins.reserve(5);
   }
@@ -13,7 +13,7 @@ Cell::Cell(string Name, string Model, float X, float Y) :
   name(Name),
   model(Model),
   delay(0),
-  power(0),
+  power(10),
   minSlack(INT_MAX){
     coor.setCoor(X, Y);
     // pins.reserve(5);
@@ -22,7 +22,7 @@ Cell::Cell(string Name, string Model, float X, float Y,float w,float h) :
   name(Name),
   model(Model),
   delay(0),
-  power(0),
+  power(10),
   size(Rect(w,h,0,0)),
   minSlack(INT_MAX){
     coor.setCoor(X, Y);

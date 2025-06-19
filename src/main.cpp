@@ -229,6 +229,7 @@ int main() {
     srand(time(0));
     for(size_t i=0;i<1;i++){
       vector<FF*> flipflop=clusters[i].flip_flops;
+      //TODO: handle maxDrivingStrength
       int maxDrivingStrength = 4;
       double b = 0.95;
       MBFFgeneration generator(flipflop, maxDrivingStrength, b,alpha,beta,gamma);
