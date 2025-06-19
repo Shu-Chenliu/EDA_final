@@ -289,8 +289,13 @@ int main() {
 
     for (const auto& mbff : current_mbffs) {
       currentAreaCost += mbff.getSavedArea();
-      currentPowerCost += mbff.getSavedPower();
+      // currentPowerCost += mbff.getSavedPower();
     }
+    // new method estimate power
+    for (int ii = 0; ii < (int)current_mbffs.size(); ++ii) {
+      currentPowerCost += (double)(current_mbffs[ii].getNext.size()) / (double)(current_mbffs[ii].getMembers().size());
+    }
+
 
     legalize.legalizePlacing(current_mbffs, bins, board);
     // MST of MBFF
