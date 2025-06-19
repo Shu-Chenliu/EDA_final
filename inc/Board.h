@@ -86,7 +86,7 @@ class Board{
     const vector<IOPin> &getOutPins() const;
 
     Netlist getNetList() const;
-    vector<pair<Cell*, int>> getFFs() const;
+
 
     // Read files
     void readWeight(string file);

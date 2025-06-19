@@ -88,7 +88,7 @@ int main() {
   float gamma=board.getGamma();
   vector<FF*> flip_flops;
   // FFs -> flip_flops
-  for (int i = 0; i < board_FFs.size(); ++i) {
+  for (int i = 0; i < (int)board_FFs.size(); ++i) {
     Cell* cell = board_FFs[i].first;
     int bit = board_FFs[i].second;
     FF* ff = new FF(cell->getName(), cell->getModel(), cell->getX(), cell->getY(), cell->getW(), cell->getH());
@@ -188,7 +188,7 @@ int main() {
 
 
 
-  for(size_t j=0;j<KmeanIteration;j++){
+  for(int j=0;j<KmeanIteration;j++){
     
     beforeCost = currentCost;
     
