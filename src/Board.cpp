@@ -118,6 +118,9 @@ void Board::setOutPins(vector<IOPin> &pins){
 Rect Board::getSize() const{
   return size;
 }
+vector<Cell> Board::getCells()const{
+  return Cells;
+}
 float Board::getW() const{
   return size.getW();
 }

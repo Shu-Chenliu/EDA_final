@@ -44,6 +44,7 @@ class MBFF{
     void setY(float y);
     void setW(float w);
     void setH(float h);
+    void addMember(string s);
     void addSavedPower(double power);
     void addSavedArea(double area);
     void addNext(int index);

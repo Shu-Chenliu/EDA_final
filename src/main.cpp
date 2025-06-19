@@ -70,8 +70,6 @@ vector<Bin> generateBins(Board board) {
 	return bins;
 }
 
-
-
 void save_cost_to_file(const std::vector<double>& cost, const std::string& filename = "cost.txt") {
     std::ofstream file(filename);
     for (size_t i = 0; i < cost.size(); ++i) {
@@ -109,7 +107,11 @@ int main() {
   float exactPower=board.getTPO();
   float exactArea=board.getArea();
   vector<pair<Cell*, int>> board_FFs = board.getFFs();
-  unordered_map<string,pair<FF*,int>> FFnameMap;
+  vector<Cell> cells=board.getCells();
+  unordered_map<string,pair<Cell*,int>> cellNameMap;
+  for(size_t i=0;i<cells.size();i++){
+    cellNameMap[cells[i].getName()]={&cells[i],i};
+  }
   float alpha=board.getAlpha();
   float beta=board.getBeta();
   float gamma=board.getGamma();
@@ -126,7 +128,6 @@ int main() {
     ff->setRelocateCoor(Coor(-1,-1));
     ff->addPins(cell->getPins());
     flip_flops.push_back(ff);
-    FFnameMap[cell->getName()]={ff,i};
     maxDrivingStrength=max(maxDrivingStrength,bit);
   }
   cout<<"finish converting cells to FFs"<<endl;
@@ -162,17 +163,17 @@ int main() {
     // }
     for(const auto&in:ffIn){
       cout << "Input FF: " << in << endl;
-      if (FFnameMap.find(in) == FFnameMap.end()) {
+      if (cellNameMap.find(in) == cellNameMap.end()) {
           cerr << "[ERROR] FFnameMap missing key: " << in << endl;
           continue; // 或 return 或 throw
       }
-      FF* ff=FFnameMap[in].first;
+      Cell* ff=cellNameMap[in].first;
       for(const auto&out:ffOut){
-        if (FFnameMap.find(out) == FFnameMap.end()) {
+        if (cellNameMap.find(out) == cellNameMap.end()) {
             cerr << "[ERROR] FFnameMap missing key: " << out << endl;
             continue; // 或 return 或 throw
         }
-        ff->addNext(FFnameMap[out].second,out);
+        ff->addNext(cellNameMap[out].second,out);
         cout << "  -> Next FF: " << out << endl;
       }
     }
@@ -182,7 +183,6 @@ int main() {
   //TODO: fix estimate method
   kp=exactPower/(float)numberFO;
   ka=exactArea/(float)flip_flops.size();
-  cout<<"estimate param"<<kp<<" "<<ka<<endl;
   cout<<"finish adding pins"<<endl;
   
   
@@ -190,23 +190,26 @@ int main() {
   int total_wire_length = 0;
   vector<Edge> edges;
   // turn wire to edge
-  cout << "FF size: " << flip_flops.size() << endl;
-  for (size_t i = 0; i < flip_flops.size(); ++i) {
-    for (size_t j = 0; j < flip_flops[i]->getNext().size(); ++j) {
+  cout << "Cell size: " << cells.size() << endl;
+  for (size_t i = 0; i < cells.size(); ++i) {
+    for (size_t j = 0; j < cells[i].getNext().size(); ++j) {
       edges.push_back(Edge(
         i,
-        flip_flops[i]->getNext()[j],
-        (int)abs(flip_flops[i]->getX() - flip_flops[flip_flops[i]->getNext()[j]]->getX()) +
-        abs(flip_flops[i]->getY() - flip_flops[flip_flops[i]->getNext()[j]]->getY())
+        cells[i].getNext()[j],
+        (int)abs(cells[i].getX() - cells[cells[i].getNext()[j]].getX()) +
+        abs(cells[i].getY() - cells[cells[i].getNext()[j]].getY())
       )); // Manhattan distance
       
     }
   }
   // do MST
-  MST mst_before(edges, (int)flip_flops.size());
+  cout<<edges.size()<<endl;
+  MST mst_before(edges, (int)cells.size());
   total_wire_length = mst_before.MinimumSpanningTreeCost();
   cout << "Initial MST wire length: " << total_wire_length << endl;
   kt=exactTNS/total_wire_length;
+  cout<<"estimate param"<<kp<<" "<<ka<<" "<<kt<<endl;
+  
   Legalization legalize;
   legalize.legalizePlacing(flip_flops,bins,board);
   cout<<"finish legalizing"<<endl;
@@ -218,12 +221,12 @@ int main() {
     if (ff->getY() > bottom) bottom = ff->getY();
   }
   size_t size=flip_flops.size();
-  int minCost = numeric_limits<int>::max();
-  int currentCost = 0;
-  int beforeCost = 0;
+  float minCost = numeric_limits<float>::max();
+  float currentCost = 0;
+  float beforeCost = 0;
   int state = 0; // 1: increase, -1: decrease, 0: no change
   bool local_minimum_occur = false;
-  int KmeanIteration = 10;
+  int KmeanIteration = 3;
   double currentMSTCost = 0;
   double currentPowerCost = 0;
   double currentAreaCost = 0;
@@ -270,7 +273,6 @@ int main() {
     // currentMSTCost = mst_after.MinimumSpanningTreeCost();
     // MST_costs.push_back(currentMSTCost);
     // cout << "MST wire length after k-means: " << currentMSTCost << endl;
-
     srand(time(0));
     for(size_t i=0;i< (int)clusters.size();i++){
       vector<FF*> flipflop=clusters[i].flip_flops;
@@ -279,11 +281,48 @@ int main() {
       // vector<set<string>> mbff_result = generator.generateMBFF();
       vector<MBFF> placed_mbffs=generator.locationAssignment(bins,board);
       generator.MBFFsizing(placed_mbffs);
-      generator.handleConnection(placed_mbffs);
       current_mbffs.insert(current_mbffs.end(), placed_mbffs.begin(), placed_mbffs.end());
 
     }
-
+    unordered_set<string> ff_set;
+    for(const auto&ff:flip_flops){
+      ff_set.insert(ff->getName());
+    }
+    
+    for(const auto&c:cells){
+      if(ff_set.count(c.getName())){
+        continue;
+      }
+      MBFF target;
+      float minDis = numeric_limits<float>::max();
+      for(const auto&mbff:current_mbffs){
+        if(abs(mbff.getCoor().getX()-c.getX())+abs(mbff.getCoor().getY()-c.getY())<minDis){
+          minDis=abs(mbff.getCoor().getX()-c.getX())+abs(mbff.getCoor().getY()-c.getY());
+          target=mbff;
+        }
+      }
+      target.addMember(c.getName());
+    }
+    for(int i=0;i<(int)current_mbffs.size();i++){
+      unordered_set<int> nextConn;
+      for(const auto&memberName:current_mbffs[i].getMembers()){
+        Cell* ff=cellNameMap[memberName].first;
+        vector<string> nexts=ff->getNextName();
+        for(int j=0;j<(int)current_mbffs.size();j++){
+          if(i!=j){
+            for(const auto&next:nexts){
+              if(current_mbffs[j].getMembers().count(next)){
+                nextConn.insert(j);
+                break;
+              }
+            }
+          }
+        }
+      }
+      for(const auto& index:nextConn){
+        current_mbffs[i].addNext(index);
+      }
+    }
     currentAreaCost = 0;
     currentPowerCost = 0;
 
@@ -309,7 +348,6 @@ int main() {
     currentMSTCost = mst_after.MinimumSpanningTreeCost();
     MST_costs.push_back(currentMSTCost);
     cout << "MST wire length after k-means: " << currentMSTCost << endl;
-
 
     
     //TODO: add power and area estimation

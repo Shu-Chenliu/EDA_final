@@ -51,6 +51,9 @@ void MBFF::setW(float w){
 void MBFF::addSavedPower(double power){
   savedPower+=power;
 }
+void MBFF::addMember(string s){
+  members.insert(s);
+}
 void MBFF::addSavedArea(double area){
   savedArea+=area;
 }

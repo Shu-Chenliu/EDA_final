@@ -62,7 +62,7 @@ double estimateMBFFArea(int bitwidth, double avgFFArea) {
 	double overhead_ratio = 0.1;  // 一個簡單預設：MBFF 有額外 MUX/route 等 overhead
 	double sharing_efficiency = 0.8; // clock routing、control logic 的共享效率
 
-	return bitwidth * avgFFArea * sharing_efficiency + avgFFArea * overhead_ratio;
+	return (double)bitwidth * avgFFArea * sharing_efficiency + avgFFArea * overhead_ratio;
 }
 // void MBFFgeneration::generateGraph(int driving_strength){
 // 	for(int i=0;i<flipflops.size();i++){
@@ -156,24 +156,21 @@ double MBFFgeneration::cost(set<string> c){
 	double totalPower=0;
 	int count=0;
 	vector<string> v(c.begin(),c.end());
-	unordered_map<string, int> nameToIndex;
-	for (int i = 0; i < v.size(); ++i) {
-			nameToIndex[v[i]] = i;
-	}
 	vector<Edge> edges;
 	int i=0;
 	cout << "FF size: " << c.size() << endl;
   for (int i=0;i<v.size();i++) {
 		FF* ff=map[v[i]];
-    for (size_t j = 0; j < ff->getNextName().size(); ++j) {
-			if(!c.count(ff->getNextName()[j])){
+    for (int j=0;j<v.size();j++) {
+			if(i==j){
 				continue;
 			}
+			FF* ff2=map[v[j]];
       edges.push_back(Edge(
         i,
-        nameToIndex[ff->getNextName()[j]],
-        (int)abs(ff->getX() - map[ff->getNextName()[j]]->getX()) +
-        abs(ff->getY() - map[ff->getNextName()[j]]->getY())
+        j,
+        (int)abs(ff->getX() - ff2->getX()) +
+        abs(ff->getY() - ff2->getY())
       )); // Manhattan distance
     }
   }
@@ -183,30 +180,28 @@ double MBFFgeneration::cost(set<string> c){
 		totalArea+=ff->getW()*ff->getH();
 		totalPower+=ff->getPower();
 	}
-	//TODO: delta 算法要改
 	double mbff_area = estimateMBFFArea(nextPowerOfTwo(c.size()), totalArea/(double)c.size());
 	double savedArea=totalArea-mbff_area;
 	double savedPower=0.4*clockSavingPercent(nextPowerOfTwo(c.size()));
 	MST mst_estimate(edges,(int)c.size());
 	double delta_tns=mst_estimate.MinimumSpanningTreeCost();
-	//TODO :add kp,kt,ka
 	totalCost-=gamma*savedArea*ka;
 	totalCost-=beta*savedPower*kp;
 	totalCost-=alpha*delta_tns*kt;
+	cout<<gamma*savedArea*ka<<" "<<beta*savedPower*kp<<" "<<alpha*delta_tns*kt<<endl;
 	cout<<"totalCost: "<<totalCost<<endl;
-	return (int)totalCost;
+	return totalCost;
 }
 pair<double, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c) {
 	int size = c.size();
 
 	vector<string> elements(c.begin(), c.end()); // for random selection
-	int minCost = numeric_limits<int>::max();
+	double minCost = numeric_limits<double>::max();
 	//currectCost is mostly 0
-  int currentCost = 0;
-  int beforeCost = 0;
+  double currentCost = 0;
+  double beforeCost = 0;
   int state = 0; // 1: increase, -1: decrease, 0: no change
   bool local_minimum_occur = false;
-  int KmeanIteration = 1;
 	set<string> minClique;
 	for (int i = 0; i < size; i++) {
 		beforeCost=currentCost;
@@ -487,25 +482,25 @@ void MBFFgeneration::MBFFsizing(vector<MBFF>& mbffs){
 	cout << "[DEBUG] Average Slack: " << avg_slack << endl;
 	downsizeMBFFs(mbffs, avg_slack);
 }
-void MBFFgeneration::handleConnection(vector<MBFF>& mbffs){
-	for(int i=0;i<(int)mbffs.size();i++){
-		unordered_set<int> nextConn;
-		for(const auto&memberName:mbffs[i].getMembers()){
-			FF* ff=map[memberName];
-			vector<string> nexts=ff->getNextName();
-			for(int j=0;j<(int)mbffs.size();j++){
-				if(i!=j){
-					for(const auto&next:nexts){
-						if(mbffs[j].getMembers().count(next)){
-							nextConn.insert(j);
-							break;
-						}
-					}
-				}
-			}
-		}
-		for(const auto& index:nextConn){
-			mbffs[i].addNext(index);
-		}
-	}
-}
+// void MBFFgeneration::handleConnection(vector<MBFF>& mbffs){
+// 	for(int i=0;i<(int)mbffs.size();i++){
+// 		unordered_set<int> nextConn;
+// 		for(const auto&memberName:mbffs[i].getMembers()){
+// 			FF* ff=map[memberName];
+// 			vector<string> nexts=ff->getNextName();
+// 			for(int j=0;j<(int)mbffs.size();j++){
+// 				if(i!=j){
+// 					for(const auto&next:nexts){
+// 						if(mbffs[j].getMembers().count(next)){
+// 							nextConn.insert(j);
+// 							break;
+// 						}
+// 					}
+// 				}
+// 			}
+// 		}
+// 		for(const auto& index:nextConn){
+// 			mbffs[i].addNext(index);
+// 		}
+// 	}
+// }

@@ -20,6 +20,9 @@ class Cell {
     float delay;
     vector<Pin> pins;
     int minSlack;
+  protected:
+    vector<int> next;
+    vector<string> nextName;
 
   public:
     Cell();
@@ -36,10 +39,10 @@ class Cell {
     void setSize(float W, float H);
     void setPower(float p);
     void setDelay(float d);
-
+    virtual void addNext(int index,string name) ;
     void addPin(Pin pin);
     void addPins(const vector<Pin>& Pins);
-
+    virtual void clearNext();
     // Getter
     string getName() const;
     string getModel() const;
@@ -53,6 +56,8 @@ class Cell {
     int getPinNum() const;
     const vector<Pin> &getPins() const;
     int getMinSlack() const;
+    virtual vector<int> getNext() const;
+    virtual vector<string> getNextName() const;
     // Print
     void print();
 };

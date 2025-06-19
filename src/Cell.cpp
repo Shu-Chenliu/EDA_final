@@ -137,3 +137,16 @@ void Cell::print(){
     p.print();
   }
 }
+vector<int> Cell::getNext()const{
+  return next;
+}
+vector<string> Cell::getNextName()const{
+  return nextName;
+}
+void Cell::addNext(int x,string name){
+  next.push_back(x);
+  nextName.push_back(name);
+}
+void Cell::clearNext(){
+  next.clear();
+}

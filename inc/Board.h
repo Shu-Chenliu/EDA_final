@@ -65,6 +65,7 @@ class Board{
 
     // Getter
     Rect getSize() const;
+    vector<Cell> getCells()const;
     float getW() const;
     float getH() const;
     float getBinW() const;

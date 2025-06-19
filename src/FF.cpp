@@ -32,12 +32,8 @@ void FF::setRelocateCoor(Coor coor){
 void FF::setCluster(int c){
   cluster=c;
 }
-void FF::addNext(int x,string name){
-  next.push_back(x);
-  nextName.push_back(name);
-}
-void FF::clearNext(){
-  next.clear();
+void FF::addNext(int index,string name){
+  Cell::addNext(index,name);
 }
 // Getter
 int FF::getBit() const{
@@ -57,9 +53,12 @@ Coor FF::getRelocateCoor() const{
 int FF::getCluster() const{
   return cluster;
 }
-vector<int> FF::getNext()const{
-  return next;
+vector<string> FF::getNextName() const {
+  return Cell::getNextName();  // 呼叫父類別的方法
 }
-vector<string> FF::getNextName()const{
-  return nextName;
+vector<int> FF::getNext() const{
+  return Cell::getNext();
+}
+void FF::clearNext(){
+  Cell::clearNext();
 }

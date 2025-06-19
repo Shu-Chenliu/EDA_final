@@ -9,8 +9,7 @@ class FF : public Cell{
     int scan;
     Coor relocateCoor;
     int cluster;
-    vector<int> next;
-    vector<string> nextName;
+    
 
   public:
     FF();
@@ -23,17 +22,16 @@ class FF : public Cell{
     void setScan(int n);
     void setRelocateCoor(Coor coor);
     void setCluster(int cluster);
-    void addNext(int index,string name);
-    void clearNext();
-    
+    void clearNext() override;
+    vector<string> getNextName() const override;
+    void addNext(int index,string name) override;
+    vector<int> getNext() const override;
     // Getter
     int getBit() const;
     int getClk() const;
     int getScan() const;
     Coor getRelocateCoor() const;
     int getCluster() const;
-    vector<int> getNext() const;
-    vector<string> getNextName() const;
 };
 
 #endif
