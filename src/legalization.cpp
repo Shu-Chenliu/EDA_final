@@ -95,8 +95,8 @@ void Legalization::legalizePlacing(vector<FF*>& flipflops, vector<Bin>& bins, Bo
     }
 }
 void Legalization::legalizePlacing(vector<MBFF>& mbffs, vector<Bin>& bins, Board& board) {
-    sort(mbffs.begin(), mbffs.end(), [](const MBFF* a, const MBFF* b) {
-        return a->getMinSlack() < b->getMinSlack();
+    sort(mbffs.begin(), mbffs.end(), [](const MBFF a, const MBFF b) {
+        return a.getMinSlack() < b.getMinSlack();
     });
 
     int x_bins = board.getW() / board.getBinW();
@@ -107,11 +107,11 @@ void Legalization::legalizePlacing(vector<MBFF>& mbffs, vector<Bin>& bins, Board
     };
 
     for (MBFF mbff : mbffs) {
-        int required_bins_x = ceil(mbff->getW() / board.getBinW());
-        int required_bins_y = ceil(mbff->getH() / board.getBinH());
+        int required_bins_x = ceil(mbff.getW() / board.getBinW());
+        int required_bins_y = ceil(mbff.getH() / board.getBinH());
 
-        int start_x = mbff->getX() / board.getBinW();
-        int start_y = mbff->getY() / board.getBinH();
+        int start_x = mbff.getX() / board.getBinW();
+        int start_y = mbff.getY() / board.getBinH();
 
         queue<pair<int, int>> q;
         unordered_set<int> visited;
@@ -157,8 +157,8 @@ void Legalization::legalizePlacing(vector<MBFF>& mbffs, vector<Bin>& bins, Board
                 for (auto* b : candidate_bins)
                     b->occupied = true;
 
-                mbff->setX(bins[cy * x_bins + cx].area.getX());
-                mbff->setY(bins[cy * x_bins + cx].area.getY());
+                mbff.setX(bins[cy * x_bins + cx].area.getX());
+                mbff.setY(bins[cy * x_bins + cx].area.getY());
                 placed = true;
                 break;
             }
@@ -176,7 +176,7 @@ void Legalization::legalizePlacing(vector<MBFF>& mbffs, vector<Bin>& bins, Board
 
         if (!placed) {
             cerr << "[Warning] Cannot place MBFF of size " 
-                 << mbff->getW() << "x" << mbff->getH() << endl;
+                 << mbff.getW() << "x" << mbff.getH() << endl;
         }
     }
 }
