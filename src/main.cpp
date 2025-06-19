@@ -194,7 +194,7 @@ int main() {
   cout << "FO count: " << numberFO << endl;
   float kp,ka,kt;
   //TODO: fix estimate method
-  kp=exactPower/(float)numberFO;
+  kp=exactPower;
   ka=exactArea/(float)flip_flops.size();
   cout<<"finish adding pins"<<endl;
   
@@ -251,8 +251,10 @@ int main() {
   vector<double> cost;
   vector<double> Power_cost;
   vector<double> Area_cost;
-
-
+  cost.push_back(exactArea*gamma+exactPower*beta+exactTNS*alpha);
+  MST_costs.push_back(exactTNS*alpha);
+  Power_cost.push_back(exactPower*beta);
+  Area_cost.push_back(exactArea*gamma);
 
   for(int j=0;j<KmeanIteration;j++){
     cout<<"iteration:" <<j<<endl;
@@ -292,7 +294,7 @@ int main() {
       double b = 0.95;
       MBFFgeneration generator(flipflop, maxDrivingStrength, b,alpha,beta,gamma,kt,kp,ka);
       // vector<set<string>> mbff_result = generator.generateMBFF();
-      vector<MBFF> placed_mbffs=generator.locationAssignment(bins,board);
+      vector<MBFF> placed_mbffs=generator.locationAssignment(bins,board,exactPower);
       generator.MBFFsizing(placed_mbffs);
       current_mbffs.insert(current_mbffs.end(), placed_mbffs.begin(), placed_mbffs.end());
 
@@ -366,8 +368,8 @@ int main() {
     currentMSTCost = mst_after.MinimumSpanningTreeCost();
     MST_costs.push_back(currentMSTCost);
     cout << "MST wire length after k-means: " << currentMSTCost << endl;
-    Power_cost.push_back(currentPowerCost);
-    Area_cost.push_back(currentAreaCost);
+    Power_cost.push_back(board.getBeta() * (exactPower -currentPowerCost));
+    Area_cost.push_back(board.getGamma() * (exactArea-currentAreaCost));
     
     //TODO: add power and area estimation
     //TODO: update legalization

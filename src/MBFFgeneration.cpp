@@ -404,7 +404,7 @@ Rect MBFFgeneration::feasibleRegionForClique(MBFF mbff){
 }
 
 
-vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins,Board& board) {
+vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins,Board& board,double exactPower) {
 	cout << "[DEBUG] Start MBFF Location Assignment" << endl;
 	cout << "  -> Total bins generated: " << bins.size() << endl;
 	vector<set<string>> non_conflictMBFF=generateMBFF();
@@ -417,7 +417,6 @@ vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins,Board& board) 
 		float x=0;
 		float y=0;
 		int maxDS=1;
-		double totalPower=0;
 		float totalArea=0;
 		for (auto& name : clique) {
 			cout<<name<<endl;
@@ -426,7 +425,6 @@ vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins,Board& board) 
 			y+=ff->getRelocateCoor().getY();
 			mbff.setPins(ff->getPins());
 			maxDS=max(maxDS,ff->getBit());
-			totalPower+=ff->getPower();
 			totalArea+=ff->getW()*ff->getH();
 		}
 		mbff.setPosition(Coor(x/clique.size(),y/clique.size()));
@@ -436,7 +434,7 @@ vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins,Board& board) 
 		double mbff_area = estimateMBFFArea(nextPowerOfTwo(clique.size()), totalArea/(double)clique.size());
 		mbff.addSavedArea(totalArea-mbff_area);
 		double saved=0.4*clockSavingPercent(nextPowerOfTwo(clique.size()));
-		mbff.addSavedPower((1-saved)*totalPower);
+		mbff.addSavedPower(saved*exactPower);
 		assignMBFFLocation(mbff, bins);
 		mbff.setH(board.getBinH());
 		mbff.setW(mbff_area/mbff.getH());
