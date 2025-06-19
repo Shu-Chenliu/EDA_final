@@ -67,6 +67,6 @@ ax.set_ylim(-0.5, input[0][1]+0.5)
 ax.set_aspect('equal')
 
 plt.axis('off')
-plt.savefig("plot.png", dpi=500)
+plt.savefig("plotInitial.png", dpi=500)
 
 print("fin~~")

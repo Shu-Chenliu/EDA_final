@@ -465,12 +465,12 @@ void MBFFgeneration::MBFFsizing(vector<MBFF>& mbffs){
 	downsizeMBFFs(mbffs, avg_slack);
 }
 void MBFFgeneration::handleConnection(vector<MBFF>& mbffs){
-	for(int i=0;i<mbffs.size();i++){
+	for(int i=0;i<(int)mbffs.size();i++){
 		unordered_set<int> nextConn;
 		for(const auto&memberName:mbffs[i].getMembers()){
 			FF* ff=map[memberName];
 			vector<string> nexts=ff->getNextName();
-			for(int j=0;j<mbffs.size();j++){
+			for(int j=0;j<(int)mbffs.size();j++){
 				if(i!=j){
 					for(const auto&next:nexts){
 						if(mbffs[j].getMembers().count(next)){

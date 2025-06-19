@@ -71,7 +71,7 @@ void Cell::addPin(Pin pin){
 }
 
 void Cell::addPins(const vector<Pin>& Pins){
-  for(int i=0;i<Pins.size();i++){
+  for(int i=0;i<(int)Pins.size();i++){
     pins.push_back(Pins[i]);
     if(Pins[i].getSlack()<minSlack){
       minSlack=Pins[i].getSlack();
