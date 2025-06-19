@@ -65,8 +65,8 @@ class MBFF{
     Rect getFeasibleRegion()const;
     int getDrivingStrength()const;
     vector<int> getNext() const;
-    double getSavedPower();
-    double getSavedArea();
+    double getSavedPower()const;
+    double getSavedArea()const;
     int getMinSlack()const;
 };
 

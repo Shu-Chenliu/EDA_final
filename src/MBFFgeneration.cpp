@@ -150,7 +150,7 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 	return vector<set<string>>(filtered.begin(), filtered.end());
 }
 
-int MBFFgeneration::cost(set<string> c){
+double MBFFgeneration::cost(set<string> c){
 	double totalCost=0;
 	double totalArea=0;
 	double totalPower=0;
@@ -196,7 +196,7 @@ int MBFFgeneration::cost(set<string> c){
 	cout<<"totalCost: "<<totalCost<<endl;
 	return (int)totalCost;
 }
-pair<int, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c) {
+pair<double, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string> c) {
 	int size = c.size();
 
 	vector<string> elements(c.begin(), c.end()); // for random selection
@@ -290,14 +290,14 @@ vector<set<string>> MBFFgeneration::generateMBFF(){
 		
 	}
 	cout << "  => Total MBFF candidates: " << mbff_candidates.size() << endl;
-	priority_queue<pair<int,pair<set<string>,set<string>>>,vector<pair<int,pair<set<string>,set<string>>>>,greater<pair<int,pair<set<string>,set<string>>>>> pq;
+	priority_queue<pair<double,pair<set<string>,set<string>>>,vector<pair<double,pair<set<string>,set<string>>>>,greater<pair<double,pair<set<string>,set<string>>>>> pq;
 	vector<set<string>> non_conflictMBFF;
 	for(const auto& maxclique:mbff_candidates){
 		pq.push(MBFFcost(maxclique));
 	}
 	unordered_set<string> marked;
 	while(!pq.empty()){
-		pair<int,pair<set<string>,set<string>>> m=pq.top();
+		pair<double,pair<set<string>,set<string>>> m=pq.top();
 		pq.pop();
 		bool isValid=true;
 		for(const auto& ff:m.second.first){

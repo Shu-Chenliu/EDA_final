@@ -90,3 +90,9 @@ float MBFF::getW()const{
 float MBFF::getH()const{
   return H;
 }
+double MBFF::getSavedPower()const{
+  return savedPower;
+}
+double MBFF::getSavedArea()const {
+  return savedArea;
+}
