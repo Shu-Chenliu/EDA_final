@@ -161,10 +161,7 @@ double MBFFgeneration::cost(set<string> c){
 	cout << "FF size: " << c.size() << endl;
   for (int i=0;i<v.size();i++) {
 		FF* ff=map[v[i]];
-    for (int j=0;j<v.size();j++) {
-			if(i==j){
-				continue;
-			}
+    for (int j=i+1;j<v.size();j++) {
 			FF* ff2=map[v[j]];
       edges.push_back(Edge(
         i,
@@ -187,7 +184,7 @@ double MBFFgeneration::cost(set<string> c){
 	double delta_tns=mst_estimate.MinimumSpanningTreeCost();
 	totalCost-=gamma*savedArea*ka;
 	totalCost-=beta*savedPower*kp;
-	totalCost-=alpha*delta_tns*kt;
+	totalCost+=alpha*delta_tns*kt;
 	cout<<gamma*savedArea*ka<<" "<<beta*savedPower*kp<<" "<<alpha*delta_tns*kt<<endl;
 	cout<<"totalCost: "<<totalCost<<endl;
 	return totalCost;
@@ -355,41 +352,8 @@ Rect computePreferredRegion(const MBFF& mbff) {
 	return Rect(margin, margin, x_center, y_center);
 }
 
-void assignMBFFLocation(MBFF& mbff, vector<Bin>& bins) {
-	cout << "  [Bin Assignment] For MBFF with " << mbff.getMembers().size() << " members" << endl;
-	for (auto& bin : bins) {
-		if (bin.getArea().intersect(mbff.getPreferredRegion())) {
-			bin.setRank(0);
-		} else if (bin.getArea().intersect(mbff.getFeasibleRegion())) {
-			// Calculate Manhattan distance to preferred region center
-			int cx = (mbff.getPreferredRegion().getX()*2+mbff.getPreferredRegion().getW()) / 2;
-			int cy = (mbff.getPreferredRegion().getY()*2+mbff.getPreferredRegion().getH()) / 2;
-			int bx = (bin.getArea().getX()*2+bin.getArea().getW()) / 2;
-			int by = (bin.getArea().getY()*2+bin.getArea().getH()) / 2;
-			bin.setRank(abs(cx - bx) + abs(cy - by));
-		} else {
-			bin.setRank(-1); // invalid
-		}
-	}
 
-	// 找出可用最低 rank 的 bin
-	int min_rank = INT_MAX;
-	Bin* best_bin = nullptr;
-	for (auto& bin : bins) {
-		if (!bin.getOccupied() && bin.getRank() >= 0 && bin.getRank() < min_rank) {
-			min_rank = bin.getRank();
-			best_bin = &bin;
-		}
-	}
 
-	if (best_bin) {
-		best_bin->setOccupied(true);
-		mbff.setFeasibleRegion(best_bin->getArea());
-		cout << "    Assigned to bin (" << best_bin->getxIndex() << "," << best_bin->getyIndex() << ") rank = " << best_bin->getRank() << endl;
-	} else {
-		cout << "    [Warning] No available bin found!" << endl;
-	}
-}
 Rect MBFFgeneration::feasibleRegionForClique(MBFF mbff){
 	int new_x_min = INT_MAX, new_x_max = INT_MIN;
   int new_y_min = INT_MAX, new_y_max = INT_MIN;
@@ -404,7 +368,7 @@ Rect MBFFgeneration::feasibleRegionForClique(MBFF mbff){
 }
 
 
-vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins,Board& board,double exactPower) {
+vector<MBFF> MBFFgeneration::locationAssignment(unordered_map<int,unordered_map<int,Bin*>>& bins,Board& board,double exactPower) {
 	cout << "[DEBUG] Start MBFF Location Assignment" << endl;
 	cout << "  -> Total bins generated: " << bins.size() << endl;
 	vector<set<string>> non_conflictMBFF=generateMBFF();
@@ -417,7 +381,7 @@ vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins,Board& board,d
 		float x=0;
 		float y=0;
 		int maxDS=1;
-		float totalArea=0;
+		float totalArea=ka*(float)clique.size();
 		for (auto& name : clique) {
 			cout<<name<<endl;
 			FF* ff = map[name];
@@ -425,7 +389,6 @@ vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins,Board& board,d
 			y+=ff->getRelocateCoor().getY();
 			mbff.setPins(ff->getPins());
 			maxDS=max(maxDS,ff->getBit());
-			totalArea+=ff->getW()*ff->getH();
 		}
 		mbff.setPosition(Coor(x/clique.size(),y/clique.size()));
 		mbff.setFeasibleRegion(feasibleRegionForClique(mbff)); // intersect all FF feasible regions]
@@ -435,7 +398,7 @@ vector<MBFF> MBFFgeneration::locationAssignment(vector<Bin>& bins,Board& board,d
 		mbff.addSavedArea(totalArea-mbff_area);
 		double saved=0.4*clockSavingPercent(nextPowerOfTwo(clique.size()));
 		mbff.addSavedPower(saved*exactPower);
-		assignMBFFLocation(mbff, bins);
+		// assignMBFFLocation(mbff, bins,board.getBinW(),board.getBinH());
 		mbff.setH(board.getBinH());
 		mbff.setW(mbff_area/mbff.getH());
 		placed_mbffs.push_back(mbff);

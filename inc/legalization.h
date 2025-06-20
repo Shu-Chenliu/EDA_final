@@ -13,8 +13,8 @@ class Legalization{
   public:
     Legalization();
     ~Legalization();
-    void legalizePlacing(vector<FF*>& flipflops,vector<Bin>& bins,Board& board);
-    void legalizePlacing(vector<MBFF>& mbffs,vector<Bin>& bins,Board& board);
+    void legalizePlacing(vector<FF*>& flipflops,vector<Bin*>& bins,Board& board);
+    void legalizePlacing(vector<MBFF>& mbffs,vector<Bin*>& bins,Board& board);
 };
 
 #endif

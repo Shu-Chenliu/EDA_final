@@ -56,18 +56,25 @@ void readFile(string file){
   f.close();
   return;
 } 
-vector<Bin> generateBins(Board board) {
-	vector<Bin> bins;
+vector<Bin*> generateBins(Board board,unordered_map<int,unordered_map<int,Bin*>>& map) {
+	vector<Bin*> bins;
 	int x_bins = (board.getW()) / board.getBinW();
 	int y_bins = (board.getH()) / board.getBinH();
 
 	for (int i = 0; i < x_bins; ++i) {
 		for (int j = 0; j < y_bins; ++j) {
 			Rect area(board.getBinW(),board.getBinH(),board.getSize().getX()+i*board.getBinW(),board.getSize().getY()+j * board.getBinH());
-			bins.push_back(Bin(i,j,area));
+      Bin* b=new Bin(i,j,area);
+			bins.push_back(b);
+      map[i][j]=b;
 		}
 	}
 	return bins;
+}
+void resetBin(vector<Bin*>& bins){
+  for(const auto&bin:bins){
+    bin->setOccupied(false);
+  }
 }
 
 void save_cost_to_file(const std::vector<double>& cost, const std::string& filename = "cost.txt") {
@@ -112,7 +119,8 @@ int main() {
   board.readDef(file);
   board.readV(file);
   board.forMatplotlib(file);
-  vector<Bin> bins=generateBins(board);
+  unordered_map<int,unordered_map<int,Bin*>> binMap;
+  vector<Bin*> bins=generateBins(board,binMap);
   Netlist netlist=board.getNetList();
   random_device rd;
   mt19937 gen(rd());
@@ -195,10 +203,10 @@ int main() {
   float kp,ka,kt;
   //TODO: fix estimate method
   kp=exactPower;
-  ka=exactArea/(float)flip_flops.size();
+  ka = (exactArea) / static_cast<float>(flip_flops.size());
+  cout<<kp<<" "<<ka<<endl;
   cout<<"finish adding pins"<<endl;
-  
-  
+  // return 0;
   // initial wire cost for TNS
   int total_wire_length = 0;
   vector<Edge> edges;
@@ -225,7 +233,10 @@ int main() {
   
   Legalization legalize;
   legalize.legalizePlacing(flip_flops,bins,board);
+  
   cout<<"finish legalizing"<<endl;
+  resetBin(bins);
+  cout<<"finish reset bins"<<endl;
   int left = 0, right = 0, top = 0, bottom = 0;
   for (auto ff : flip_flops) {
     if (ff->getX() < left) left = ff->getX();
@@ -239,7 +250,7 @@ int main() {
   float beforeCost = 0;
   int state = 0; // 1: increase, -1: decrease, 0: no change
   bool local_minimum_occur = false;
-  int KmeanIteration = 3;
+  int KmeanIteration = 10;//TODO:
   double currentMSTCost = 0;
   double currentPowerCost = 0;
   double currentAreaCost = 0;
@@ -294,11 +305,11 @@ int main() {
       double b = 0.95;
       MBFFgeneration generator(flipflop, maxDrivingStrength, b,alpha,beta,gamma,kt,kp,ka);
       // vector<set<string>> mbff_result = generator.generateMBFF();
-      vector<MBFF> placed_mbffs=generator.locationAssignment(bins,board,exactPower);
+      vector<MBFF> placed_mbffs=generator.locationAssignment(binMap,board,exactPower);
       generator.MBFFsizing(placed_mbffs);
       current_mbffs.insert(current_mbffs.end(), placed_mbffs.begin(), placed_mbffs.end());
-
     }
+    resetBin(bins);
     unordered_set<string> ff_set;
     for(const auto&ff:flip_flops){
       ff_set.insert(ff->getName());
@@ -352,6 +363,7 @@ int main() {
 
 
     legalize.legalizePlacing(current_mbffs, bins, board);
+    resetBin(bins);
     // MST of MBFF
     edges.clear();
     for (int ii = 0; ii < (int)current_mbffs.size(); ++ii) {
@@ -424,13 +436,7 @@ int main() {
   save_cost_to_file(cost);
   save_all_costs_to_file(MST_costs, Power_cost, Area_cost, cost);
   save_results_to_file(best_mbffs);
-
-
-
-
-  for (auto ff : flip_flops) {
-    ff->setRelocateCoor(Coor(ff->getX(),ff->getY()));
-  }
+  
 
   for (auto ff : flip_flops) {
     delete ff;

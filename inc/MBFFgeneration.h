@@ -34,7 +34,7 @@ class MBFFgeneration
 		// vector<set<string>> findMaximalCliques(int driving_strength);
 		vector<set<string>> generateMBFF();
 		Rect feasibleRegionForClique(MBFF mbff);
-		vector<MBFF> locationAssignment(vector<Bin>& bins,Board& board,double exactPower);
+		vector<MBFF> locationAssignment(unordered_map<int,unordered_map<int,Bin*>>& bins,Board& board,double exactPower);
 		void MBFFsizing(vector<MBFF>& mbffs);
 		double cost(set<string> c);
 		pair<double,pair<set<string>,set<string>>> MBFFcost(set<string> c);

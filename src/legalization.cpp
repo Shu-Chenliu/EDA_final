@@ -7,7 +7,7 @@ Legalization::~Legalization(){
 
 }
 
-void Legalization::legalizePlacing(vector<FF*>& flipflops, vector<Bin>& bins, Board& board) {
+void Legalization::legalizePlacing(vector<FF*>& flipflops, vector<Bin*>& bins, Board& board) {
     sort(flipflops.begin(), flipflops.end(), [](const FF* a, const FF* b) {
         return a->getMinSlack() < b->getMinSlack();
     });
@@ -56,12 +56,12 @@ void Legalization::legalizePlacing(vector<FF*>& flipflops, vector<Bin>& bins, Bo
                     }
 
                     int idx = ny * x_bins + nx;
-                    if (bins[idx].getOccupied()) {
+                    if (bins[idx]->getOccupied()) {
                         valid = false;
                         break;
                     }
 
-                    candidate_bins.push_back(&bins[idx]);
+                    candidate_bins.push_back(bins[idx]);
                 }
                 if (!valid) break;
             }
@@ -71,8 +71,8 @@ void Legalization::legalizePlacing(vector<FF*>& flipflops, vector<Bin>& bins, Bo
                 for (auto* b : candidate_bins)
                     b->setOccupied(true);
 
-                ff->setX(bins[cy * x_bins + cx].getArea().getX());
-                ff->setY(bins[cy * x_bins + cx].getArea().getY());
+                ff->setX(bins[cy * x_bins + cx]->getArea().getX());
+                ff->setY(bins[cy * x_bins + cx]->getArea().getY());
                 placed = true;
                 break;
             }
@@ -94,7 +94,7 @@ void Legalization::legalizePlacing(vector<FF*>& flipflops, vector<Bin>& bins, Bo
         }
     }
 }
-void Legalization::legalizePlacing(vector<MBFF>& mbffs, vector<Bin>& bins, Board& board) {
+void Legalization::legalizePlacing(vector<MBFF>& mbffs, vector<Bin*>& bins, Board& board) {
     sort(mbffs.begin(), mbffs.end(), [](const MBFF a, const MBFF b) {
         return a.getMinSlack() < b.getMinSlack();
     });
@@ -142,12 +142,12 @@ void Legalization::legalizePlacing(vector<MBFF>& mbffs, vector<Bin>& bins, Board
                     }
 
                     int idx = ny * x_bins + nx;
-                    if (bins[idx].getOccupied()) {
+                    if (bins[idx]->getOccupied()) {
                         valid = false;
                         break;
                     }
 
-                    candidate_bins.push_back(&bins[idx]);
+                    candidate_bins.push_back(bins[idx]);
                 }
                 if (!valid) break;
             }
@@ -157,8 +157,8 @@ void Legalization::legalizePlacing(vector<MBFF>& mbffs, vector<Bin>& bins, Board
                 for (auto* b : candidate_bins)
                     b->setOccupied(true);
 
-                mbff.setX(bins[cy * x_bins + cx].getArea().getX());
-                mbff.setY(bins[cy * x_bins + cx].getArea().getY());
+                mbff.setX(bins[cy * x_bins + cx]->getArea().getX());
+                mbff.setY(bins[cy * x_bins + cx]->getArea().getY());
                 placed = true;
                 break;
             }
