@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 iterations = []
 costs = []
 
-with open('cost.txt', 'r') as f:
+with open('testcase1/cost.txt', 'r') as f:
     for line in f:
         i, c = map(int, line.strip().split())
         iterations.append(i)

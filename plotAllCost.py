@@ -8,9 +8,9 @@ cost3 = []
 cost4 = []
 
 # Read the file
-with open('cost_all.txt', 'r') as f:
+with open('testcase1/cost_all.txt', 'r') as f:
     for line in f:
-        i, c1, c2, c3, c4 = map(int, line.strip().split())
+        i, c1, c2, c3, c4 = map(float, line.strip().split())
         iterations.append(i)
         cost1.append(c1)
         cost2.append(c2)
