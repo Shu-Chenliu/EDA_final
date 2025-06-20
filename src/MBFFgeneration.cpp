@@ -152,7 +152,7 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 
 double MBFFgeneration::cost(set<string> c){
 	double totalCost=0;
-	double totalArea=0;
+	double totalArea=ka*(double)c.size();
 	double totalPower=0;
 	int count=0;
 	vector<string> v(c.begin(),c.end());
@@ -171,12 +171,6 @@ double MBFFgeneration::cost(set<string> c){
       )); // Manhattan distance
     }
   }
-	// double areaAfter=0;
-	for(const auto&name:c){
-		FF* ff=map[name];
-		totalArea+=ff->getW()*ff->getH();
-		totalPower+=ff->getPower();
-	}
 	double mbff_area = estimateMBFFArea(nextPowerOfTwo(c.size()), totalArea/(double)c.size());
 	double savedArea=totalArea-mbff_area;
 	double savedPower=0.4*clockSavingPercent(nextPowerOfTwo(c.size()));

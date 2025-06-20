@@ -18,3 +18,5 @@
 bin/
 
 *.png
+*.txt
+testcase1/

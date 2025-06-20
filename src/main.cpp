@@ -203,7 +203,7 @@ int main() {
   float kp,ka,kt;
   //TODO: fix estimate method
   kp=exactPower;
-  ka = (exactArea) / static_cast<float>(flip_flops.size());
+  ka = board.getBinH()*board.getBinW() / static_cast<float>(flip_flops.size());
   cout<<kp<<" "<<ka<<endl;
   cout<<"finish adding pins"<<endl;
   // return 0;
@@ -329,26 +329,39 @@ int main() {
       }
       target.addMember(c.getName());
     }
-    for(int i=0;i<(int)current_mbffs.size();i++){
+    cout<<"finish add member"<<endl;
+    unordered_map<string, int> ffToMBFFIndex;
+    for (int i = 0; i < (int)current_mbffs.size(); ++i) {
+      for (const auto& name : current_mbffs[i].getMembers()) {
+        ffToMBFFIndex[name] = i;
+      }
+    }
+
+    // 接著建立 MBFF 的 next 關係
+    for (int i = 0; i < (int)current_mbffs.size(); ++i) {
       unordered_set<int> nextConn;
-      for(const auto&memberName:current_mbffs[i].getMembers()){
-        Cell* ff=cellNameMap[memberName].first;
-        vector<string> nexts=ff->getNextName();
-        for(int j=0;j<(int)current_mbffs.size();j++){
-          if(i!=j){
-            for(const auto&next:nexts){
-              if(current_mbffs[j].getMembers().count(next)){
-                nextConn.insert(j);
-                break;
-              }
+
+      for (const auto& memberName : current_mbffs[i].getMembers()) {
+        cout<<memberName<<endl;
+        Cell* ff = cellNameMap[memberName].first;
+        const vector<string>& nexts = ff->getNextName();
+
+        for (const auto& next : nexts) {
+          auto it = ffToMBFFIndex.find(next);
+          if (it != ffToMBFFIndex.end()) {
+            int j = it->second;
+            if (j != i) {
+              nextConn.insert(j);
             }
           }
         }
       }
-      for(const auto& index:nextConn){
-        current_mbffs[i].addNext(index);
+
+      for (int j : nextConn) {
+        current_mbffs[i].addNext(j);
       }
     }
+    cout<<"finish handle conn"<<endl;
     currentAreaCost = 0;
     currentPowerCost = 0;
 
@@ -363,6 +376,7 @@ int main() {
 
 
     legalize.legalizePlacing(current_mbffs, bins, board);
+    cout<<"finish legalizing"<<endl;
     resetBin(bins);
     // MST of MBFF
     edges.clear();
@@ -436,7 +450,7 @@ int main() {
   save_cost_to_file(cost);
   save_all_costs_to_file(MST_costs, Power_cost, Area_cost, cost);
   save_results_to_file(best_mbffs);
-  
+
 
   for (auto ff : flip_flops) {
     delete ff;
