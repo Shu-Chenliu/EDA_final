@@ -9,7 +9,7 @@ light_blue = '#609ebc'
 blue = '#5b6b9e'
 
 # Load
-f = open('testcase1/results.txt')
+f = open('results.txt')
 input = []
 
 for line in f.readlines():

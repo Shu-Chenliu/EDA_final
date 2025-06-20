@@ -6,10 +6,10 @@ using namespace std;
 
 
 // Kruskal's algorithm
-int kruskal(int n, vector<Edge>& edges, vector<Edge>& mst) {
+double kruskal(int n, vector<Edge>& edges, vector<Edge>& mst) {
     sort(edges.begin(), edges.end()); // Sort edges by weight
     DSU dsu(n);
-    int total_weight = 0;
+    double total_weight = 0;
 
     for(const Edge& e : edges) {
         if(dsu.unite(e.start, e.end)) {
@@ -21,10 +21,10 @@ int kruskal(int n, vector<Edge>& edges, vector<Edge>& mst) {
 }
 
 // Example usage
-int MST::MinimumSpanningTreeCost() {
+double MST::MinimumSpanningTreeCost() {
     
     vector<Edge> mst;
-    int weight = kruskal(n, edges, mst);
+    double weight = kruskal(n, edges, mst);
 
     // cout << "Total weight of MST: " << weight << endl;
     // cout << "Edges in MST:\n";

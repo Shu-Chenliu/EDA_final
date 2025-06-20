@@ -50,7 +50,7 @@ class MST{
 public:
     MST(vector<Edge> &edges, int n) : edges(edges), n(n) {}
     ~MST() {}
-    int MinimumSpanningTreeCost();
+    double MinimumSpanningTreeCost();
 private:
     vector<Edge> edges;
     int n; // Number of nodes

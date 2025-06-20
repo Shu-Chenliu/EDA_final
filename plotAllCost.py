@@ -8,7 +8,7 @@ cost3 = []
 cost4 = []
 
 # Read the file
-with open('testcase1/cost_all.txt', 'r') as f:
+with open('cost_all.txt', 'r') as f:
     for line in f:
         i, c1, c2, c3, c4 = map(float, line.strip().split())
         iterations.append(i)
@@ -22,7 +22,7 @@ plt.figure(figsize=(10, 6))
 plt.plot(iterations, cost1, label='Cost 1: TNS estimated cost', marker='o')
 plt.plot(iterations, cost2, label='Cost 2: Power estimated cost', marker='s')
 plt.plot(iterations, cost3, label='Cost 3: Area estimated cost', marker='^')
-plt.plot(iterations, cost4, label='Total estimated cost', marker='x')
+plt.plot(iterations, cost4, label='Total weighted estimated cost', marker='x')
 
 plt.xlabel('Iteration')
 plt.ylabel('Cost')
