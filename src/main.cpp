@@ -212,13 +212,24 @@ int main() {
   vector<Edge> edges;
   // turn wire to edge
   cout << "Cell size: " << cells.size() << endl;
+  // for (size_t i = 0; i < cells.size(); ++i) {
+  //   for (size_t j = 0; j < cells[i].getNext().size(); ++j) {
+  //     edges.push_back(Edge(
+  //       i,
+  //       cells[i].getNext()[j],
+  //       (int)abs(cells[i].getX() - cells[cells[i].getNext()[j]].getX()) +
+  //       abs(cells[i].getY() - cells[cells[i].getNext()[j]].getY())
+  //     )); // Manhattan distance
+      
+  //   }
+  // }
   for (size_t i = 0; i < cells.size(); ++i) {
-    for (size_t j = 0; j < cells[i].getNext().size(); ++j) {
+    for (size_t j = i+1; j < cells.size(); ++j) {
       edges.push_back(Edge(
         i,
-        cells[i].getNext()[j],
-        (int)abs(cells[i].getX() - cells[cells[i].getNext()[j]].getX()) +
-        abs(cells[i].getY() - cells[cells[i].getNext()[j]].getY())
+        j,
+        (int)abs(cells[i].getX() - cells[j].getX()) +
+        abs(cells[i].getY() - cells[j].getY())
       )); // Manhattan distance
       
     }
@@ -282,7 +293,7 @@ int main() {
     kmean kmean(SIZE_LIMIT,MAX_ITER,DISP_LIMIT);
     vector<Cluster> clusters=kmean.kmeansWeighted(flip_flops);
     cout << "K-means clustering completed with " << clusters.size() << " clusters." << endl;
-    // edges.clear();
+    edges.clear();
     // for (size_t ii = 0; ii < flip_flops.size(); ++ii) {
     //   for (size_t jj = 0; jj < flip_flops[ii]->getNext().size(); ++jj) {
     //     edges.push_back(Edge(
@@ -295,11 +306,25 @@ int main() {
              
     //   }
     // }
-    // // do MST
-    // MST mst_after(edges, (int)flip_flops.size());
-    // currentMSTCost = mst_after.MinimumSpanningTreeCost();
-    // MST_costs.push_back(currentMSTCost);
-    // cout << "MST wire length after k-means: " << currentMSTCost << endl;
+    for (size_t ii = 0; ii < flip_flops.size(); ++ii) {
+      for (size_t jj = ii+1; jj < flip_flops.size(); ++jj) {
+        edges.push_back(Edge(
+          ii,
+          jj,
+          (int)abs(flip_flops[ii]->getRelocateCoor().getX() - flip_flops[jj]->getRelocateCoor().getX()) +
+          abs(flip_flops[ii]->getRelocateCoor().getY() - flip_flops[jj]->getRelocateCoor().getY())
+        )); // Manhattan distance
+
+             
+      }
+    }
+    // do MST
+    MST mst_after(edges, (int)flip_flops.size());
+    currentMSTCost = mst_after.MinimumSpanningTreeCost();
+    MST_costs.push_back(currentMSTCost);
+    Power_cost.push_back(Power_cost.back());
+    Area_cost.push_back(Area_cost.back());
+    cout << "MST wire length after k-means: " << currentMSTCost << endl;
     srand(time(0));
     for(int i=0;i< (int)clusters.size();i++){
       vector<FF*> flipflop=clusters[i].flip_flops;
@@ -382,17 +407,17 @@ int main() {
     // MST of MBFF
     edges.clear();
     for (int ii = 0; ii < (int)current_mbffs.size(); ++ii) {
-      for (int jj = 0; jj < (int)current_mbffs[ii].getNext().size(); ++jj) {
+      for (int jj = jj+1; jj < (int)current_mbffs.size(); ++jj) {
         edges.push_back(Edge(
           ii,
-          current_mbffs[ii].getNext()[jj],
-          (int)abs(current_mbffs[ii].getX() - current_mbffs[current_mbffs[ii].getNext()[jj]].getX()) +
-          abs(current_mbffs[ii].getY() - current_mbffs[current_mbffs[ii].getNext()[jj]].getY())
+          jj,
+          (int)abs(current_mbffs[ii].getX() - current_mbffs[jj].getX()) +
+          abs(current_mbffs[ii].getY() - current_mbffs[jj].getY())
         )); // Manhattan distance
       }
     }
-    MST mst_after(edges, (int)current_mbffs.size());
-    currentMSTCost = mst_after.MinimumSpanningTreeCost();
+    MST mst_afterMBFF(edges, (int)current_mbffs.size());
+    currentMSTCost = mst_afterMBFF.MinimumSpanningTreeCost();
     MST_costs.push_back(currentMSTCost);
     cout << "MST wire length after k-means: " << currentMSTCost << endl;
     Power_cost.push_back(board.getBeta() * (exactPower -currentPowerCost));
@@ -405,8 +430,8 @@ int main() {
     //               board.getBeta() * (exactPower - Power_cost.back()) +
     //               board.getGamma() * (exactArea-Area_cost.back());
     currentCost = board.getAlpha() * MST_costs.back() * kt +
-                  board.getBeta() * (exactPower - Power_cost.back()) *0.001 +
-                  board.getGamma() * (exactArea-Area_cost.back());
+                  board.getBeta() * (Power_cost.back()) *0.001 +
+                  board.getGamma() * (Area_cost.back());
 
     cost.push_back(currentCost);
     // estimate cost
