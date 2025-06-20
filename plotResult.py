@@ -41,24 +41,24 @@ rowSpan, colSpan = input[1][4], input[1][5]
 ## Pin
 ### inPins
 
-inPins = int(input[2][0])
-ip = []
-for i in range(inPins):
-  ip.append(patches.Circle((input[3+i][0], input[3+i][1]), radius=1, color=light_purple))
-  ax.add_patch(ip[i])
+inPins = 0
+# ip = []
+# for i in range(inPins):
+#   ip.append(patches.Circle((input[3+i][0], input[3+i][1]), radius=1, color=light_purple))
+#   ax.add_patch(ip[i])
 
 ### outPins
-outPins = int(input[3+inPins][0])
-op = []
-for i in range(inPins):
-  op.append(patches.Circle((input[3+inPins+1+i][0], input[3+inPins+1+i][1]), radius=1, color=light_blue))
-  ax.add_patch(op[i])
+outPins = 0
+# op = []
+# for i in range(inPins):
+#   op.append(patches.Circle((input[3+inPins+1+i][0], input[3+inPins+1+i][1]), radius=1, color=light_blue))
+#   ax.add_patch(op[i])
 
 ## Cell
-cells = int(input[3+inPins+1+outPins][0])
+cells = int(input[2][0])
 c = []
 for i in range(cells):
-  c.append(patches.Circle((input[3+inPins+1+outPins+1+i][0], input[3+inPins+1+outPins+1+i][1]), radius=1, color=purple))
+  c.append(patches.Circle((input[2+1+i][0], input[2+1+i][1]), radius=1, color=purple))
   ax.add_patch(c[i])
 
 print("...output -ing")
