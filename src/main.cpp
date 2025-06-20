@@ -230,6 +230,7 @@ int main() {
   cout << "Initial MST wire length: " << total_wire_length << endl;
   kt=exactTNS/total_wire_length;
   cout<<"estimate param"<<kp<<" "<<ka<<" "<<kt<<endl;
+  // return 0;
   
   Legalization legalize;
   legalize.legalizePlacing(flip_flops,bins,board);
@@ -400,8 +401,11 @@ int main() {
     //TODO: add power and area estimation
     //TODO: update legalization
 
+    // currentCost = board.getAlpha() * MST_costs.back() * kt +
+    //               board.getBeta() * (exactPower - Power_cost.back()) +
+    //               board.getGamma() * (exactArea-Area_cost.back());
     currentCost = board.getAlpha() * MST_costs.back() * kt +
-                  board.getBeta() * (exactPower - Power_cost.back()) +
+                  board.getBeta() * (exactPower - Power_cost.back()) *0.001 +
                   board.getGamma() * (exactArea-Area_cost.back());
 
     cost.push_back(currentCost);
