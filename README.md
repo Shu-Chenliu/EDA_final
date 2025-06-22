@@ -1,40 +1,64 @@
 # EDA_final
 
-b11901009 b11901052 b11901129
+Team Members:  
+b11901009, b11901052, b11901129
 
+## 📦 Project Package
+
+Download the `.zip` file from the provided link: https://drive.google.com/file/d/1oNhATUNTjZxUXb2liP4lebKZEjpHqYNC/view?usp=sharing
+
+After unzipping, you will see a folder named `testcase1_0529` containing the `testcase1` folder.
+
+**Directory structure should be organized as follows:**
+```
+your_directory/
+├── EDA_final/ # Cloned from GitHub
+└── testcase1/ # Located inside testcase1_0529
+```
+
+## 🔧 Setup
+
+Clone the project from GitHub:
+
+```bash
+git clone https://github.com/Shu-Chenliu/EDA_final.git
+```
+
+Make sure the cloned EDA_final directory and the testcase1 folder are in the same directory level.
+
+## How to Run
+In the EDA_final directory, run:
 ```bash
 make
 ./bin/test
 ```
-
-After Finish running the code
-There should be 3 output file:
+After execution, the following output files will be generated:
 ```
 results.txt
 cost_all.txt
 cost.txt
 ```
-
-You can generate the plot of the initial FF placement by 
+## How to Visualize Results
+1. Initial Flip-Flop Placement
 ```bash
 python plot.py
 ```
-You can see the result in ```plot.png```
+Output: plot.png
 
-You can generate the plot of the placement of the MBFFs after running the code by
+2. Final MBFF Placement
 ```bash
 python plotResult.py
 ```
-You can see the result in ```plotResult.png```
+Output: plotResult.png
 
-You can generate the plot of the cost in each iteration by
+3. Cost per Iteration
 ```bash
 python plotCost.py
 ```
-You can see the result in ```cost_plot.png```
+Output: cost_plot.png
 
-You can generate the plot of the each individual cost in each iteration by
+4. Detailed Cost Components per Iteration
 ```bash
 python plotAllCost.py
 ```
-You can see the result in ```cost_comparison.png```
+Output: cost_comparison.png
