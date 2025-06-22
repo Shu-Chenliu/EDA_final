@@ -152,7 +152,7 @@ vector<set<string>> findMaximalCliquesSweepLine(vector<Rect>& rects) {
 
 double MBFFgeneration::cost(set<string> c){
 	double totalCost=0;
-	double totalArea=ka*(double)c.size();
+	double totalArea=0;
 	double totalPower=0;
 	int count=0;
 	vector<string> v(c.begin(),c.end());
@@ -170,6 +170,7 @@ double MBFFgeneration::cost(set<string> c){
         abs(ff->getY() - ff2->getY())
       )); // Manhattan distance
     }
+		totalArea+=ff->getW()*ff->getH();
   }
 	double mbff_area = estimateMBFFArea(nextPowerOfTwo(c.size()), totalArea/(double)c.size());
 	double savedArea=totalArea-mbff_area;
@@ -241,7 +242,7 @@ pair<double, pair<set<string>, set<string>>> MBFFgeneration::MBFFcost(set<string
         }
       } else if (currentCost < beforeCost) {
         state = -1; // Increase
-        local_minimum_occur = false;
+        // local_minimum_occur = false;
       } else if (currentCost > beforeCost) {
         state = 1; // Decrease
       } 
@@ -362,7 +363,7 @@ Rect MBFFgeneration::feasibleRegionForClique(MBFF mbff){
 }
 
 
-vector<MBFF> MBFFgeneration::locationAssignment(unordered_map<int,unordered_map<int,Bin*>>& bins,Board& board,double exactPower) {
+vector<MBFF> MBFFgeneration::locationAssignment(unordered_map<int,unordered_map<int,Bin*>>& bins,Board& board,double avgPower) {
 	cout << "[DEBUG] Start MBFF Location Assignment" << endl;
 	cout << "  -> Total bins generated: " << bins.size() << endl;
 	vector<set<string>> non_conflictMBFF=generateMBFF();
@@ -375,7 +376,7 @@ vector<MBFF> MBFFgeneration::locationAssignment(unordered_map<int,unordered_map<
 		float x=0;
 		float y=0;
 		int maxDS=1;
-		float totalArea=ka*(float)clique.size();
+		float totalArea=0;
 		for (auto& name : clique) {
 			cout<<name<<endl;
 			FF* ff = map[name];
@@ -383,15 +384,16 @@ vector<MBFF> MBFFgeneration::locationAssignment(unordered_map<int,unordered_map<
 			y+=ff->getRelocateCoor().getY();
 			mbff.setPins(ff->getPins());
 			maxDS=max(maxDS,ff->getBit());
+			totalArea+=ff->getH()*ff->getW();
 		}
 		mbff.setPosition(Coor(x/clique.size(),y/clique.size()));
 		mbff.setFeasibleRegion(feasibleRegionForClique(mbff)); // intersect all FF feasible regions]
 		mbff.setPreferredRegion(computePreferredRegion(mbff));
 		mbff.setDrivingStrength(maxDS);
 		double mbff_area = estimateMBFFArea(nextPowerOfTwo(clique.size()), totalArea/(double)clique.size());
-		mbff.addSavedArea(totalArea-mbff_area);
+		mbff.addSavedArea((totalArea-mbff_area)*ka);
 		double saved=0.4*clockSavingPercent(nextPowerOfTwo(clique.size()));
-		mbff.addSavedPower(saved*exactPower);
+		mbff.addSavedPower(saved*avgPower);
 		// assignMBFFLocation(mbff, bins,board.getBinW(),board.getBinH());
 		mbff.setH(board.getBinH());
 		mbff.setW(mbff_area/mbff.getH());
@@ -406,7 +408,7 @@ void MBFFgeneration::downsizeMBFFs(vector<MBFF>& mbffs, double avg_slack) {
 		int l = 0;
 		// Step 1~5: 根據 slack 做降速處理
 		for (Pin& pin : mbff.getPins()) {
-			if (pin.getSlack() > b * avg_slack) {
+			if (pin.getSlack() > avg_slack) {
 				pin.setSlack(0);
 				l++;
 			}
@@ -414,7 +416,7 @@ void MBFFgeneration::downsizeMBFFs(vector<MBFF>& mbffs, double avg_slack) {
 		// Step 6~8: 處理空 bit（都可降速）
 		l+=nextPowerOfTwo(mbff.getMembers().size())-mbff.getMembers().size();
 		double powerSavingCoeff = 0.2;
-		mbff.addSavedPower(l*powerSavingCoeff);
+		mbff.addSavedPower(kp/nextPowerOfTwo(mbff.getMembers().size())*l*powerSavingCoeff);
 		// int k = mbff.bits.size();
 		// int h = k - l;
 		// Step 10: 已原地更新 MBFF，可加上 power report 或 output log

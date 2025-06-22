@@ -4,11 +4,21 @@ import matplotlib.pyplot as plt
 iterations = []
 costs = []
 
-with open('testcase1/cost.txt', 'r') as f:
-    for line in f:
-        i, c = map(int, line.strip().split())
-        iterations.append(i)
-        costs.append(c)
+with open('cost.txt', 'r') as f:
+    for idx, line in enumerate(f):
+        parts = line.strip().split()
+        print(f"Line {idx} raw: {repr(line.strip())}, split: {parts}")
+        if len(parts) != 2:
+            print(f"❌ Skipping line {idx}, wrong format.")
+            continue
+        try:
+            i, c = map(float, parts)
+            iterations.append(i)
+            costs.append(c)
+        except ValueError as e:
+            print(f"❌ Error parsing line {idx}: {e}")
+
+
 
 # Plotting
 plt.figure(figsize=(8, 5))

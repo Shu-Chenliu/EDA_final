@@ -23,6 +23,7 @@ class Cell {
   protected:
     vector<int> next;
     vector<string> nextName;
+    Coor relocateCoor;
 
   public:
     Cell();
@@ -31,6 +32,7 @@ class Cell {
     ~Cell();
 
     // Setter
+    virtual void setRelocateCoor(Coor coor);
     void setName(string Name);
     void setModel(string Model);
     void setX(float X);
@@ -44,6 +46,7 @@ class Cell {
     void addPins(const vector<Pin>& Pins);
     virtual void clearNext();
     // Getter
+    virtual Coor getRelocateCoor() const;
     string getName() const;
     string getModel() const;
     float getX() const;

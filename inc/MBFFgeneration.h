@@ -22,6 +22,12 @@ using namespace std;
 struct Cluster {
   double cx, cy;
   vector<FF*> flip_flops;
+	double getX()const {
+		return cx;
+	}
+	double getY()const {
+		return cy;
+	}
 };
 class MBFFgeneration
 {

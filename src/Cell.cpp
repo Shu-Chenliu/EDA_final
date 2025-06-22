@@ -16,6 +16,7 @@ Cell::Cell(string Name, string Model, float X, float Y) :
   power(10),
   minSlack(INT_MAX){
     coor.setCoor(X, Y);
+    relocateCoor.setCoor(X,Y);
     // pins.reserve(5);
   }
 Cell::Cell(string Name, string Model, float X, float Y,float w,float h) : 
@@ -26,6 +27,7 @@ Cell::Cell(string Name, string Model, float X, float Y,float w,float h) :
   size(Rect(w,h,0,0)),
   minSlack(INT_MAX){
     coor.setCoor(X, Y);
+    relocateCoor.setCoor(X,Y);
     // pins.reserve(5);
   }
 Cell::~Cell(){}
@@ -62,7 +64,9 @@ void Cell::setPower(float p){
 void Cell::setDelay(float d){
   delay = d;
 }
-
+void Cell::setRelocateCoor(Coor coor){
+  relocateCoor.setCoor(coor.getX(),coor.getY());
+}
 void Cell::addPin(Pin pin){
   pins.push_back(pin);
   if(pin.getSlack()<minSlack){
@@ -136,6 +140,9 @@ void Cell::print(){
     cout << "    = ";
     p.print();
   }
+}
+Coor Cell::getRelocateCoor() const{
+  return relocateCoor;
 }
 vector<int> Cell::getNext()const{
   return next;

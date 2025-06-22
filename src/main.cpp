@@ -22,7 +22,6 @@
 #include "MST.h"
 #include "legalization.h"
 #include "Bin.h"
-//TODO: write bin class
 
 using namespace std;
 
@@ -142,11 +141,10 @@ int main() {
   for (size_t i = 0; i < board_FFs.size(); ++i) {
     Cell* cell = board_FFs[i].first;
     int bit = board_FFs[i].second;
-    FF* ff = new FF(cell->getName(), cell->getModel(), cell->getX(), cell->getY(), cell->getW(), cell->getH());
+    FF* ff = new FF(cell->getName(), cell->getModel(), cell->getX(), cell->getY(), board.getBinW(), board.getBinH());
     ff->setBit(bit);
     ff->setClk(1);  // Assuming clk is always 1 for simplicity
     ff->setScan(0); // Assuming scan is always 0 for simplicity
-    ff->setRelocateCoor(Coor(-1,-1));
     ff->addPins(cell->getPins());
     flip_flops.push_back(ff);
     maxDrivingStrength=max(maxDrivingStrength,bit);
@@ -202,13 +200,21 @@ int main() {
   cout << "FO count: " << numberFO << endl;
   float kp,ka,kt;
   //TODO: fix estimate method
-  kp=exactPower;
-  ka = board.getBinH()*board.getBinW() / static_cast<float>(flip_flops.size());
+  kp=exactPower/(float)flip_flops.size();
+  ka = exactArea/(board.getBinH()*board.getBinW()*(float)flip_flops.size());
   cout<<kp<<" "<<ka<<endl;
   cout<<"finish adding pins"<<endl;
-  // return 0;
+  Legalization legalize;
+  legalize.legalizePlacing(flip_flops,bins,board);
+  
+  cout<<"finish legalizing"<<endl;
+  resetBin(bins);
+  cout<<"finish reset bins"<<endl;
+  for(const auto&ff:flip_flops){
+    cells[cellNameMap[ff->getName()].second].setCoor(ff->getX(),ff->getY());
+  }
   // initial wire cost for TNS
-  int total_wire_length = 0;
+  double total_wire_length = 0;
   vector<Edge> edges;
   // turn wire to edge
   cout << "Cell size: " << cells.size() << endl;
@@ -243,12 +249,7 @@ int main() {
   cout<<"estimate param"<<kp<<" "<<ka<<" "<<kt<<endl;
   // return 0;
   
-  Legalization legalize;
-  legalize.legalizePlacing(flip_flops,bins,board);
   
-  cout<<"finish legalizing"<<endl;
-  resetBin(bins);
-  cout<<"finish reset bins"<<endl;
   int left = 0, right = 0, top = 0, bottom = 0;
   for (auto ff : flip_flops) {
     if (ff->getX() < left) left = ff->getX();
@@ -275,9 +276,9 @@ int main() {
   vector<double> Power_cost;
   vector<double> Area_cost;
   cost.push_back(exactArea*gamma+exactPower*beta+exactTNS*alpha);
-  MST_costs.push_back(exactTNS*alpha);
-  Power_cost.push_back(exactPower*beta);
-  Area_cost.push_back(exactArea*gamma);
+  MST_costs.push_back(exactTNS);
+  Power_cost.push_back(exactPower);
+  Area_cost.push_back(exactArea);
 
   for(int j=0;j<KmeanIteration;j++){
     cout<<"iteration:" <<j<<endl;
@@ -293,17 +294,35 @@ int main() {
     kmean kmean(SIZE_LIMIT,MAX_ITER,DISP_LIMIT);
     vector<Cluster> clusters=kmean.kmeansWeighted(flip_flops);
     cout << "K-means clustering completed with " << clusters.size() << " clusters." << endl;
+    unordered_set<string> ffs;
+    for(const auto&ff:flip_flops){
+      ffs.insert(ff->getName());
+      cells[cellNameMap[ff->getName()].second].setRelocateCoor(ff->getRelocateCoor());
+    }
+    for(auto&c:cells){
+      if(ffs.count(c.getName())){
+        continue;
+      }
+      Cluster target;
+      float minDis = numeric_limits<float>::max();
+      for(const auto&cluster:clusters){
+        if(abs(cluster.getX()-c.getX())+abs(cluster.getY()-c.getY())<minDis){
+          minDis=abs(cluster.getX()-c.getX())+abs(cluster.getY()-c.getY());
+          target=cluster;
+        }
+      }
+      c.setRelocateCoor(Coor(target.getX(),target.getY()));
+    }
+    //TODO
     edges.clear();
-    for (size_t ii = 0; ii < flip_flops.size(); ++ii) {
-      for (size_t jj = 0; jj < flip_flops[ii]->getNext().size(); ++jj) {
+    for (size_t ii = 0; ii < cells.size(); ++ii) {
+      for (size_t jj = 0; jj < cells[ii].getNext().size(); ++jj) {
         edges.push_back(Edge(
           ii,
-          flip_flops[ii]->getNext()[jj],
-          (int)abs(flip_flops[ii]->getRelocateCoor().getX() - flip_flops[flip_flops[ii]->getNext()[jj]]->getRelocateCoor().getX()) +
-          abs(flip_flops[ii]->getRelocateCoor().getY() - flip_flops[flip_flops[ii]->getNext()[jj]]->getRelocateCoor().getY())
-        )); // Manhattan distance
-
-             
+          cells[ii].getNext()[jj],
+          (int)abs(cells[ii].getRelocateCoor().getX() - cells[cells[ii].getNext()[jj]].getRelocateCoor().getX()) +
+          abs(cells[ii].getRelocateCoor().getY() - cells[cells[ii].getNext()[jj]].getRelocateCoor().getY())
+        )); // Manhattan distance   
       }
     }
     // for (size_t ii = 0; ii < flip_flops.size(); ++ii) {
@@ -319,7 +338,7 @@ int main() {
     //   }
     // }
     // do MST
-    MST mst_after(edges, (int)flip_flops.size());
+    MST mst_after(edges, (int)cells.size());
     currentMSTCost = mst_after.MinimumSpanningTreeCost();
     // MST_costs.push_back(currentMSTCost);
     // Power_cost.push_back(Power_cost.back());
@@ -328,13 +347,44 @@ int main() {
     //               board.getBeta() * (Power_cost.back()) *0.001 +
     //               board.getGamma() * (Area_cost.back());
     cout << "MST wire length after k-means: " << currentMSTCost << endl;
+    // vector<string> relocate_records;
+    // for (const auto& cell : cells) {
+    //   Coor original = Coor(cell.getX(),cell.getY());            // 原始位置
+    //   Coor relocated = cell.getRelocateCoor();   // 移動後位置
+
+    //   // 格式: CellName x_orig y_orig x_reloc y_reloc
+    //   ostringstream oss;
+    //   oss << cell.getName() << " "<<ffs.count(cell.getName())<<" "
+    //       << original.getX() << " " << original.getY() << " "
+    //       << relocated.getX() << " " << relocated.getY();
+
+    //   relocate_records.push_back(oss.str());
+    // }
+    // for(int i=0;i<flip_flops.size();i++){
+    //   ostringstream oss;
+    //   oss << flip_flops[i]->getName() << " "<<i<<" "
+    //       << flip_flops[i]->getX() << " " << flip_flops[i]->getY() << " "
+    //       << flip_flops[i]->getRelocateCoor().getX() << " " << flip_flops[i]->getRelocateCoor().getY();
+    //   relocate_records.push_back(oss.str());
+    // }
+    // ofstream outfile("relocate_result.txt");
+    // if (outfile.is_open()) {
+    //     for (const auto& line : relocate_records) {
+    //         outfile << line << '\n';
+    //     }
+    //     outfile.close();
+    //     cout << "Relocate results written to relocate_result.txt" << endl;
+    // } else {
+    //     cerr << "Failed to open relocate_result.txt for writing." << endl;
+    // }
+    // // break;
     srand(time(0));
     for(int i=0;i< (int)clusters.size();i++){
       vector<FF*> flipflop=clusters[i].flip_flops;
       double b = 0.95;
       MBFFgeneration generator(flipflop, maxDrivingStrength, b,alpha,beta,gamma,kt,kp,ka);
       // vector<set<string>> mbff_result = generator.generateMBFF();
-      vector<MBFF> placed_mbffs=generator.locationAssignment(binMap,board,exactPower);
+      vector<MBFF> placed_mbffs=generator.locationAssignment(binMap,board,kp);
       generator.MBFFsizing(placed_mbffs);
       current_mbffs.insert(current_mbffs.end(), placed_mbffs.begin(), placed_mbffs.end());
     }
@@ -403,7 +453,7 @@ int main() {
     //   currentPowerCost += (double)(current_mbffs[ii].getNext().size()) / (double)sqrt(current_mbffs[ii].getMembers().size());
     // }
 
-
+    cout<<currentMSTCost<<" "<<exactPower-currentPowerCost<<" "<<exactArea-currentAreaCost<<endl;
     legalize.legalizePlacing(current_mbffs, bins, board);
     cout<<"finish legalizing"<<endl;
     resetBin(bins);
@@ -424,8 +474,8 @@ int main() {
 
     MST_costs.push_back(currentMSTCost*kt);
     cout << "MST wire length after k-means: " << currentMSTCost << endl;
-    Power_cost.push_back( currentPowerCost *0.001);
-    Area_cost.push_back(currentAreaCost*100);
+    Power_cost.push_back( exactPower-currentPowerCost);
+    Area_cost.push_back(exactArea-currentAreaCost);
     
     //TODO: add power and area estimation
     //TODO: update legalization
@@ -434,7 +484,7 @@ int main() {
     //               board.getBeta() * (exactPower - Power_cost.back()) +
     //               board.getGamma() * (exactArea-Area_cost.back());
     currentCost = board.getAlpha() * MST_costs.back() +
-                  board.getBeta() * currentPowerCost +
+                  board.getBeta() * Power_cost.back() +
                   board.getGamma() * Area_cost.back();
 
     cost.push_back(currentCost);

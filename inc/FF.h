@@ -7,7 +7,7 @@ class FF : public Cell{
     int bit;
     int clk;
     int scan;
-    Coor relocateCoor;
+    
     int cluster;
     
 
@@ -20,7 +20,7 @@ class FF : public Cell{
     void setBit(int n);
     void setClk(int n);
     void setScan(int n);
-    void setRelocateCoor(Coor coor);
+    void setRelocateCoor(Coor coor)override;
     void setCluster(int cluster);
     void clearNext() override;
     vector<string> getNextName() const override;
@@ -30,7 +30,7 @@ class FF : public Cell{
     int getBit() const;
     int getClk() const;
     int getScan() const;
-    Coor getRelocateCoor() const;
+    Coor getRelocateCoor() const override;
     int getCluster() const;
 };
 

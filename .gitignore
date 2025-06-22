@@ -17,6 +17,5 @@
 # Binary directory
 bin/
 
-*.png
-*.txt
+relocate_result.txt
 testcase1/
